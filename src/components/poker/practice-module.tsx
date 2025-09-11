@@ -57,7 +57,7 @@ type State = {
 
 type ActionPayload =
   | { type: 'SET_SCENARIO'; payload: Partial<Scenario> }
-  | { type: 'HANDLE_ACTION'; payload: Action }
+  | { type: 'HANDLE_ACTION'; payload: { action: Action, recordHand: Function } }
   | { type: 'NEXT_HAND' }
   | { type: 'TOGGLE_EXPLANATION'; payload?: GetPreflopExplanationOutput }
   | { type: 'SET_LOADING'; payload: boolean };
@@ -130,10 +130,16 @@ const reducer = (state: State, action: ActionPayload): State => {
       if (!state.currentHand || !state.currentHandRange) {
         return state;
       }
-      const actionTaken = action.payload;
+      const { action: actionTaken, recordHand } = action.payload;
       const correctAction = state.currentHandRange[state.currentHand.handNotation] || 'fold';
       const isOptimal = actionTaken === correctAction;
       
+      recordHand({
+          ...state.scenario,
+          hand: state.currentHand.handNotation,
+          action: actionTaken,
+      }, isOptimal);
+
       return {
         ...state,
         feedback: { isOptimal, action: actionTaken },
@@ -141,9 +147,11 @@ const reducer = (state: State, action: ActionPayload): State => {
     }
 
     case 'NEXT_HAND': {
+      const { range, hand } = loadRangeAndHand(state.scenario);
       return {
         ...state,
-        currentHand: getNewHand(),
+        currentHand: hand,
+        currentHandRange: range,
         feedback: null,
         showExplanation: false,
       };
@@ -202,12 +210,6 @@ export function PracticeModule() {
   }, [state.scenario, state.currentHand, state.feedback]);
 
   useEffect(() => {
-      if (lastInputAction && state.feedback) {
-          recordHand(lastInputAction, state.feedback.isOptimal);
-      }
-  }, [lastInputAction, state.feedback, recordHand])
-
-  useEffect(() => {
     if (!state.currentHandRange && !state.isLoading) {
       toast({
         variant: 'destructive',
@@ -250,7 +252,7 @@ export function PracticeModule() {
   }
 
   const handleAction = (action: Action) => {
-    dispatch({type: 'HANDLE_ACTION', payload: action})
+    dispatch({type: 'HANDLE_ACTION', payload: { action, recordHand }})
   }
 
   const handleNextHand = () => {
@@ -264,7 +266,7 @@ export function PracticeModule() {
     
     let randomPreviousAction: 'none' | 'raise' = 'none';
 
-    // If position is BB, it must face a raise in our current dataset
+    // Prevent impossible BB vs limp scenario in our data
     if (randomPosition === 'BB') {
         randomPreviousAction = 'raise';
     } else {
@@ -466,5 +468,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
