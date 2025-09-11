@@ -207,7 +207,8 @@ export function PracticeModule() {
     isLoading: true,
     explanationIsLoading: false,
   });
-  
+
+  // Initial load
   useEffect(() => {
     dispatch({
       type: 'SET_SCENARIO',
@@ -245,7 +246,7 @@ export function PracticeModule() {
         state.feedback.isOptimal
       );
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.feedback]);
 
   const handleShowExplanation = async () => {
@@ -303,14 +304,18 @@ export function PracticeModule() {
   };
 
   const handleRandomizeScenario = () => {
-    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+    let randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
     
     let randomPreviousAction: 'none' | 'raise' = 'none';
 
+    // Only BB can face a raise in our current GTO data.
     if (randomPosition === 'BB') {
-        randomPreviousAction = 'raise';
+        // 50/50 chance of facing a raise or getting a walk
+        if (Math.random() > 0.5) {
+            randomPreviousAction = 'raise';
+        }
     }
 
     dispatch({ type: 'SET_SCENARIO', payload: {
@@ -447,6 +452,11 @@ export function PracticeModule() {
                 </SelectItem>
               </SelectContent>
             </Select>
+            {isPreviousActionDisabled && (
+              <p className="text-xs text-muted-foreground">
+                La acción previa solo es aplicable a la posición BB en los rangos actuales.
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -566,12 +576,12 @@ export function PracticeModule() {
         </CardContent>
       </Card>
       <div className="lg:col-span-3">
-        {state.currentHandRange ? (
+        {state.currentHandRange && state.feedback ? (
           <HandRangeGrid
-            currentHand={state.feedback ? state.currentHand?.handNotation : null}
-            range={state.feedback ? state.currentHandRange : null}
+            currentHand={state.currentHand?.handNotation}
+            range={state.currentHandRange}
           />
-        ) : (
+        ) : !state.currentHandRange ? (
           <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
             <XCircle className="h-10 w-10 text-destructive mb-2" />
             <p className="font-semibold text-destructive">Error de Rango</p>
@@ -580,7 +590,7 @@ export function PracticeModule() {
               selecciona otro.
             </p>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
