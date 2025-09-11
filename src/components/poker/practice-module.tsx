@@ -237,6 +237,16 @@ export function PracticeModule() {
       }
   }, [state.lastInput, state.feedback, recordHand])
 
+  useEffect(() => {
+    if (!state.currentHandRange && !state.isLoading) {
+      toast({
+        variant: 'destructive',
+        title: 'Error de Rango',
+        description: `No se pudo cargar el rango para este escenario. (${generateCacheKey(state.scenario)})`,
+      });
+    }
+  }, [state.currentHandRange, state.isLoading, state.scenario, toast]);
+
   const handleShowExplanation = () => {
     if (state.showExplanation && state.feedback?.explanation) {
         dispatch({ type: 'TOGGLE_EXPLANATION' });
@@ -259,7 +269,7 @@ export function PracticeModule() {
                 });
             }
         });
-        dispatch({ type: 'TOGGLE_EXPLANAITON' });
+        dispatch({ type: 'TOGGLE_EXPLANATION' });
     }
   }
 
@@ -283,15 +293,6 @@ export function PracticeModule() {
       </div>
     )
   }
-
-  if (!state.currentHandRange) {
-      toast({
-        variant: 'destructive',
-        title: 'Error de Rango',
-        description: `No se pudo cargar el rango para este escenario. (${generateCacheKey(state.scenario)})`,
-      });
-  }
-
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -452,5 +453,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
