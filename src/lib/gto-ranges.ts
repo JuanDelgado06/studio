@@ -1,5 +1,8 @@
 
-import ranges from './gto-ranges.json';
+
 import type { HandRange } from './types';
+const ranges = {};
 
 export const allRanges: Record<string, HandRange> = ranges;
+
+    

@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { PokerCard } from './poker-card';
 import { POSITIONS, STACK_SIZES, TABLE_TYPES } from '@/lib/data';
 import type { Position, TableType, Action } from '@/lib/types';
-import { getPreflopExplanationAction } from '@/lib/actions';
+import { getPreflopExplanationAction, getHandRangeAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { CheckCircle, Info, Loader2, Shuffle, XCircle } from 'lucide-react';
@@ -29,7 +29,7 @@ import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
 import type { HandRange } from '@/lib/types';
-import { allRanges } from '@/lib/gto-ranges';
+import { expandRange } from '@/lib/range-expander';
 
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
@@ -84,9 +84,6 @@ type Feedback = {
     explanation?: GetPreflopExplanationOutput;
 }
 
-const generateCacheKey = (pos: Position, stack: number, type: TableType, prevAction: 'none' | 'raise') =>
-  `${pos}-${stack}-${type}-${prevAction}`;
-
 export function PracticeModule() {
   const [position, setPosition] = useState<Position>('BTN');
   const [stackSize, setStackSize] = useState<number>(100);
@@ -100,34 +97,44 @@ export function PracticeModule() {
   const [isExplanationLoading, startExplanationTransition] = useTransition();
   
   const [currentHandRange, setCurrentHandRange] = useState<HandRange | null>(null);
+  const [isRangeLoading, startRangeTransition] = useTransition();
 
   const { toast } = useToast();
   const { recordHand } = useStats();
 
   
   const handleScenarioChange = useCallback((newPosition: Position, newStackSize: number, newTableType: TableType, newPreviousAction: 'none' | 'raise') => {
-    startTransition(() => {
+    startRangeTransition(async () => {
       setPosition(newPosition);
       setStackSize(newStackSize);
       setTableType(newTableType);
       setPreviousAction(newPreviousAction);
       
-      const key = generateCacheKey(newPosition, newStackSize, newTableType, newPreviousAction);
-      const range = (allRanges as Record<string, HandRange>)[key] || null;
-      setCurrentHandRange(range);
-      
-      if (!range) {
-        toast({
-          variant: 'destructive',
-          title: 'Error de Rango',
-          description: 'No se pudo cargar el rango para este escenario.',
-        });
+      const result = await getHandRangeAction({
+        position: newPosition,
+        stackSize: newStackSize,
+        tableType: newTableType,
+        previousAction: newPreviousAction,
+      });
+
+      if (result.success && result.data) {
+        const expandedRange = expandRange(result.data);
+        setCurrentHandRange(expandedRange);
+      } else {
+         setCurrentHandRange(null);
+         toast({
+            variant: 'destructive',
+            title: 'Error de Rango',
+            description: result.error || 'No se pudo cargar el rango para este escenario.',
+         });
       }
   
-      setCurrentHand(getNewHand());
-      setFeedback(null);
-      setShowExplanation(false);
-      setLastInput(null);
+      startTransition(() => {
+        setCurrentHand(getNewHand());
+        setFeedback(null);
+        setShowExplanation(false);
+        setLastInput(null);
+      });
     });
   }, [toast]);
 
@@ -148,7 +155,7 @@ export function PracticeModule() {
   }, []);
 
   const handleAction = (action: Action) => {
-    if (!currentHand || isPending) return;
+    if (!currentHand || isPending || isRangeLoading) return;
     
     startTransition(() => {
         if (!currentHandRange) {
@@ -213,7 +220,7 @@ export function PracticeModule() {
       return <PokerCard rank={rank} suit={suit} />;
   }
   
-  const isUIBlocked = isPending;
+  const isUIBlocked = isPending || isRangeLoading;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -333,7 +340,7 @@ export function PracticeModule() {
              </div>
           )}
 
-          {isPending && !feedback && <Loader2 className="animate-spin h-8 w-8 text-primary" />}
+          {(isPending || isRangeLoading) && !feedback && <Loader2 className="animate-spin h-8 w-8 text-primary" />}
 
           {!feedback && !isUIBlocked && (
             <div className="flex gap-4">
@@ -349,20 +356,20 @@ export function PracticeModule() {
             </div>
           )}
 
-          {(feedback || (isPending && feedback)) && (
-            <Button size="lg" onClick={handleNextHand} disabled={isPending && !feedback}>
-              {isPending && !feedback ? <Loader2 className="mr-2 animate-spin"/> : null}
+          {feedback && (
+            <Button size="lg" onClick={handleNextHand} disabled={isPending}>
+              {isPending ? <Loader2 className="mr-2 animate-spin"/> : null}
               Siguiente Mano
             </Button>
           )}
         </CardContent>
       </Card>
       <div className="lg:col-span-3">
-        {isPending ? (
+        {isRangeLoading ? (
             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               <p className="mt-4 text-muted-foreground">
-                Cargando...
+                Cargando rango de manos de la IA...
               </p>
             </div>
         ) : feedback && currentHandRange ? (
@@ -378,3 +385,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    

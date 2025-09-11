@@ -11,17 +11,18 @@ const RANK_MAP = RANKS.reduce((acc, rank, index) => {
 
 function parseRange(rangeStr: string): string[] {
     const hands: string[] = [];
+    const sanitizedStr = rangeStr.trim();
 
     // Case 1: Handle pairs (e.g., "77", "TT+", "JJ-88")
-    if (rangeStr.length >= 2 && rangeStr[0] === rangeStr[1]) {
-        const rank = rangeStr[0];
-        if (rangeStr.endsWith('+')) {
+    if (sanitizedStr.length >= 2 && sanitizedStr[0] === sanitizedStr[1] && !sanitizedStr.includes('s') && !sanitizedStr.includes('o')) {
+        const rank = sanitizedStr[0];
+        if (sanitizedStr.endsWith('+')) {
             const startIndex = RANK_MAP[rank];
             for (let i = 0; i <= startIndex; i++) {
                 hands.push(RANKS[i] + RANKS[i]);
             }
-        } else if (rangeStr.includes('-')) {
-            const [start, end] = rangeStr.split('-');
+        } else if (sanitizedStr.includes('-')) {
+            const [start, end] = sanitizedStr.split('-');
             const startIndex = RANK_MAP[start[0]];
             const endIndex = RANK_MAP[end[0]];
             const [first, last] = [Math.min(startIndex, endIndex), Math.max(startIndex, endIndex)]
@@ -30,18 +31,18 @@ function parseRange(rangeStr: string): string[] {
             }
         }
         else {
-            hands.push(rangeStr);
+            hands.push(sanitizedStr);
         }
         return hands;
     }
 
     // Case 2: Suited/Offsuit hands (e.g., "AKs", "QJo", "ATs+", "KJo+", "T8s-T6s")
-    if (rangeStr.length >= 3) {
-        const type = rangeStr[2]; // 's' or 'o'
-        const r1 = rangeStr[0];
-        const r2 = rangeStr[1];
+    if (sanitizedStr.length >= 3) {
+        const type = sanitizedStr.includes('s') ? 's' : 'o';
+        const r1 = sanitizedStr[0];
+        const r2 = sanitizedStr[1];
         
-        if (rangeStr.endsWith('+')) {
+        if (sanitizedStr.endsWith('+')) {
             const highRank = r1;
             const lowRank = r2;
             const highRankIndex = RANK_MAP[highRank];
@@ -50,8 +51,8 @@ function parseRange(rangeStr: string): string[] {
             for (let i = lowRankIndex; i > highRankIndex; i--) {
                 hands.push(`${highRank}${RANKS[i]}${type}`);
             }
-        } else if (rangeStr.includes('-')) {
-             const [start, end] = rangeStr.split('-'); // e.g. "T9s", "T6s"
+        } else if (sanitizedStr.includes('-')) {
+             const [start, end] = sanitizedStr.split('-'); // e.g. "T9s", "T6s"
              const startRank = start[0];
              const startKickerIndex = RANK_MAP[start[1]];
              const endKickerIndex = RANK_MAP[end[1]];
@@ -65,14 +66,14 @@ function parseRange(rangeStr: string): string[] {
              }
 
         } else {
-            hands.push(rangeStr);
+            hands.push(sanitizedStr);
         }
         return hands;
     }
     
     // Fallback for single combos if not matched
-    if(rangeStr.length >= 2) {
-        hands.push(rangeStr);
+    if(sanitizedStr.length >= 2) {
+        hands.push(sanitizedStr);
     }
     
     return hands;
@@ -99,7 +100,7 @@ export function expandRange(summary: GetHandRangeOutput): HandRange {
     handRange[hand] = 'fold';
   });
 
-  function processAction(hands: string[], action: Action) {
+  function processAction(hands: string[] | undefined, action: Action) {
     if (!hands) return;
     hands.forEach(rangeStr => {
       const parsed = parseRange(rangeStr);
@@ -114,3 +115,5 @@ export function expandRange(summary: GetHandRangeOutput): HandRange {
   
   return handRange;
 }
+
+    
