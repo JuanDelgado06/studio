@@ -358,7 +358,7 @@ export function PracticeModule() {
 
   const descriptionText = state.scenario.previousAction === 'raise'
     ? `Un oponente ha subido. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`
-    : `La acción te llega de fold. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+    : `Nadie ha apostado todavía. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
 
   return (
     <div className="space-y-6">
