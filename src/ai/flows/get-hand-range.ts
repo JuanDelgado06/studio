@@ -4,7 +4,7 @@
  * @fileOverview Provides a detailed GTO hand range for a specific preflop scenario.
  *
  * - getHandRange - Generates the hand range.
- * - GetHandRangeInput - The input type for getHandRange.
+ * - GetHandRangeInput - The input type for getHandrange.
  * - GetHandRangeOutput - The output type for getHandRange.
  */
 
@@ -23,7 +23,9 @@ export type GetHandRangeInput = z.infer<typeof GetHandRangeInputSchema>;
 const HandActionSchema = z.record(z.enum(['raise', 'call', 'fold']));
 
 const GetHandRangeOutputSchema = z.object({
-    range: HandActionSchema.describe('An object where keys are hand notations (e.g., AKs, 77, T9o) and values are the optimal action: "raise", "call", or "fold". Include all 169 possible hand combinations.')
+  range: HandActionSchema.describe(
+    'An object where keys are hand notations (e.g., AKs, 77, T9o) and values are the optimal action: "raise", "call", or "fold". Include all 169 possible hand combinations.'
+  ),
 });
 
 export type GetHandRangeOutput = z.infer<typeof GetHandRangeOutputSchema>;
@@ -45,15 +47,18 @@ const getHandRangePrompt = ai.definePrompt({
 *   Mesa: {{{tableType}}}
 
 **Instrucciones:**
-1.  **Output:** Devuelve un objeto JSON que se ajuste al esquema de salida.
-2.  **Rango Completo:** El objeto 'range' debe contener TODAS las 169 combinaciones de manos posibles (pares, suited y offsuit).
-3.  **Acciones:** Para cada mano, el valor debe ser una de las siguientes tres acciones, basada en una estrategia GTO estándar para un open-raise (o una defensa contra un open-raise si la posición es SB o BB): "raise", "call", o "fold".
+1.  **Output JSON:** Devuelve un único objeto JSON que se ajuste al esquema de salida.
+2.  **Rango Completo (169 manos):** El objeto 'range' debe contener TODAS las 169 combinaciones de manos posibles.
+    *   **Pares:** 13 combinaciones (AA, KK, ..., 22).
+    *   **Suited:** 78 combinaciones (AKs, AQs, ..., 32s). Usa la notación 's'.
+    *   **Offsuit:** 78 combinaciones (AKo, AQo, ..., 32o). Usa la notación 'o'.
+3.  **Acciones Válidas:** Para cada mano, el valor DEBE SER una de las siguientes tres strings: "raise", "call", o "fold".
     *   Usa "raise" para manos que deberían abrir subiendo la apuesta.
-    *   Usa "call" solo cuando sea aplicable (ej. defender en la BB contra un raise). En la mayoría de las posiciones de open-raise, las acciones serán "raise" o "fold".
+    *   Usa "call" solo cuando sea aplicable (ej. defender en la BB contra un raise). En la mayoría de las posiciones de open-raise, las acciones serán principalmente "raise" o "fold".
     *   Usa "fold" para manos que no se deben jugar.
-4.  **Sin Explicaciones:** No incluyas explicaciones, solo el objeto JSON con el rango.
+4.  **Sin Explicaciones:** No incluyas absolutamente ningún texto, explicación o markdown fuera del objeto JSON. La respuesta debe ser solo el JSON.
 
-Asegúrate de que tu respuesta coincida con el esquema JSON de salida.`,
+Asegúrate de que tu respuesta coincida exactamente con el esquema JSON de salida.`,
 });
 
 const getHandRangeFlow = ai.defineFlow(
