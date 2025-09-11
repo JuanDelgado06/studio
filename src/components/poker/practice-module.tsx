@@ -103,7 +103,7 @@ export function PracticeModule() {
   const { recordHand } = useStats();
 
   
-  const handleScenarioChange = useCallback((newPosition: Position, newStackSize: number, newTableType: TableType, newPreviousAction: 'none' | 'raise') => {
+  const handleScenarioChange = (newPosition: Position, newStackSize: number, newTableType: TableType, newPreviousAction: 'none' | 'raise') => {
     startRangeTransition(async () => {
       setPosition(newPosition);
       setStackSize(newStackSize);
@@ -136,9 +136,9 @@ export function PracticeModule() {
         setLastInput(null);
       });
     });
-  }, [toast]);
+  };
 
-  // Load initial range
+  // Load initial range on mount
   useEffect(() => {
     handleScenarioChange(position, stackSize, tableType, previousAction);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -385,5 +385,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
