@@ -199,12 +199,34 @@ export function PracticeModule() {
   }
   
   const handleRandomizeScenario = () => {
-    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
-    const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
-    const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
-    const randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
+    startTransition(() => {
+        const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+        const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
+        const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
+        const randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
+        
+        setPosition(randomPosition);
+        setStackSize(randomStackSize);
+        setTableType(randomTableType);
+        setPreviousAction(randomPreviousAction);
 
-    handleScenarioChange(randomPosition, randomStackSize, randomTableType, randomPreviousAction);
+        const key = generateCacheKey(randomPosition, randomStackSize, randomTableType, randomPreviousAction);
+        const range = (allRanges as Record<string, HandRange>)[key] || null;
+        
+        setCurrentHandRange(range);
+        setCurrentHand(getNewHand());
+        setFeedback(null);
+        setShowExplanation(false);
+        setLastInput(null);
+
+        if (!range) {
+             toast({
+                variant: 'destructive',
+                title: 'Error de Rango',
+                description: 'No se pudo cargar el rango para este escenario.',
+            });
+        }
+    });
   };
   
   const renderCard = (cardStr: string) => {
@@ -358,7 +380,7 @@ export function PracticeModule() {
         </CardContent>
       </Card>
       <div className="lg:col-span-3">
-        {isPending && !feedback && (
+        {isPending && (
             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               <p className="mt-4 text-muted-foreground">
