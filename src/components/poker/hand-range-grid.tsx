@@ -13,15 +13,15 @@ interface HandRangeGridProps {
 }
 
 const actionColors: Record<Action, string> = {
-    raise: 'bg-green-500/30 border-green-500/50',
-    call: 'bg-blue-500/30 border-blue-500/50',
-    fold: 'bg-secondary/20 border-border',
+    raise: 'bg-green-500/30 border-green-500/60',
+    call: 'bg-sky-500/30 border-sky-500/60',
+    fold: 'bg-neutral-500/20 border-neutral-500/40',
 }
 
 const pairColors: Record<Action, string> = {
-    raise: 'bg-green-700/50 border-green-700/80 text-white',
-    call: 'bg-blue-700/50 border-blue-700/80 text-white',
-    fold: 'bg-destructive/20 text-destructive-foreground',
+    raise: 'bg-green-600 border-green-500 text-white font-bold',
+    call: 'bg-sky-600 border-sky-500 text-white font-bold',
+    fold: 'bg-neutral-600/50 border-neutral-500 text-neutral-200',
 }
 
 export const HandRangeGrid: React.FC<HandRangeGridProps> = ({
@@ -88,15 +88,15 @@ export const HandRangeGrid: React.FC<HandRangeGridProps> = ({
         </div>
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
             <div className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded-sm border border-green-500/50 bg-green-500/30" />
+                <div className="h-4 w-4 rounded-sm border-green-500/60 bg-green-500/30" />
                 <span>Raise</span>
             </div>
              <div className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded-sm border border-blue-500/50 bg-blue-500/30" />
+                <div className="h-4 w-4 rounded-sm border-sky-500/60 bg-sky-500/30" />
                 <span>Call</span>
             </div>
              <div className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded-sm border border-border bg-secondary/20" />
+                <div className="h-4 w-4 rounded-sm border-neutral-500/40 bg-neutral-500/20" />
                 <span>Fold</span>
             </div>
         </div>
