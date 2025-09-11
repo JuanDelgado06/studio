@@ -1,8 +1,10 @@
+
 'use server';
 
 import { analyzePreflopDecision } from "@/ai/flows/analyze-preflop-decision";
 import { adaptDifficultyBasedOnProgress } from "@/ai/flows/adapt-difficulty-based-on-progress";
 import { getPreflopExplanation } from "@/ai/flows/get-preflop-explanation";
+import { suggestImprovementExercises as suggestImprovementExercisesFlow } from "@/ai/flows/suggest-improvement-exercises";
 import { z } from "zod";
 
 const PreflopDecisionSchema = z.object({
@@ -70,4 +72,22 @@ export async function getAdaptedDifficulty(input: z.infer<typeof AdaptDifficulty
     console.error(error);
     return { success: false, error: 'Failed to get adapted difficulty from AI.' };
   }
+}
+
+const SuggestImprovementExercisesSchema = z.object({
+    decisionRecords: z.string(),
+});
+
+export async function suggestImprovementExercises(input: z.infer<typeof SuggestImprovementExercisesSchema>) {
+    try {
+        const validatedInput = SuggestImprovementExercisesSchema.parse(input);
+        const result = await suggestImprovementExercisesFlow(validatedInput);
+        return { success: true, data: result };
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return { success: false, error: 'Invalid input for suggesting exercises.' };
+        }
+        console.error(error);
+        return { success: false, error: 'Failed to get suggested exercises from AI.' };
+    }
 }

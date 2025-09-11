@@ -110,7 +110,7 @@ export function PracticeModule() {
       if (result.success && result.data) {
         setFeedback({ isOptimal: result.data.isOptimal, action });
         setLastInput(input);
-        recordHand(position, result.data.isOptimal);
+        recordHand(input, result.data.isOptimal);
       } else {
         toast({
           variant: 'destructive',
@@ -259,7 +259,7 @@ export function PracticeModule() {
 
           {isPending && <Loader2 className="animate-spin h-8 w-8 text-primary" />}
 
-          {!feedback && (
+          {!feedback && !isPending && (
             <div className="flex gap-4">
               <Button variant="destructive" size="lg" onClick={() => handleAction('fold')} disabled={isPending}>
                 Fold 🤚

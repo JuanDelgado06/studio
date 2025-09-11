@@ -1,9 +1,10 @@
 
 'use client';
 
-import type { Position } from '@/lib/types';
+import type { Position, Action } from '@/lib/types';
 import * as React from 'react';
 import { getAdaptedDifficulty } from '@/lib/actions';
+import type { AnalyzePreflopDecisionInput } from '@/ai/flows/analyze-preflop-decision';
 
 type AccuracyData = {
   position: string;
@@ -11,6 +12,11 @@ type AccuracyData = {
   total: number;
   correct: number;
 };
+
+type DecisionRecord = AnalyzePreflopDecisionInput & {
+    isCorrect: boolean;
+    timestamp: number;
+}
 
 type Stats = {
   handsPlayed: number;
@@ -23,11 +29,12 @@ type Stats = {
   accuracyByPosition: AccuracyData[];
   lastPracticeDate: string | null;
   handsPlayedToday: number;
+  decisionHistory: DecisionRecord[];
 };
 
 type StatsContextType = {
   stats: Stats;
-  recordHand: (position: Position, isCorrect: boolean) => void;
+  recordHand: (handData: AnalyzePreflopDecisionInput, isCorrect: boolean) => void;
   resetStats: () => void;
   isClient: boolean;
 };
@@ -52,6 +59,7 @@ const initialStats: Stats = {
   accuracyByPosition: initialAccuracyByPosition,
   lastPracticeDate: null,
   handsPlayedToday: 0,
+  decisionHistory: [],
 };
 
 const STATS_STORAGE_KEY = 'poker-pro-stats';
@@ -74,6 +82,9 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
         // Ensure accuracyByPosition is initialized correctly if it's missing from storage
         if (!parsedStats.accuracyByPosition || parsedStats.accuracyByPosition.length === 0) {
           parsedStats.accuracyByPosition = initialAccuracyByPosition;
+        }
+        if (!parsedStats.decisionHistory) {
+            parsedStats.decisionHistory = [];
         }
         setStats(parsedStats);
       }
@@ -127,10 +138,10 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
       }
       fetchFocusAreas();
     }
-  }, [stats.handsPlayed, stats.overallAccuracy, stats.accuracyByPosition, stats.weeklyGoal, isClient]);
+  }, [stats.handsPlayed, isClient]);
 
 
-  const recordHand = (position: Position, isCorrect: boolean) => {
+  const recordHand = (handData: AnalyzePreflopDecisionInput, isCorrect: boolean) => {
     setStats((prevStats) => {
       const today = new Date().toDateString();
       const newHandsPlayed = prevStats.handsPlayed + 1;
@@ -146,8 +157,8 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
           ? Math.round((newCorrectDecisions / newHandsPlayed) * 100)
           : 'N/A';
       
-      const newAccuracyByPosition = prevStats.accuracyByPosition.map((posData) => {
-          if (posData.position === position) {
+      const newAccuracyByPosition = [...prevStats.accuracyByPosition].map((posData) => {
+          if (posData.position === handData.position) {
               const newTotal = posData.total + 1;
               const newCorrect = isCorrect ? posData.correct + 1 : posData.correct;
               return {
@@ -163,35 +174,38 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
       const isNewDay = prevStats.lastPracticeDate !== today;
       let handsPlayedToday = isNewDay ? 1 : (prevStats.handsPlayedToday || 0) + 1;
       let newStreak = prevStats.streak || 0;
-
-      if (isNewDay) {
-          if (prevStats.lastPracticeDate) {
-              const lastDate = new Date(prevStats.lastPracticeDate);
-              const yesterday = new Date();
-              yesterday.setDate(yesterday.getDate() - 1);
-              if (lastDate.toDateString() !== yesterday.toDateString()) {
-                  newStreak = 0; // Reset streak if a day was missed
-              }
-          }
-      }
       
-      if (handsPlayedToday === 10) {
-          if (prevStats.lastPracticeDate) {
-              const lastDate = new Date(prevStats.lastPracticeDate);
-              const yesterday = new Date();
-              yesterday.setDate(yesterday.getDate() - 1);
-
-              if (lastDate.toDateString() === yesterday.toDateString()) {
-                  newStreak += 1; // Continue streak
-              } else if (lastDate.toDateString() !== today) {
-                  newStreak = 1; // Start new streak after a gap
-              }
-          } else {
-              newStreak = 1; // First time reaching 10 hands
+      if (isNewDay) {
+        // This is the first hand of a new day. Check if the streak should continue or reset.
+        if (prevStats.lastPracticeDate) {
+          const lastDate = new Date(prevStats.lastPracticeDate);
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+      
+          // If the last practice wasn't yesterday, reset the streak.
+          if (lastDate.toDateString() !== yesterday.toDateString()) {
+            newStreak = 0;
           }
+        }
+      }
+
+      // Check if the 10th hand of the day has been played to update the streak
+      if (handsPlayedToday === 10) {
+        if (newStreak > 0) {
+          newStreak += 1; // Continue streak
+        } else {
+          newStreak = 1; // Start a new streak
+        }
       }
 
       const newWeeklyGoal = Math.min(100, Math.round((newCorrectDecisions / (newHandsPlayed + 10)) * 100));
+
+      const newDecisionRecord: DecisionRecord = {
+        ...handData,
+        isCorrect,
+        timestamp: Date.now(),
+      };
+      const newDecisionHistory = [...(prevStats.decisionHistory || []), newDecisionRecord].slice(-50); // Keep last 50 decisions
 
       return {
         ...prevStats,
@@ -204,6 +218,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
         weeklyGoal: newWeeklyGoal,
         lastPracticeDate: today,
         handsPlayedToday: handsPlayedToday,
+        decisionHistory: newDecisionHistory,
       };
     });
   };

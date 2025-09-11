@@ -1,4 +1,3 @@
-// This file is machine-generated - edit at your own risk.
 
 'use server';
 
@@ -19,7 +18,7 @@ const SuggestImprovementExercisesInputSchema = z.object({
   decisionRecords: z
     .string()
     .describe(
-      'A record of the user’s past preflop poker decisions, including position, hand, stack size, action taken, and whether it was correct.'
+      'A JSON string array of the user’s past preflop poker decisions, including position, hand, stack size, action taken, and whether it was correct.'
     ),
 });
 
@@ -31,7 +30,7 @@ const SuggestImprovementExercisesOutputSchema = z.object({
   suggestedExercises: z
     .string()
     .describe(
-      'A list of suggested exercises tailored to the user’s error patterns, with explanations of why each exercise is recommended.'
+      'A formatted string of suggested exercises tailored to the user’s error patterns, with explanations of why each exercise is recommended. Each exercise should be a separate paragraph.'
     ),
 });
 
@@ -49,11 +48,26 @@ const suggestImprovementExercisesPrompt = ai.definePrompt({
   name: 'suggestImprovementExercisesPrompt',
   input: {schema: SuggestImprovementExercisesInputSchema},
   output: {schema: SuggestImprovementExercisesOutputSchema},
-  prompt: `You are a poker training coach. Analyze the user’s past decisions and error patterns to suggest tailored exercises.
+  prompt: `Eres un coach de poker experto que se comunica en español. Tu objetivo es analizar el historial de decisiones de un usuario para identificar patrones de error y sugerir ejercicios personalizados para mejorar.
 
-Past Decisions: {{{decisionRecords}}}
+Historial de Decisiones (en formato JSON):
+{{{decisionRecords}}}
 
-Suggest a list of exercises tailored to the user’s error patterns, with explanations of why each exercise is recommended.
+**Instrucciones:**
+1.  **Idioma:** Responde **completamente en español**.
+2.  **Análisis:** Analiza el JSON para encontrar los errores más frecuentes del jugador. Considera la posición, el tipo de mano y la acción.
+3.  **Ejercicios:** Basado en los errores, genera 2-3 ejercicios **prácticos y específicos**.
+    *   Cada ejercicio debe apuntar a un error concreto.
+    *   Explica claramente por qué el ejercicio es útil para corregir ese error.
+    *   El tono debe ser alentador y constructivo.
+4.  **Terminología:** **NO traduzcas** términos comunes de poker como 'equity', 'range', 'fold', 'call', 'raise', 'GTO', 'EV', 'pot odds'.
+5.  **Formato:** Devuelve el texto como un solo string, con cada ejercicio en un párrafo separado. No uses listas ni markdown.
+
+**Ejemplo de Salida Esperada:**
+
+"Para mejorar tu juego en las ciegas, te sugiero un ejercicio de defensa de BB. Enfócate en defender tu Big Blind con un range más amplio contra un open-raise desde BTN. Revisa tablas de GTO y practica defendiendo manos como K7s o A5o. Esto te ayudará a no ser explotado por raises tardíos.
+
+He notado que a veces haces call con manos dominadas en middle position. Un buen ejercicio es filtrar tu range de MP. Juega solo el top 15% de las manos desde esta posición durante tus próximas 100 manos. El objetivo es internalizar la fuerza relativa de las manos y evitar situaciones de alto riesgo con EV negativo."
 `,
 });
 
