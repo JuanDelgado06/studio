@@ -194,7 +194,6 @@ export function PracticeModule() {
     setFeedback(null);
     setShowExplanation(false);
     setLastInput(null);
-    fetchHandRange(position, stackSize, tableType, previousAction);
   };
   
   const renderCard = (cardStr: string) => {
