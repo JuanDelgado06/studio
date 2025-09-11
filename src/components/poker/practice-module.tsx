@@ -110,14 +110,14 @@ export function PracticeModule() {
   const [isExplanationLoading, startExplanationTransition] = useTransition();
   
   const [currentHandRange, setCurrentHandRange] = useState<HandRange | null>(null);
-  const [isRangeLoading, setIsRangeLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { toast } = useToast();
   const { recordHand } = useStats();
   
-  const loadRange = useCallback((pos: Position, stack: number, table: TableType, prevAction: 'none' | 'raise') => {
-    setIsRangeLoading(true);
-    const key = generateCacheKey(pos, stack, table, prevAction);
+  const loadRange = useCallback(() => {
+    setIsLoading(true);
+    const key = generateCacheKey(position, stackSize, tableType, previousAction);
     const rangeData = (allRanges as Record<string, any>)[key];
 
     if (rangeData) {
@@ -131,21 +131,13 @@ export function PracticeModule() {
         description: `No se pudo cargar el rango para este escenario. (${key})`,
       });
     }
-    setIsRangeLoading(false);
-  }, [toast]);
-
-  useEffect(() => {
-    loadRange(position, stackSize, tableType, previousAction);
-    if (!currentHand) {
-      setCurrentHand(getNewHand());
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [position, stackSize, tableType, previousAction]);
+    setIsLoading(false);
+  }, [position, stackSize, tableType, previousAction, toast]);
   
   // Load initial hand and range
   useEffect(() => {
     setCurrentHand(getNewHand());
-    loadRange(position, stackSize, tableType, previousAction);
+    loadRange();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -163,7 +155,7 @@ export function PracticeModule() {
   }
 
   const handleAction = (action: Action) => {
-    if (!currentHand || isPending || isRangeLoading) return;
+    if (!currentHand || isPending || isLoading) return;
     
     startTransition(() => {
         if (!currentHandRange) {
@@ -220,23 +212,49 @@ export function PracticeModule() {
     newPreviousAction: 'none' | 'raise'
   ) => {
     startTransition(() => {
-        setPosition(newPosition);
-        setStackSize(newStackSize);
-        setTableType(newTableType);
-        setPreviousAction(newPreviousAction);
-        resetHandAndFeedback();
-    })
-  }
+      setIsLoading(true);
+      setPosition(newPosition);
+      setStackSize(newStackSize);
+      setTableType(newTableType);
+      setPreviousAction(newPreviousAction);
+      resetHandAndFeedback();
+      
+      const key = generateCacheKey(newPosition, newStackSize, newTableType, newPreviousAction);
+      const rangeData = (allRanges as Record<string, any>)[key];
+
+      if (rangeData) {
+        const expandedRange = expandRange(rangeData);
+        setCurrentHandRange(expandedRange);
+      } else {
+        setCurrentHandRange(null);
+        toast({
+          variant: 'destructive',
+          title: 'Error de Rango',
+          description: `No se pudo cargar el rango para este escenario. (${key})`,
+        });
+      }
+      setIsLoading(false);
+    });
+  };
   
   const handleRandomizeScenario = () => {
     const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
-    // If BB, previousAction must be 'raise'. If not BB, it can be random.
-    const randomPreviousAction = randomPosition === 'BB' ? 'raise' : (Math.random() > 0.5 ? 'raise' : 'none');
+    
+    let randomPreviousAction: 'none' | 'raise' = 'none';
+    if (randomPosition === 'BB') {
+      randomPreviousAction = 'raise';
+    } else {
+      randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
+    }
     
     handleScenarioChange(randomPosition, randomStackSize, randomTableType, randomPreviousAction);
   };
+  
+  useEffect(() => {
+    loadRange();
+  }, [position, stackSize, tableType, previousAction, loadRange]);
   
   const renderCard = (cardStr: string) => {
       const rank = cardStr[0] as any;
@@ -244,7 +262,7 @@ export function PracticeModule() {
       return <PokerCard rank={rank} suit={suit} />;
   }
   
-  const isUIBlocked = isPending || isRangeLoading;
+  const isUIBlocked = isPending || isLoading;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -364,7 +382,7 @@ export function PracticeModule() {
              </div>
           )}
 
-          {(isPending || isRangeLoading) && !feedback && <Loader2 className="animate-spin h-8 w-8 text-primary" />}
+          {(isPending || isLoading) && !feedback && <Loader2 className="animate-spin h-8 w-8 text-primary" />}
 
           {!feedback && !isUIBlocked && (
             <div className="flex gap-4">
@@ -389,7 +407,7 @@ export function PracticeModule() {
         </CardContent>
       </Card>
       <div className="lg:col-span-3">
-        {isRangeLoading ? (
+        {isLoading ? (
             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               <p className="mt-4 text-muted-foreground">
