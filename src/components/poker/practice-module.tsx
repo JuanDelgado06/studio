@@ -30,7 +30,7 @@ import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explana
 import { HandRangeGrid } from './hand-range-grid';
 import type { HandRange } from '@/lib/types';
 import { expandRange } from '@/lib/range-expander';
-import { allRanges } from '@/lib/gto-ranges';
+import allRanges from '@/lib/gto-ranges.json';
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const SUITS = ['s', 'h', 'd', 'c'];
@@ -258,7 +258,7 @@ export function PracticeModule() {
   }
 
   const handleRandomizeScenario = () => {
-    let randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
     
