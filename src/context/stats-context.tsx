@@ -22,6 +22,8 @@ type Stats = {
   weeklyGoal: number;
   focusAreas: string[];
   accuracyByPosition: AccuracyData[];
+  lastPracticeDate: string | null;
+  handsPlayedToday: number;
 };
 
 type StatsContextType = {
@@ -49,6 +51,8 @@ const initialStats: Stats = {
   weeklyGoal: 0,
   focusAreas: [],
   accuracyByPosition: initialAccuracyByPosition,
+  lastPracticeDate: null,
+  handsPlayedToday: 0,
 };
 
 const StatsContext = React.createContext<StatsContextType | undefined>(
@@ -65,6 +69,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
 
   const recordHand = (position: Position, isCorrect: boolean) => {
     setStats((prevStats) => {
+      const today = new Date().toDateString();
       const newHandsPlayed = prevStats.handsPlayed + 1;
       const newCorrectDecisions = isCorrect
         ? prevStats.correctDecisions + 1
@@ -92,9 +97,34 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
           return pos;
       });
 
-      // Simple placeholder logic for streak and weekly goal
-      const newStreak = isCorrect ? prevStats.streak + 1 : 0;
-      const newWeeklyGoal = Math.min(100, Math.round((newCorrectDecisions / (newHandsPlayed + 10)) * 100)); // Example goal logic
+      const isNewDay = prevStats.lastPracticeDate !== today;
+      const handsPlayedToday = isNewDay ? 1 : prevStats.handsPlayedToday + 1;
+      let newStreak = prevStats.streak;
+
+      if (handsPlayedToday === 10) {
+        if (isNewDay) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            if (prevStats.lastPracticeDate === yesterday.toDateString()) {
+                newStreak += 1;
+            } else {
+                newStreak = 1;
+            }
+        }
+      }
+       if (handsPlayedToday === 1 && isNewDay) {
+          if (prevStats.lastPracticeDate !== null) {
+            const lastDate = new Date(prevStats.lastPracticeDate);
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            if (lastDate.toDateString() !== yesterday.toDateString()) {
+              newStreak = 0; // Reset if a day was missed
+            }
+          }
+      }
+
+
+      const newWeeklyGoal = Math.min(100, Math.round((newCorrectDecisions / (newHandsPlayed + 10)) * 100));
 
       const updatedStats = {
         ...prevStats,
@@ -105,9 +135,10 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
         accuracyByPosition: newAccuracyByPosition,
         streak: newStreak,
         weeklyGoal: newWeeklyGoal,
+        lastPracticeDate: today,
+        handsPlayedToday: handsPlayedToday,
       };
 
-      // Every 10 hands, ask the AI for new focus areas
       if (newHandsPlayed > 0 && newHandsPlayed % 10 === 0) {
         const fetchFocusAreas = async () => {
           const positionalAccuracy: Record<string, number> = {};
@@ -119,7 +150,6 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
             userStats: {
               overallAccuracy: (updatedStats.overallAccuracy as number) / 100,
               positionalAccuracy,
-              // These are placeholders for now
               handTypeAccuracy: {}, 
               commonMistakes: [],
               weeklyGoalSuccessRate: updatedStats.weeklyGoal / 100,
