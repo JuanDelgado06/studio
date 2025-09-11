@@ -47,21 +47,21 @@ const analyzePreflopDecisionPrompt = ai.definePrompt({
   name: 'analyzePreflopDecisionPrompt',
   input: {schema: AnalyzePreflopDecisionInputSchema},
   output: {schema: AnalyzePreflopDecisionOutputSchema},
-  prompt: `You are an expert poker coach, specializing in preflop play.
+  prompt: `Eres un entrenador de poker experto, especializado en el juego preflop.
 
-You are given the following information about a poker hand:
+Se te proporciona la siguiente información sobre una mano de poker:
 
-*   Position: {{{position}}}
+*   Posición: {{{position}}}
 *   Stack Size: {{{stackSize}}} BB
-*   Table Type: {{{tableType}}}
-*   Hand: {{{hand}}}
-*   Action: {{{action}}}
-*   Bet Size (if applicable): {{#if betSize}}{{{betSize}}} BB{{else}}N/A{{/if}}
+*   Tipo de Mesa: {{{tableType}}}
+*   Mano: {{{hand}}}
+*   Acción: {{{action}}}
+*   Tamaño de la Apuesta (si aplica): {{#if betSize}}{{{betSize}}} BB{{else}}N/A{{/if}}
 
-Analyze the player's decision based on GTO principles and provide detailed feedback.
-Explain whether the decision was optimal, and why or why not. Include an explanation of the expected value (EV) of the play.
+Analiza la decisión del jugador basándote en los principios GTO y proporciona feedback detallado en español.
+Explica si la decisión fue óptima y por qué. Incluye una explicación del valor esperado (EV) de la jugada.
 
-Ensure your output matches the following schema: {{outputSchema}}`,
+Asegúrate de que tu respuesta coincida con el siguiente esquema: {{outputSchema}}`,
 });
 
 const analyzePreflopDecisionFlow = ai.defineFlow(
