@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { useStats } from '@/context/stats-context';
 import * as React from 'react';
 import { suggestImprovementExercises } from '@/lib/actions';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const educationalContent = [
@@ -80,6 +80,10 @@ export default function LearnPage() {
     }
     setIsLoading(false);
   };
+  
+  const handleClearExercises = () => {
+    setSuggestedExercises('');
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -179,15 +183,23 @@ export default function LearnPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <Button
-            onClick={handleGenerateExercises}
-            disabled={isLoading || stats.handsPlayed < 5}
-          >
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : null}
-            Generar Ejercicios
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleGenerateExercises}
+              disabled={isLoading || stats.handsPlayed < 5}
+              className="flex-grow"
+            >
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              Generar Ejercicios
+            </Button>
+            {suggestedExercises && !isLoading && (
+                 <Button onClick={handleClearExercises} variant="destructive" size="icon">
+                    <Trash2 className="h-4 w-4" />
+                 </Button>
+            )}
+          </div>
           {stats.handsPlayed < 5 && (
             <p className="text-xs text-center text-muted-foreground">
               Juega al menos 5 manos para generar ejercicios.
