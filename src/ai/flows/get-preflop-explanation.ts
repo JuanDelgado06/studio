@@ -18,7 +18,7 @@ const GetPreflopExplanationInputSchema = z.object({
   stackSize: z.number().describe('The player stack size in big blinds.'),
   tableType: z.enum(['cash', 'tournament']).describe('The type of table.'),
   hand: z.string().describe('The player hand (e.g., AsKd, 7c7d).'),
-  action: z.enum(['fold', 'call', 'raise']).describe('The player action.'),
+  action: z.enum(['fold', 'call', 'raise', '3-bet', 'all-in']).describe('The player action.'),
   betSize: z.number().optional().describe('The bet size if the action is raise.'),
   isOptimal: z.boolean().describe('Whether the decision was optimal.'),
 });
@@ -61,7 +61,7 @@ Analiza la siguiente mano de poker preflop y proporciona una explicación concis
 **Instrucciones:**
 1.  **Idioma:** Responde **completamente en español**.
 2.  **Claridad:** Sé directo y fácil de entender.
-3.  **Terminología:** **NO traduzcas** términos comunes de poker como 'equity', 'range', 'fold', 'call', 'raise', 'GTO', 'EV', 'pot odds', 'nuts', 'bluff', 'semi-bluff', 'implied odds'.
+3.  **Terminología:** **NO traduzcas** términos comunes de poker como 'equity', 'range', 'fold', 'call', 'raise', '3-bet', 'all-in', 'GTO', 'EV', 'pot odds', 'nuts', 'bluff', 'semi-bluff', 'implied odds'.
 4.  **Contenido:**
     *   **Feedback:** Explica por qué la jugada fue correcta o incorrecta basándote en principios GTO. Sé breve.
     *   **EV Explanation:** Proporciona una explicación muy breve sobre el valor esperado (EV) de la acción realizada.
@@ -76,7 +76,11 @@ const getPreflopExplanationFlow = ai.defineFlow(
     outputSchema: GetPreflopExplanationOutputSchema,
   },
   async input => {
-    const {output} = await getPreflopExplanationPrompt(input);
+    const mappedInput = {
+        ...input,
+        action: ['3-bet', 'all-in'].includes(input.action) ? 'raise' : input.action
+    } as any;
+    const {output} = await getPreflopExplanationPrompt(mappedInput);
     return output!;
   }
 );

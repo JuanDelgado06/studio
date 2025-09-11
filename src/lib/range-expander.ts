@@ -80,7 +80,7 @@ function parseRange(rangeStr: string): string[] {
 }
 
 
-export function expandRange(summary: GetHandRangeOutput): HandRange {
+export function expandRange(summary: any): HandRange {
   const handRange: HandRange = {};
 
   const allHands: {hand: string, type: 'pair' | 'suited' | 'offsuit'}[] = [];
@@ -112,8 +112,8 @@ export function expandRange(summary: GetHandRangeOutput): HandRange {
 
   processAction(summary.raise, 'raise');
   processAction(summary.call, 'call');
+  processAction(summary['3-bet'], '3-bet');
+  processAction(summary['all-in'], 'all-in');
   
   return handRange;
 }
-
-    

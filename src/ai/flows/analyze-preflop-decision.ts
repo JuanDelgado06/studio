@@ -18,7 +18,7 @@ const AnalyzePreflopDecisionInputSchema = z.object({
   stackSize: z.number().describe('The player stack size in big blinds.'),
   tableType: z.enum(['cash', 'tournament']).describe('The type of table.'),
   hand: z.string().describe('The player hand (e.g., AsKd, 7c7d).'),
-  action: z.enum(['fold', 'call', 'raise']).describe('The player action.'),
+  action: z.enum(['fold', 'call', 'raise', '3-bet', 'all-in']).describe('The player action.'),
   betSize: z.number().optional().describe('The bet size if the action is raise.'),
 });
 export type AnalyzePreflopDecisionInput = z.infer<
@@ -67,9 +67,11 @@ const analyzePreflopDecisionFlow = ai.defineFlow(
     outputSchema: AnalyzePreflopDecisionOutputSchema,
   },
   async input => {
-    const {output} = await analyzePreflopDecisionPrompt(input);
+    const mappedInput = {
+        ...input,
+        action: ['3-bet', 'all-in'].includes(input.action) ? 'raise' : input.action
+    } as any;
+    const {output} = await analyzePreflopDecisionPrompt(mappedInput);
     return output!;
   }
 );
-
-    

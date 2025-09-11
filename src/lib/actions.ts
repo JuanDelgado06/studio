@@ -11,7 +11,7 @@ const PreflopDecisionSchema = z.object({
   stackSize: z.number(),
   tableType: z.enum(['cash', 'tournament']),
   hand: z.string(),
-  action: z.enum(['fold', 'call', 'raise']),
+  action: z.enum(['fold', 'call', 'raise', '3-bet', 'all-in']),
   betSize: z.number().optional(),
 });
 
@@ -23,7 +23,12 @@ const PreflopExplanationSchema = PreflopDecisionSchema.extend({
 export async function getPreflopExplanationAction(input: z.infer<typeof PreflopExplanationSchema>) {
     try {
         const validatedInput = PreflopExplanationSchema.parse(input);
-        const result = await getPreflopExplanation(validatedInput);
+        // Map 3-bet and all-in to raise for the AI model if needed
+        const mappedInput = {
+            ...validatedInput,
+            action: ['3-bet', 'all-in'].includes(validatedInput.action) ? 'raise' : validatedInput.action,
+        } as any;
+        const result = await getPreflopExplanation(mappedInput);
         return { success: true, data: result };
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -77,5 +82,3 @@ export async function suggestImprovementExercises(input: z.infer<typeof SuggestI
         return { success: false, error: 'Failed to get suggested exercises from AI.' };
     }
 }
-
-    

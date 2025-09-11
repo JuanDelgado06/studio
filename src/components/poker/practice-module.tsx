@@ -153,7 +153,13 @@ const reducer = (state: State, action: ActionPayload): State => {
       const actionTaken = action.payload;
       const correctAction =
         state.currentHandRange[state.currentHand.handNotation] || 'fold';
-      const isOptimal = actionTaken === correctAction;
+
+      // If the correct action is '3-bet' or 'all-in', a 'raise' is also acceptable
+      const isAggressiveActionCorrect = ['3-bet', 'all-in'].includes(correctAction) && actionTaken === 'raise';
+      // If the correct action is 'raise', a '3-bet' is also acceptable in a vs-raise scenario
+      const isRaiseSynonymCorrect = correctAction === 'raise' && actionTaken === '3-bet' && state.scenario.previousAction === 'raise';
+
+      const isOptimal = actionTaken === correctAction || isAggressiveActionCorrect || isRaiseSynonymCorrect;
 
       return {
         ...state,
@@ -233,6 +239,7 @@ export function PracticeModule() {
           ...state.scenario,
           hand: state.currentHand.handNotation,
           action: state.feedback.action,
+          betSize: state.scenario.stackSize, // Pass stack size as a proxy for bet size
         },
         state.feedback.isOptimal
       );
@@ -279,6 +286,7 @@ export function PracticeModule() {
         hand: state.currentHand.handNotation,
         action: state.feedback.action,
         isOptimal: state.feedback.isOptimal,
+        betSize: state.scenario.stackSize, // Pass stack size as a proxy for bet size
       });
 
       if (result.success && result.data) {
@@ -359,6 +367,10 @@ export function PracticeModule() {
   const descriptionText = state.scenario.previousAction === 'raise'
     ? `Un oponente ha subido. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`
     : `Nadie ha apostado todavía. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+  
+  const showOpenRaiseActions = state.scenario.previousAction === 'none' && !isBBvsLimp;
+  const showVsRaiseActions = state.scenario.previousAction === 'raise';
+
 
   return (
     <div className="space-y-6">
@@ -543,49 +555,77 @@ export function PracticeModule() {
             )}
 
             {!state.feedback && state.currentHandRange && (
-                <div className="flex gap-4">
+                <div className="flex flex-wrap justify-center gap-4">
                 {isBBvsLimp ? (
                     <>
                         <Button
                             variant="secondary"
                             size="lg"
-                            onClick={() => handleAction('call' as Action)}
+                            onClick={() => handleAction('call')}
                         >
                             Check ✅
                         </Button>
                          <Button
                             variant="default"
                             size="lg"
-                            onClick={() => handleAction('raise' as Action)}
+                            onClick={() => handleAction('raise')}
                         >
                             Bet 🚀
                         </Button>
                     </>
-                ) : (
+                ) : showOpenRaiseActions ? (
                     <>
                         <Button
                             variant="destructive"
                             size="lg"
-                            onClick={() => handleAction('fold' as Action)}
+                            onClick={() => handleAction('fold')}
+                        >
+                            Fold 🤚
+                        </Button>
+                        <Button
+                            variant="default"
+                            size="lg"
+                            onClick={() => handleAction('raise')}
+                        >
+                            Raise 🚀
+                        </Button>
+                    </>
+                ) : showVsRaiseActions ? (
+                    <>
+                        <Button
+                            variant="destructive"
+                            size="lg"
+                            onClick={() => handleAction('fold')}
                         >
                             Fold 🤚
                         </Button>
                          <Button
                             variant="secondary"
                             size="lg"
-                            onClick={() => handleAction('call' as Action)}
+                            onClick={() => handleAction('call')}
                         >
                             Call 💰
                         </Button>
                         <Button
-                            variant="default"
+                            style={{backgroundColor: '#f59e0b'}} // amber-500
+                            className="text-white hover:bg-amber-600"
                             size="lg"
-                            onClick={() => handleAction('raise' as Action)}
+                            onClick={() => handleAction('3-bet')}
                         >
-                            Raise 🚀
+                            3-Bet 💣
                         </Button>
+                        {state.scenario.stackSize <= 40 && (
+                            <Button
+                                variant="destructive"
+                                className="bg-red-700 hover:bg-red-800"
+                                size="lg"
+                                onClick={() => handleAction('all-in')}
+                            >
+                                All-in 🔥
+                            </Button>
+                        )}
                     </>
-                )}
+                ) : null }
                 </div>
             )}
              {!state.feedback && !state.currentHandRange && (
@@ -624,5 +664,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
