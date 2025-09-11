@@ -105,6 +105,8 @@ export function PracticeModule() {
   const fetchHandRange = useCallback(async (pos: Position, stack: number, type: TableType, prevAction: 'none' | 'raise') => {
     setIsRangeLoading(true);
     setHandRange(null);
+    setFeedback(null);
+    setCurrentHand(getNewHand());
     startTransition(async () => {
       try {
         const result = await getHandRangeAction({ position: pos, stackSize: stack, tableType: type, previousAction: prevAction });
@@ -140,8 +142,8 @@ export function PracticeModule() {
   }, []);
 
   useEffect(() => {
-    handleNextHand();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchHandRange(position, stackSize, tableType, previousAction);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -212,8 +214,6 @@ export function PracticeModule() {
         setStackSize(randomStackSize);
         setTableType(randomTableType);
         setPreviousAction(randomPreviousAction);
-        
-        handleNextHand();
     });
   };
   
@@ -235,7 +235,7 @@ export function PracticeModule() {
         <CardContent className="space-y-4">
            <Button variant="secondary" onClick={handleRandomizeScenario} className="w-full" disabled={isPending || isRangeLoading}>
               <Shuffle className="mr-2 h-4 w-4" />
-              Aleatorizar Escenario
+              Escenario Aleatorio
             </Button>
           <div className="space-y-2">
             <Label htmlFor="position">Posición</Label>
@@ -343,7 +343,7 @@ export function PracticeModule() {
 
           {isPending && !feedback && <Loader2 className="animate-spin h-8 w-8 text-primary" />}
 
-          {!feedback && !isPending && (
+          {!feedback && !isPending && !isRangeLoading && (
             <div className="flex gap-4">
               <Button variant="destructive" size="lg" onClick={() => handleAction('fold')} disabled={isPending || isRangeLoading}>
                 Fold 🤚
