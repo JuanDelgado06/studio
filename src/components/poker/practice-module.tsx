@@ -260,7 +260,7 @@ export function PracticeModule() {
   }
 
   const handleRandomizeScenario = () => {
-    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+    let randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
     
