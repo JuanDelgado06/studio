@@ -31,6 +31,7 @@ import { HandRangeGrid } from './hand-range-grid';
 import { expandRange } from '@/lib/range-expander';
 import allRanges from '@/lib/gto-ranges.json';
 import type { HandRange } from '@/lib/types';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const SUITS = ['s', 'h', 'd', 'c'];
@@ -311,6 +312,8 @@ export function PracticeModule() {
     let randomPreviousAction: 'none' | 'raise' = 'raise';
     if (randomPosition !== 'BB') {
         randomPreviousAction = 'none';
+    } else {
+        randomPreviousAction = 'raise';
     }
 
     dispatch({ type: 'SET_SCENARIO', payload: {
@@ -352,109 +355,117 @@ export function PracticeModule() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Card className="lg:col-span-1">
-        <CardHeader>
-          <CardTitle className="font-headline">Configurar Escenario</CardTitle>
-          <CardDescription>
-            Elige las condiciones para tu sesión de práctica.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button
-            variant="secondary"
-            onClick={handleRandomizeScenario}
-            className="w-full"
-          >
-            <Shuffle className="mr-2 h-4 w-4" />
-            Escenario Aleatorio
-          </Button>
-          <div className="space-y-2">
-            <Label htmlFor="position">Posición</Label>
-            <Select
-              value={state.scenario.position}
-              onValueChange={(v) =>
-                handleSetScenario({ position: v as Position })
-              }
-            >
-              <SelectTrigger id="position">
-                <SelectValue placeholder="Selecciona posición" />
-              </SelectTrigger>
-              <SelectContent>
-                {POSITIONS.map((pos) => (
-                  <SelectItem key={pos} value={pos}>
-                    {pos}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="stack-size">Stack (BBs)</Label>
-            <Select
-              value={String(state.scenario.stackSize)}
-              onValueChange={(v) =>
-                handleSetScenario({ stackSize: Number(v) })
-              }
-            >
-              <SelectTrigger id="stack-size">
-                <SelectValue placeholder="Selecciona stack" />
-              </SelectTrigger>
-              <SelectContent>
-                {STACK_SIZES.map((size) => (
-                  <SelectItem key={size} value={String(size)}>
-                    {size} BB
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="table-type">Tipo de Mesa</Label>
-            <Select
-              value={state.scenario.tableType}
-              onValueChange={(v) =>
-                handleSetScenario({ tableType: v as TableType })
-              }
-            >
-              <SelectTrigger id="table-type">
-                <SelectValue placeholder="Selecciona tipo de mesa" />
-              </SelectTrigger>
-              <SelectContent>
-                {TABLE_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type === 'cash' ? 'Cash Game' : 'Torneo'}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="previous-action">Acción Previa</Label>
-            <Select
-              value={state.scenario.previousAction}
-              onValueChange={(v) =>
-                handleSetScenario({ previousAction: v as 'none' | 'raise' })
-              }
-              disabled={isPreviousActionDisabled}
-            >
-              <SelectTrigger id="previous-action">
-                <SelectValue placeholder="Selecciona acción previa" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">
-                  Nadie ha apostado (Open-Raise)
-                </SelectItem>
-                <SelectItem value="raise">
-                  Hubo un Raise antes de mí
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            {isPreviousActionDisabled && (
-              <p className="text-xs text-muted-foreground">
-                Esta opción solo aplica para la posición BB.
-              </p>
-            )}
-          </div>
-        </CardContent>
+        <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
+            <AccordionItem value="item-1">
+                <AccordionTrigger className="px-6">
+                    <div className="text-left">
+                        <h3 className="font-headline text-lg">Configurar Escenario</h3>
+                        <p className="text-sm text-muted-foreground">
+                            Elige las condiciones para tu práctica.
+                        </p>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6">
+                    <div className="space-y-4 pt-4">
+                        <Button
+                            variant="secondary"
+                            onClick={handleRandomizeScenario}
+                            className="w-full"
+                        >
+                            <Shuffle className="mr-2 h-4 w-4" />
+                            Escenario Aleatorio
+                        </Button>
+                        <div className="space-y-2">
+                            <Label htmlFor="position">Posición</Label>
+                            <Select
+                            value={state.scenario.position}
+                            onValueChange={(v) =>
+                                handleSetScenario({ position: v as Position })
+                            }
+                            >
+                            <SelectTrigger id="position">
+                                <SelectValue placeholder="Selecciona posición" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {POSITIONS.map((pos) => (
+                                <SelectItem key={pos} value={pos}>
+                                    {pos}
+                                </SelectItem>
+                                ))}
+                            </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="stack-size">Stack (BBs)</Label>
+                            <Select
+                            value={String(state.scenario.stackSize)}
+                            onValueChange={(v) =>
+                                handleSetScenario({ stackSize: Number(v) })
+                            }
+                            >
+                            <SelectTrigger id="stack-size">
+                                <SelectValue placeholder="Selecciona stack" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {STACK_SIZES.map((size) => (
+                                <SelectItem key={size} value={String(size)}>
+                                    {size} BB
+                                </SelectItem>
+                                ))}
+                            </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="table-type">Tipo de Mesa</Label>
+                            <Select
+                            value={state.scenario.tableType}
+                            onValueChange={(v) =>
+                                handleSetScenario({ tableType: v as TableType })
+                            }
+                            >
+                            <SelectTrigger id="table-type">
+                                <SelectValue placeholder="Selecciona tipo de mesa" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {TABLE_TYPES.map((type) => (
+                                <SelectItem key={type} value={type}>
+                                    {type === 'cash' ? 'Cash Game' : 'Torneo'}
+                                </SelectItem>
+                                ))}
+                            </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="previous-action">Acción Previa</Label>
+                            <Select
+                            value={state.scenario.previousAction}
+                            onValueChange={(v) =>
+                                handleSetScenario({ previousAction: v as 'none' | 'raise' })
+                            }
+                            disabled={isPreviousActionDisabled}
+                            >
+                            <SelectTrigger id="previous-action">
+                                <SelectValue placeholder="Selecciona acción previa" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none">
+                                Nadie ha apostado (Open-Raise)
+                                </SelectItem>
+                                <SelectItem value="raise">
+                                Hubo un Raise antes de mí
+                                </SelectItem>
+                            </SelectContent>
+                            </Select>
+                            {isPreviousActionDisabled && (
+                            <p className="text-xs text-muted-foreground">
+                                Solo aplicable para la posición BB.
+                            </p>
+                            )}
+                        </div>
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
       </Card>
 
       <Card className="lg:col-span-2">
