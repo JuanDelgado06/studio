@@ -46,7 +46,7 @@ const getPreflopExplanationPrompt = ai.definePrompt({
   name: 'getPreflopExplanationPrompt',
   input: {schema: GetPreflopExplanationInputSchema},
   output: {schema: GetPreflopExplanationOutputSchema},
-  prompt: `Eres un entrenador de poker experto que se comunica en español.
+  prompt: `Eres un entrenador de poker experto que se comunica en español. Tu feedback debe ser conciso.
 
 Analiza la siguiente mano de poker preflop y proporciona una explicación concisa y directa.
 
@@ -63,7 +63,7 @@ Analiza la siguiente mano de poker preflop y proporciona una explicación concis
 2.  **Claridad:** Sé directo y fácil de entender.
 3.  **Terminología:** **NO traduzcas** términos comunes de poker como 'equity', 'range', 'fold', 'call', 'raise', 'GTO', 'EV', 'pot odds', 'nuts', 'bluff', 'semi-bluff', 'implied odds'.
 4.  **Contenido:**
-    *   **Feedback:** Explica por qué la jugada fue correcta o incorrecta basándote en principios GTO.
+    *   **Feedback:** Explica por qué la jugada fue correcta o incorrecta basándote en principios GTO. Sé breve.
     *   **EV Explanation:** Proporciona una explicación muy breve sobre el valor esperado (EV) de la acción realizada.
 
 Asegúrate de que tu respuesta coincida con el esquema JSON de salida.`,
