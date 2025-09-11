@@ -154,15 +154,6 @@ const reducer = (state: State, action: ActionPayload): State => {
         state.currentHandRange[state.currentHand.handNotation] || 'fold';
       const isOptimal = actionTaken === correctAction;
 
-      recordHand(
-        {
-          ...state.scenario,
-          hand: state.currentHand.handNotation,
-          action: actionTaken,
-        },
-        isOptimal
-      );
-
       return {
         ...state,
         feedback: { isOptimal, action: actionTaken },
@@ -199,14 +190,10 @@ const reducer = (state: State, action: ActionPayload): State => {
   }
 };
 
-// This needs to be defined outside to avoid being recreated on each render
-// and breaking the memoization of the useStats hook.
-let recordHand: (handData: any, isCorrect: boolean) => void;
 
 export function PracticeModule() {
   const { toast } = useToast();
-  const statsHook = useStats();
-  recordHand = statsHook.recordHand;
+  const { recordHand } = useStats();
 
   const [state, dispatch] = useReducer(reducer, {
     scenario: {
@@ -236,6 +223,22 @@ export function PracticeModule() {
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Record hand stats when feedback is given
+  useEffect(() => {
+    if (state.feedback && state.currentHand) {
+      recordHand(
+        {
+          ...state.scenario,
+          hand: state.currentHand.handNotation,
+          action: state.feedback.action,
+        },
+        state.feedback.isOptimal
+      );
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.feedback]);
+
 
   useEffect(() => {
     if (!state.currentHandRange && !state.isLoading) {
