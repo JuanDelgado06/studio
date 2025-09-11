@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useReducer, useTransition, useEffect, useMemo } from 'react';
+import { useReducer, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -53,14 +53,16 @@ type State = {
   } | null;
   showExplanation: boolean;
   isLoading: boolean;
+  explanationIsLoading: boolean;
 };
 
 type ActionPayload =
   | { type: 'SET_SCENARIO'; payload: Partial<Scenario> }
-  | { type: 'HANDLE_ACTION'; payload: { action: Action, recordHand: Function } }
+  | { type: 'HANDLE_ACTION'; payload: { action: Action; recordHand: Function } }
   | { type: 'NEXT_HAND' }
-  | { type: 'TOGGLE_EXPLANATION'; payload?: GetPreflopExplanationOutput }
-  | { type: 'SET_LOADING'; payload: boolean };
+  | { type: 'SET_EXPLANATION'; payload: GetPreflopExplanationOutput | null }
+  | { type: 'TOGGLE_EXPLANATION' }
+  | { type: 'SET_LOADING'; payload: { main?: boolean, explanation?: boolean } };
 
 function getRandomCard(deck: string[]): { card: string; remainingDeck: string[] } {
   const index = Math.floor(Math.random() * deck.length);
@@ -110,10 +112,18 @@ function loadRangeAndHand(scenario: Scenario): { range: HandRange | null, hand: 
 const reducer = (state: State, action: ActionPayload): State => {
   switch (action.type) {
     case 'SET_LOADING':
-      return { ...state, isLoading: action.payload };
+      return { 
+          ...state, 
+          isLoading: action.payload.main !== undefined ? action.payload.main : state.isLoading,
+          explanationIsLoading: action.payload.explanation !== undefined ? action.payload.explanation : state.explanationIsLoading,
+      };
 
     case 'SET_SCENARIO': {
         const newScenario = { ...state.scenario, ...action.payload };
+        // If position changes to not be BB, ensure previousAction is 'none'
+        if (action.payload.position && action.payload.position !== 'BB') {
+          newScenario.previousAction = 'none';
+        }
         const { range, hand } = loadRangeAndHand(newScenario);
         return {
             ...state,
@@ -147,23 +157,25 @@ const reducer = (state: State, action: ActionPayload): State => {
     }
 
     case 'NEXT_HAND': {
-      const { range, hand } = loadRangeAndHand(state.scenario);
+      const { hand } = loadRangeAndHand(state.scenario);
       return {
         ...state,
         currentHand: hand,
-        currentHandRange: range,
         feedback: null,
         showExplanation: false,
       };
     }
 
+    case 'SET_EXPLANATION': {
+        if (!state.feedback) return state;
+        return {
+            ...state,
+            feedback: { ...state.feedback, explanation: action.payload || undefined },
+        }
+    }
+
     case 'TOGGLE_EXPLANATION': {
-      if (!state.feedback) return state;
-      return {
-        ...state,
-        showExplanation: !state.showExplanation,
-        feedback: action.payload ? { ...state.feedback, explanation: action.payload } : state.feedback,
-      };
+      return { ...state, showExplanation: !state.showExplanation };
     }
 
     default:
@@ -175,8 +187,7 @@ const reducer = (state: State, action: ActionPayload): State => {
 export function PracticeModule() {
   const { toast } = useToast();
   const { recordHand } = useStats();
-  const [isExplanationLoading, startExplanationTransition] = useTransition();
-
+  
   const [state, dispatch] = useReducer(reducer, {
     scenario: {
       position: 'BTN',
@@ -189,6 +200,7 @@ export function PracticeModule() {
     feedback: null,
     showExplanation: false,
     isLoading: true,
+    explanationIsLoading: false,
   });
 
   useEffect(() => {
@@ -200,15 +212,6 @@ export function PracticeModule() {
       }});
   }, []);
 
-  const lastInputAction = useMemo(() => {
-    if (!state.feedback || !state.currentHand) return null;
-    return {
-        ...state.scenario,
-        hand: state.currentHand.handNotation,
-        action: state.feedback.action,
-    }
-  }, [state.scenario, state.currentHand, state.feedback]);
-
   useEffect(() => {
     if (!state.currentHandRange && !state.isLoading) {
       toast({
@@ -219,29 +222,42 @@ export function PracticeModule() {
     }
   }, [state.currentHandRange, state.isLoading, state.scenario, toast]);
 
-  const handleShowExplanation = () => {
-    if (state.showExplanation && state.feedback?.explanation) {
+  const handleShowExplanation = async () => {
+    // If explanation is already showing, just hide it.
+    if (state.showExplanation) {
         dispatch({ type: 'TOGGLE_EXPLANATION' });
         return;
     }
-    
-    if (!state.showExplanation && lastInputAction && state.feedback) {
-        startExplanationTransition(async () => {
-            const result = await getPreflopExplanationAction({
-                ...lastInputAction!,
-                isOptimal: state.feedback!.isOptimal,
-            });
-            if (result.success && result.data) {
-                dispatch({ type: 'TOGGLE_EXPLANATION', payload: result.data });
-            } else {
-                toast({
-                    variant: 'destructive',
-                    title: 'Error de Explicación',
-                    description: result.error || 'No se pudo obtener la explicación de la IA.',
-                });
-            }
-        });
+
+    // If explanation is loaded but hidden, just show it.
+    if (state.feedback?.explanation) {
         dispatch({ type: 'TOGGLE_EXPLANATION' });
+        return;
+    }
+
+    // If explanation is not loaded, fetch it.
+    if (state.feedback && state.currentHand) {
+        dispatch({ type: 'SET_LOADING', payload: { explanation: true } });
+        dispatch({ type: 'TOGGLE_EXPLANATION' }); // Show loading state
+
+        const result = await getPreflopExplanationAction({
+            ...state.scenario,
+            hand: state.currentHand.handNotation,
+            action: state.feedback.action,
+            isOptimal: state.feedback.isOptimal,
+        });
+
+        if (result.success && result.data) {
+            dispatch({ type: 'SET_EXPLANATION', payload: result.data });
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Error de Explicación',
+                description: result.error || 'No se pudo obtener la explicación de la IA.',
+            });
+            dispatch({ type: 'TOGGLE_EXPLANATION' }); // Hide explanation panel on error
+        }
+        dispatch({ type: 'SET_LOADING', payload: { explanation: false } });
     }
   }
 
@@ -260,21 +276,22 @@ export function PracticeModule() {
   }
 
   const handleRandomizeScenario = () => {
-    let randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
     
+    // Logic to ensure a valid scenario is generated
     let randomPreviousAction: 'none' | 'raise' = 'none';
-
-    // Prevent impossible BB vs limp scenario in our data
     if (randomPosition === 'BB') {
-        randomPreviousAction = 'raise';
-    } else {
-        const keyForRaise = `${randomPosition}-${randomStackSize}-${randomTableType}-raise`;
-        if ((allRanges as Record<string, any>)[keyForRaise] && Math.random() > 0.5) {
-            randomPreviousAction = 'raise';
-        }
+      // BB can face a raise. Let's randomly decide.
+      // We check if a corresponding 'raise' range exists before assigning it.
+      const keyForRaise = `${randomPosition}-${randomStackSize}-${randomTableType}-raise`;
+      if ((allRanges as Record<string, any>)[keyForRaise]) {
+          randomPreviousAction = 'raise';
+      }
     }
+    // For all other positions, our data only supports 'none' (open-raise scenarios)
+    // so we don't need to change randomPreviousAction.
 
     dispatch({ type: 'SET_SCENARIO', payload: {
         position: randomPosition,
@@ -287,6 +304,8 @@ export function PracticeModule() {
   const handleSetScenario = (payload: Partial<Scenario>) => {
     dispatch({ type: 'SET_SCENARIO', payload });
   }
+  
+  const isPreviousActionDisabled = state.scenario.position !== 'BB';
 
   if (state.isLoading || !state.currentHand) {
     return (
@@ -364,7 +383,11 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="previous-action">Acción Previa</Label>
-            <Select value={state.scenario.previousAction} onValueChange={(v) => handleSetScenario({ previousAction: v as 'none' | 'raise' })}>
+            <Select 
+                value={state.scenario.previousAction} 
+                onValueChange={(v) => handleSetScenario({ previousAction: v as 'none' | 'raise' })}
+                disabled={isPreviousActionDisabled}
+            >
               <SelectTrigger id="previous-action">
                 <SelectValue placeholder="Selecciona acción previa" />
               </SelectTrigger>
@@ -373,6 +396,7 @@ export function PracticeModule() {
                   <SelectItem value='raise'>Hubo un Raise antes de mí</SelectItem>
               </SelectContent>
             </Select>
+            {isPreviousActionDisabled && <p className="text-xs text-muted-foreground pt-1">Solo aplicable para la posición BB.</p>}
           </div>
         </CardContent>
       </Card>
@@ -402,14 +426,14 @@ export function PracticeModule() {
                                 {state.feedback.isOptimal ? "Respuesta Correcta" : "Respuesta Incorrecta"}
                             </AlertTitle>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={handleShowExplanation} disabled={isExplanationLoading}>
-                            {isExplanationLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Info className="mr-2 h-4 w-4" />}
+                        <Button variant="ghost" size="sm" onClick={handleShowExplanation} disabled={state.explanationIsLoading}>
+                            {state.explanationIsLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Info className="mr-2 h-4 w-4" />}
                             {state.showExplanation ? 'Ocultar' : 'Explicación'}
                         </Button>
                     </div>
                     {state.showExplanation && (
                         <AlertDescription className="space-y-2 pt-2">
-                           {isExplanationLoading && !state.feedback.explanation ? <p>Cargando explicación...</p> : (
+                           {state.explanationIsLoading && !state.feedback.explanation ? <p>Cargando explicación...</p> : (
                                <>
                                 <p>{state.feedback.explanation?.feedback}</p>
                                 <p className="text-xs text-muted-foreground">{state.feedback.explanation?.evExplanation}</p>
@@ -453,7 +477,11 @@ export function PracticeModule() {
             <HandRangeGrid currentHand={state.currentHand?.handNotation} range={state.currentHandRange} />
         ) : !state.currentHandRange ? (
              <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
-                <p className="text-muted-foreground">
+                <XCircle className="h-10 w-10 text-destructive mb-2" />
+                <p className="font-semibold text-destructive">
+                    Error de Rango
+                </p>
+                <p className="text-muted-foreground text-sm">
                     El rango para este escenario no está disponible. Por favor, selecciona otro.
                 </p>
             </div>
@@ -468,3 +496,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
