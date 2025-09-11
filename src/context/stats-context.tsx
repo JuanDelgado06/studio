@@ -138,7 +138,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
       }
       fetchFocusAreas();
     }
-  }, [stats.handsPlayed, isClient]);
+  }, [stats.handsPlayed, isClient, stats.accuracyByPosition, stats.overallAccuracy, stats.weeklyGoal]);
 
 
   const recordHand = (handData: AnalyzePreflopDecisionInput, isCorrect: boolean) => {
@@ -157,7 +157,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
           ? Math.round((newCorrectDecisions / newHandsPlayed) * 100)
           : 'N/A';
       
-      const newAccuracyByPosition = [...prevStats.accuracyByPosition].map((posData) => {
+      const newAccuracyByPosition = prevStats.accuracyByPosition.map((posData) => {
           if (posData.position === handData.position) {
               const newTotal = posData.total + 1;
               const newCorrect = isCorrect ? posData.correct + 1 : posData.correct;
@@ -176,26 +176,21 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
       let newStreak = prevStats.streak || 0;
       
       if (isNewDay) {
-        // This is the first hand of a new day. Check if the streak should continue or reset.
         if (prevStats.lastPracticeDate) {
           const lastDate = new Date(prevStats.lastPracticeDate);
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
       
-          // If the last practice wasn't yesterday, reset the streak.
           if (lastDate.toDateString() !== yesterday.toDateString()) {
             newStreak = 0;
           }
+        } else {
+            newStreak = 0;
         }
       }
 
-      // Check if the 10th hand of the day has been played to update the streak
       if (handsPlayedToday === 10) {
-        if (newStreak > 0) {
-          newStreak += 1; // Continue streak
-        } else {
-          newStreak = 1; // Start a new streak
-        }
+        newStreak = newStreak + 1;
       }
 
       const newWeeklyGoal = Math.min(100, Math.round((newCorrectDecisions / (newHandsPlayed + 10)) * 100));
