@@ -2,6 +2,7 @@
 
 import { analyzePreflopDecision } from "@/ai/flows/analyze-preflop-decision";
 import { adaptDifficultyBasedOnProgress } from "@/ai/flows/adapt-difficulty-based-on-progress";
+import { getPreflopExplanation } from "@/ai/flows/get-preflop-explanation";
 import { z } from "zod";
 
 const PreflopDecisionSchema = z.object({
@@ -24,6 +25,24 @@ export async function getPreflopAnalysis(input: z.infer<typeof PreflopDecisionSc
         }
         console.error(error);
         return { success: false, error: "Failed to get analysis from AI." };
+    }
+}
+
+const PreflopExplanationSchema = PreflopDecisionSchema.extend({
+    isOptimal: z.boolean(),
+});
+
+export async function getPreflopExplanationAction(input: z.infer<typeof PreflopExplanationSchema>) {
+    try {
+        const validatedInput = PreflopExplanationSchema.parse(input);
+        const result = await getPreflopExplanation(validatedInput);
+        return { success: true, data: result };
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return { success: false, error: "Invalid input for explanation." };
+        }
+        console.error(error);
+        return { success: false, error: "Failed to get explanation from AI." };
     }
 }
 

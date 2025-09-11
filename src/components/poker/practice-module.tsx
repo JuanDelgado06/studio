@@ -21,12 +21,17 @@ import { Button } from '@/components/ui/button';
 import { PokerCard } from './poker-card';
 import { POSITIONS, STACK_SIZES, TABLE_TYPES } from '@/lib/data';
 import type { Position, TableType, Action } from '@/lib/types';
-import { getPreflopAnalysis } from '@/lib/actions';
+import { getPreflopAnalysis, getPreflopExplanationAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { CheckCircle, Info, Loader2, XCircle } from 'lucide-react';
-import type { AnalyzePreflopDecisionOutput } from '@/ai/flows/analyze-preflop-decision';
+import type {
+  AnalyzePreflopDecisionOutput,
+  AnalyzePreflopDecisionInput,
+} from '@/ai/flows/analyze-preflop-decision';
 import { useStats } from '@/context/stats-context';
+import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
+
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const SUITS = ['s', 'h', 'd', 'c']; // spades, hearts, diamonds, clubs
@@ -66,14 +71,22 @@ function getNewHand() {
   return { handNotation, cards: [card1, card2] as [string, string] };
 }
 
+type Feedback = {
+    isOptimal: boolean;
+    action: Action;
+    explanation?: GetPreflopExplanationOutput;
+}
+
 export function PracticeModule() {
   const [position, setPosition] = useState<Position>('BTN');
   const [stackSize, setStackSize] = useState<number>(100);
   const [tableType, setTableType] = useState<TableType>('cash');
   const [currentHand, setCurrentHand] = useState<{ handNotation: string; cards: [string, string] } | null>(null);
-  const [feedback, setFeedback] = useState<AnalyzePreflopDecisionOutput & {action: Action} | null>(null);
+  const [lastInput, setLastInput] = useState<AnalyzePreflopDecisionInput | null>(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [isExplanationLoading, startExplanationTransition] = useTransition();
   const { toast } = useToast();
   const { recordHand } = useStats();
 
@@ -86,16 +99,18 @@ export function PracticeModule() {
     setFeedback(null);
     setShowExplanation(false);
     startTransition(async () => {
-      const result = await getPreflopAnalysis({
+      const input: AnalyzePreflopDecisionInput = {
         position,
         stackSize,
         tableType,
         hand: currentHand.handNotation,
         action,
-      });
+      }
+      const result = await getPreflopAnalysis(input);
 
       if (result.success && result.data) {
-        setFeedback({...result.data, action});
+        setFeedback({ isOptimal: result.data.isOptimal, action });
+        setLastInput(input);
         recordHand(position, result.data.isOptimal);
       } else {
         toast({
@@ -106,11 +121,33 @@ export function PracticeModule() {
       }
     });
   };
+
+  const handleShowExplanation = () => {
+    if (!showExplanation && lastInput && feedback && !feedback.explanation) {
+        startExplanationTransition(async () => {
+            const result = await getPreflopExplanationAction({
+                ...lastInput,
+                isOptimal: feedback.isOptimal,
+            });
+            if (result.success && result.data) {
+                setFeedback(f => f ? {...f, explanation: result.data} : null);
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Error de Explicación',
+                    description: result.error || 'No se pudo obtener la explicación de la IA.',
+                });
+            }
+        });
+    }
+    setShowExplanation(!showExplanation);
+  }
   
   const handleNextHand = () => {
     setCurrentHand(getNewHand());
     setFeedback(null);
     setShowExplanation(false);
+    setLastInput(null);
   };
   
   const renderCard = (cardStr: string) => {
@@ -202,15 +239,19 @@ export function PracticeModule() {
                             {feedback.isOptimal ? "¡Decisión Óptima!" : "Decisión Subóptima"}
                             </AlertTitle>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={() => setShowExplanation(!showExplanation)}>
-                            <Info className="mr-2 h-4 w-4" />
+                        <Button variant="ghost" size="sm" onClick={handleShowExplanation} disabled={isExplanationLoading}>
+                            {isExplanationLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Info className="mr-2 h-4 w-4" />}
                             {showExplanation ? 'Ocultar' : 'Explicación'}
                         </Button>
                     </div>
                     {showExplanation && (
                         <AlertDescription className="space-y-2 pt-2">
-                            <p>{feedback.feedback}</p>
-                            <p className="text-xs text-muted-foreground">{feedback.evExplanation}</p>
+                           {isExplanationLoading ? <p>Cargando explicación...</p> : (
+                               <>
+                                <p>{feedback.explanation?.feedback}</p>
+                                <p className="text-xs text-muted-foreground">{feedback.explanation?.evExplanation}</p>
+                               </>
+                           )}
                         </AlertDescription>
                     )}
                 </Alert>
