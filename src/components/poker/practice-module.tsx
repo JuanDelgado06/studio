@@ -314,11 +314,7 @@ export function PracticeModule() {
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
     
-    // 50% chance of facing a raise, unless we are SB (where it's always open-raise)
-    let randomPreviousAction: 'none' | 'raise' = 'none';
-    if (randomPosition !== 'SB' && Math.random() < 0.5) {
-        randomPreviousAction = 'raise';
-    }
+    const randomPreviousAction = Math.random() < 0.5 ? 'none' : 'raise';
 
     dispatch({ type: 'SET_SCENARIO', payload: {
         position: randomPosition,
@@ -349,7 +345,7 @@ export function PracticeModule() {
 
   const descriptionText = state.scenario.previousAction === 'raise'
     ? `Un oponente ha subido. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`
-    : `Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+    : `La acción te llega de fold. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
 
   return (
     <div className="space-y-6">
@@ -597,5 +593,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
