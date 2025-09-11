@@ -5,6 +5,7 @@ import { analyzePreflopDecision } from "@/ai/flows/analyze-preflop-decision";
 import { adaptDifficultyBasedOnProgress } from "@/ai/flows/adapt-difficulty-based-on-progress";
 import { getPreflopExplanation } from "@/ai/flows/get-preflop-explanation";
 import { suggestImprovementExercises as suggestImprovementExercisesFlow } from "@/ai/flows/suggest-improvement-exercises";
+import { getHandRange } from "@/ai/flows/get-hand-range";
 import { z } from "zod";
 
 const PreflopDecisionSchema = z.object({
@@ -89,5 +90,25 @@ export async function suggestImprovementExercises(input: z.infer<typeof SuggestI
         }
         console.error(error);
         return { success: false, error: 'Failed to get suggested exercises from AI.' };
+    }
+}
+
+const HandRangeSchema = z.object({
+    position: z.string(),
+    stackSize: z.number(),
+    tableType: z.enum(['cash', 'tournament']),
+});
+
+export async function getHandRangeAction(input: z.infer<typeof HandRangeSchema>) {
+    try {
+        const validatedInput = HandRangeSchema.parse(input);
+        const result = await getHandRange(validatedInput);
+        return { success: true, data: result };
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return { success: false, error: 'Invalid input for hand range.' };
+        }
+        console.error(error);
+        return { success: false, error: 'Failed to get hand range from AI.' };
     }
 }

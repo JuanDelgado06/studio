@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useTransition, useEffect } from 'react';
+import { useState, useTransition, useEffect, useCallback } from 'react';
 import {
   Card,
   CardContent,
@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { PokerCard } from './poker-card';
 import { POSITIONS, STACK_SIZES, TABLE_TYPES } from '@/lib/data';
 import type { Position, TableType, Action } from '@/lib/types';
-import { getPreflopAnalysis, getPreflopExplanationAction } from '@/lib/actions';
+import { getPreflopAnalysis, getPreflopExplanationAction, getHandRangeAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { CheckCircle, Info, Loader2, XCircle } from 'lucide-react';
@@ -31,6 +31,7 @@ import type {
 import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
+import type { GetHandRangeOutput } from '@/ai/flows/get-hand-range';
 
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
@@ -77,6 +78,8 @@ type Feedback = {
     explanation?: GetPreflopExplanationOutput;
 }
 
+type HandRangeData = GetHandRangeOutput['range'];
+
 export function PracticeModule() {
   const [position, setPosition] = useState<Position>('BTN');
   const [stackSize, setStackSize] = useState<number>(100);
@@ -87,12 +90,36 @@ export function PracticeModule() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isExplanationLoading, startExplanationTransition] = useTransition();
+  const [isRangeLoading, startRangeTransition] = useTransition();
+  const [handRange, setHandRange] = useState<HandRangeData | null>(null);
+
   const { toast } = useToast();
   const { recordHand } = useStats();
 
+  const fetchHandRange = useCallback((pos: Position, stack: number, type: TableType) => {
+    startRangeTransition(async () => {
+      setHandRange(null);
+      const result = await getHandRangeAction({ position: pos, stackSize: stack, tableType: type });
+      if (result.success && result.data) {
+        setHandRange(result.data.range);
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error de Rango',
+          description: result.error || 'No se pudo obtener el rango de manos.',
+        });
+      }
+    });
+  }, [toast]);
+
   useEffect(() => {
     setCurrentHand(getNewHand());
+    fetchHandRange(position, stackSize, tableType);
   }, []);
+
+  useEffect(() => {
+    fetchHandRange(position, stackSize, tableType);
+  }, [position, stackSize, tableType, fetchHandRange]);
 
   const handleAction = (action: Action) => {
     if (!currentHand) return;
@@ -168,7 +195,7 @@ export function PracticeModule() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="position">Posición</Label>
-            <Select value={position} onValueChange={(v) => setPosition(v as Position)} disabled={isPending}>
+            <Select value={position} onValueChange={(v) => setPosition(v as Position)} disabled={isPending || isRangeLoading}>
               <SelectTrigger id="position">
                 <SelectValue placeholder="Selecciona posición" />
               </SelectTrigger>
@@ -183,7 +210,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="stack-size">Stack (BBs)</Label>
-            <Select value={String(stackSize)} onValueChange={(v) => setStackSize(Number(v))} disabled={isPending}>
+            <Select value={String(stackSize)} onValueChange={(v) => setStackSize(Number(v))} disabled={isPending || isRangeLoading}>
               <SelectTrigger id="stack-size">
                 <SelectValue placeholder="Selecciona stack" />
               </SelectTrigger>
@@ -198,7 +225,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="table-type">Tipo de Mesa</Label>
-            <Select value={tableType} onValueChange={(v) => setTableType(v as TableType)} disabled={isPending}>
+            <Select value={tableType} onValueChange={(v) => setTableType(v as TableType)} disabled={isPending || isRangeLoading}>
               <SelectTrigger id="table-type">
                 <SelectValue placeholder="Selecciona tipo de mesa" />
               </SelectTrigger>
@@ -262,13 +289,13 @@ export function PracticeModule() {
 
           {!feedback && !isPending && (
             <div className="flex gap-4">
-              <Button variant="destructive" size="lg" onClick={() => handleAction('fold')} disabled={isPending}>
+              <Button variant="destructive" size="lg" onClick={() => handleAction('fold')} disabled={isPending || isRangeLoading}>
                 Fold 🤚
               </Button>
-              <Button variant="secondary" size="lg" onClick={() => handleAction('call')} disabled={isPending}>
+              <Button variant="secondary" size="lg" onClick={() => handleAction('call')} disabled={isPending || isRangeLoading}>
                 Call 💰
               </Button>
-              <Button variant="default" size="lg" onClick={() => handleAction('raise')} disabled={isPending}>
+              <Button variant="default" size="lg" onClick={() => handleAction('raise')} disabled={isPending || isRangeLoading}>
                 Raise 🚀
               </Button>
             </div>
@@ -283,7 +310,16 @@ export function PracticeModule() {
         </CardContent>
       </Card>
       <div className="lg:col-span-3">
-        <HandRangeGrid currentHand={currentHand?.handNotation} />
+        {isRangeLoading && !handRange ? (
+            <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              <p className="mt-4 text-muted-foreground">
+                Cargando rango de manos GTO...
+              </p>
+            </div>
+        ) : (
+            <HandRangeGrid currentHand={currentHand?.handNotation} range={handRange} />
+        )}
       </div>
     </div>
   );
