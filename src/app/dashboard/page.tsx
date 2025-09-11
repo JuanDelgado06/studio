@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useState } from 'react';
 import * as React from 'react';
 import { BarChart3, CheckCircle, Target, TrendingUp, XCircle } from 'lucide-react';
 import {
@@ -27,36 +26,14 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-
-const initialStats = {
-  handsPlayed: 0,
-  overallAccuracy: 'N/A' as number | 'N/A',
-  correctDecisions: 0,
-  commonErrors: 0,
-  streak: 0,
-  weeklyGoal: 0,
-  focusAreas: [],
-  accuracyByPosition: [
-    { position: 'SB', accuracy: 0 },
-    { position: 'BB', accuracy: 0 },
-    { position: 'UTG', accuracy: 0 },
-    { position: 'MP', accuracy: 0 },
-    { position: 'CO', accuracy: 0 },
-    { position: 'BTN', accuracy: 0 },
-  ],
-};
+import { useStats } from '@/context/stats-context';
 
 export default function DashboardPage() {
   const { toast } = useToast();
-  const [stats, setStats] = useState(initialStats);
-  const [isClient, setIsClient] = useState(false);
-
-  React.useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const { stats, resetStats, isClient } = useStats();
 
   const handleReset = () => {
-    setStats(initialStats);
+    resetStats();
     toast({
       title: 'Estadísticas Reiniciadas',
       description: 'Tus estadísticas de práctica han sido borradas.',

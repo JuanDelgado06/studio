@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { AppShell } from '@/components/layout/app-shell';
 import { Toaster } from '@/components/ui/toaster';
+import { StatsProvider } from '@/context/stats-context';
 
 export const metadata: Metadata = {
   title: 'Preflop Pro Trainer',
@@ -24,7 +25,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <AppShell>{children}</AppShell>
+        <StatsProvider>
+          <AppShell>{children}</AppShell>
+        </StatsProvider>
         <Toaster />
       </body>
     </html>

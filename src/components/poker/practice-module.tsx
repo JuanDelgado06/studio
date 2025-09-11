@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
@@ -25,6 +26,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { CheckCircle, Loader2, XCircle } from 'lucide-react';
 import type { AnalyzePreflopDecisionOutput } from '@/ai/flows/analyze-preflop-decision';
+import { useStats } from '@/context/stats-context';
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const SUITS = ['s', 'h', 'd', 'c']; // spades, hearts, diamonds, clubs
@@ -72,6 +74,7 @@ export function PracticeModule() {
   const [feedback, setFeedback] = useState<AnalyzePreflopDecisionOutput & {action: Action} | null>(null);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const { recordHand } = useStats();
 
   useEffect(() => {
     setCurrentHand(getNewHand());
@@ -91,6 +94,7 @@ export function PracticeModule() {
 
       if (result.success && result.data) {
         setFeedback({...result.data, action});
+        recordHand(position, result.data.isOptimal);
       } else {
         toast({
           variant: 'destructive',
