@@ -33,7 +33,7 @@ const AdaptDifficultyBasedOnProgressOutputSchema = z.object({
   suggestedFocusAreas: z
     .array(z.string())
     .describe(
-      'An array of strings describing areas the user should focus on to improve their game, based on their stats.'
+      'An array of strings describing areas the user should focus on to improve their game, based on their stats. Each string should be a short, actionable suggestion.'
     ),
   newRanges: z.string().optional().describe('An adapted hand range based on user progress.'),
 });
@@ -61,14 +61,15 @@ User Stats:
 
 Current Difficulty: {{{currentDifficulty}}}
 
-Based on this information, determine the new difficulty level and suggest focus areas for the user. Explain your reasoning.
+Based on this information, determine the new difficulty level and suggest focus areas for the user.
+The focus areas should be an array of short, actionable suggestions.
 
 Difficulty levels:
 - beginner
 - intermediate
 - advanced
 
-Respond in a JSON format.
+Respond in a JSON format that matches the output schema.
 `,
 });
 
