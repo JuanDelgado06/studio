@@ -120,7 +120,7 @@ export function PracticeModule() {
       newTableType: TableType,
       newPreviousAction: 'none' | 'raise'
     ) => {
-      startTransition(() => {
+      startRangeTransition(() => {
         setPosition(newPosition);
         setStackSize(newStackSize);
         setTableType(newTableType);
@@ -408,5 +408,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
