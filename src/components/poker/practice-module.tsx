@@ -311,15 +311,7 @@ export function PracticeModule() {
 
   const handleRandomizeScenario = () => {
     const randomPreviousAction = Math.random() < 0.5 ? 'none' : 'raise';
-    
-    let availablePositions = POSITIONS;
-    if (randomPreviousAction === 'raise') {
-        availablePositions = ['BB'];
-    } else {
-        availablePositions = POSITIONS.filter(p => p !== 'BB');
-    }
-    
-    const randomPosition = availablePositions[Math.floor(Math.random() * availablePositions.length)];
+    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
 
@@ -333,24 +325,7 @@ export function PracticeModule() {
 
 
   const handleSetScenario = (payload: Partial<Scenario>) => {
-    let newPayload = { ...payload };
-    // If previous action is 'raise', force position to 'BB'
-    if (newPayload.previousAction === 'raise') {
-        newPayload.position = 'BB';
-    }
-    // If position is 'BB', force previous action to 'raise' if it's not already
-    if (newPayload.position === 'BB' && state.scenario.previousAction !== 'raise') {
-        if (newPayload.previousAction !== 'raise') {
-            newPayload.previousAction = 'raise';
-        }
-    }
-    // If we change to an open-raise scenario, and the position is BB, pick another position
-    if (newPayload.previousAction === 'none' && (newPayload.position === 'BB' || state.scenario.position === 'BB')) {
-       const otherPositions = POSITIONS.filter(p => p !== 'BB');
-       newPayload.position = otherPositions[Math.floor(Math.random() * otherPositions.length)];
-    }
-
-    dispatch({ type: 'SET_SCENARIO', payload: newPayload });
+    dispatch({ type: 'SET_SCENARIO', payload: payload });
   };
 
   const isBBvsLimp =
@@ -417,7 +392,6 @@ export function PracticeModule() {
                         <Label htmlFor="position-sheet">Posición</Label>
                         <Select
                         value={state.scenario.position}
-                        disabled={state.scenario.previousAction === 'raise'}
                         onValueChange={(v) =>
                             handleSetScenario({ position: v as Position })
                         }
@@ -426,14 +400,13 @@ export function PracticeModule() {
                             <SelectValue placeholder="Selecciona posición" />
                         </SelectTrigger>
                         <SelectContent>
-                            {POSITIONS.filter(p => state.scenario.previousAction === 'raise' ? p === 'BB' : p !== 'BB').map((pos) => (
+                            {POSITIONS.map((pos) => (
                             <SelectItem key={pos} value={pos}>
                                 {pos}
                             </SelectItem>
                             ))}
                         </SelectContent>
                         </Select>
-                         {state.scenario.previousAction === 'raise' && <p className="text-xs text-muted-foreground">La posición se establece en BB al enfrentar un raise.</p>}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="stack-size-sheet">Stack (BBs)</Label>
@@ -630,5 +603,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
