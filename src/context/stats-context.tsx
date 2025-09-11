@@ -93,7 +93,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
 
   // Effect to fetch focus areas when hands played is a multiple of 10
   React.useEffect(() => {
-    if (stats.handsPlayed > 0 && stats.handsPlayed % 10 === 0) {
+    if (isClient && stats.handsPlayed > 0 && stats.handsPlayed % 10 === 0) {
       const fetchFocusAreas = async () => {
         if (stats.overallAccuracy === 'N/A') return;
 
@@ -113,12 +113,12 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
           currentDifficulty: 'beginner',
         });
         if (result.success && result.data) {
-          setStats(s => ({...s, focusAreas: result.data.suggestedFocusAreas}));
+          setStats(s => ({...s, focusAreas: result.data!.suggestedFocusAreas}));
         }
       }
       fetchFocusAreas();
     }
-  }, [stats.handsPlayed, stats.overallAccuracy, stats.accuracyByPosition, stats.weeklyGoal]);
+  }, [stats.handsPlayed, isClient]);
 
 
   const recordHand = (position: Position, isCorrect: boolean) => {
@@ -156,7 +156,9 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
       let newStreak = prevStats.streak || 0;
 
       if (handsPlayedToday === 10) {
-          if (prevStats.lastPracticeDate) {
+          if (!prevStats.lastPracticeDate) {
+              newStreak = 1;
+          } else {
               const lastDate = new Date(prevStats.lastPracticeDate);
               const yesterday = new Date();
               yesterday.setDate(yesterday.getDate() - 1);
@@ -165,18 +167,13 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
               } else if (lastDate.toDateString() !== today) {
                   newStreak = 1; // Start new streak after a gap
               }
-          } else {
-              newStreak = 1; // First streak ever
           }
-      } else if (isNewDay) {
-         // Check if a day was missed
+      } else if (isNewDay && newStreak > 0) {
          if (prevStats.lastPracticeDate) {
             const lastDate = new Date(prevStats.lastPracticeDate);
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
-
-            // If the last practice wasn't today or yesterday, reset streak.
-            if (lastDate.toDateString() !== yesterday.toDateString() && lastDate.toDateString() !== today) {
+            if (lastDate.toDateString() !== yesterday.toDateString()) {
                 newStreak = 0;
             }
          }
@@ -191,7 +188,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
         correctDecisions: newCorrectDecisions,
         commonErrors: newCommonErrors,
         overallAccuracy: newOverallAccuracy,
-        accuracyByPosition: newAccuracyByPosition,
+        accuracyByPosition: [...newAccuracyByPosition],
         streak: newStreak,
         weeklyGoal: newWeeklyGoal,
         lastPracticeDate: today,
