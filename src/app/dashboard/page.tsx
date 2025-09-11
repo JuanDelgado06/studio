@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import { BarChart3, CheckCircle, Target, TrendingUp, XCircle } from 'lucide-react';
 import {
   Card,
@@ -26,12 +27,35 @@ import {
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
+const initialStats = {
+  handsPlayed: 0,
+  overallAccuracy: 'N/A' as number | 'N/A',
+  correctDecisions: 0,
+  commonErrors: 0,
+  streak: 0,
+  weeklyGoal: 0,
+  focusAreas: [],
+  accuracyByPosition: [
+    { position: 'SB', accuracy: 0 },
+    { position: 'BB', accuracy: 0 },
+    { position: 'UTG', accuracy: 0 },
+    { position: 'MP', accuracy: 0 },
+    { position: 'CO', accuracy: 0 },
+    { position: 'BTN', accuracy: 0 },
+  ],
+};
+
 export default function DashboardPage() {
   const { toast } = useToast();
+  const [stats, setStats] = useState(initialStats);
+  const [isClient, setIsClient] = useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleReset = () => {
-    // Here you would implement the logic to reset the statistics.
-    // For now, we'll just show a toast notification.
+    setStats(initialStats);
     toast({
       title: 'Estadísticas Reiniciadas',
       description: 'Tus estadísticas de práctica han sido borradas.',
@@ -46,7 +70,7 @@ export default function DashboardPage() {
           <BarChart3 className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">0</div>
+          <div className="text-2xl font-bold">{stats.handsPlayed}</div>
           <p className="text-xs text-muted-foreground">Sesión actual</p>
         </CardContent>
       </Card>
@@ -56,8 +80,8 @@ export default function DashboardPage() {
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">N/A</div>
-          <p className="text-xs text-muted-foreground">Aún no hay datos</p>
+          <div className="text-2xl font-bold">{stats.overallAccuracy === 'N/A' ? 'N/A' : `${stats.overallAccuracy}%`}</div>
+          <p className="text-xs text-muted-foreground">{stats.overallAccuracy === 'N/A' ? 'Aún no hay datos' : 'Desde el reinicio'}</p>
         </CardContent>
       </Card>
       <Card>
@@ -66,7 +90,7 @@ export default function DashboardPage() {
           <CheckCircle className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">0</div>
+          <div className="text-2xl font-bold">{stats.correctDecisions}</div>
           <p className="text-xs text-muted-foreground">Total de aciertos</p>
         </CardContent>
       </Card>
@@ -76,8 +100,8 @@ export default function DashboardPage() {
           <XCircle className="h-4 w-4 text-destructive" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">0</div>
-          <p className="text-xs text-muted-foreground">Aún no hay datos</p>
+          <div className="text-2xl font-bold">{stats.commonErrors}</div>
+          <p className="text-xs text-muted-foreground">{stats.commonErrors > 0 ? 'Desde el reinicio' : 'Aún no hay datos'}</p>
         </CardContent>
       </Card>
 
@@ -89,7 +113,7 @@ export default function DashboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AccuracyChart />
+          {isClient ? <AccuracyChart data={stats.accuracyByPosition} /> : <div className="h-[250px] w-full flex items-center justify-center"><p>Cargando gráfico...</p></div>}
         </CardContent>
       </Card>
       
@@ -103,22 +127,26 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent className="space-y-6">
             <div className="text-center">
-                <span className="text-5xl">🎉</span>
-                <p className="text-2xl font-bold font-headline">Racha de 0 días</p>
-                <p className="text-sm text-muted-foreground">¡Completa tu primera práctica!</p>
+                <span className="text-5xl">{stats.streak > 0 ? '🎉' : '🤔'}</span>
+                <p className="text-2xl font-bold font-headline">Racha de {stats.streak} días</p>
+                <p className="text-sm text-muted-foreground">{stats.streak > 0 ? `¡Sigue así!` : '¡Completa tu primera práctica!'}</p>
             </div>
             <div className="space-y-2">
                 <div className="flex justify-between items-baseline">
                     <p className="font-semibold">Meta Semanal</p>
-                    <p className="text-sm font-bold text-primary">0%</p>
+                    <p className="text-sm font-bold text-primary">{stats.weeklyGoal}%</p>
                 </div>
-                <Progress value={0} />
+                <Progress value={stats.weeklyGoal} />
                 <p className="text-xs text-muted-foreground">Completa prácticas para progresar.</p>
             </div>
              <div className="space-y-2">
                 <p className="font-semibold">Áreas de Enfoque Sugeridas por IA</p>
                 <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">Juega para recibir sugerencias</Badge>
+                    {stats.focusAreas.length > 0 ? (
+                        stats.focusAreas.map((area, i) => <Badge key={i} variant="secondary">{area}</Badge>)
+                    ) : (
+                        <Badge variant="secondary">Juega para recibir sugerencias</Badge>
+                    )}
                 </div>
             </div>
         </CardContent>
