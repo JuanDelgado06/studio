@@ -14,7 +14,7 @@ export default {
       },
       fontFamily: {
         body: ['PT Sans', 'sans-serif'],
-        headline: ['Alegreya Sans SC', 'sans-serif'],
+        headline: ['Alegreya Sans', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
