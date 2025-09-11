@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { PokerCard } from './poker-card';
 import { POSITIONS, STACK_SIZES, TABLE_TYPES } from '@/lib/data';
 import type { Position, TableType, Action } from '@/lib/types';
-import { getPreflopExplanationAction, getHandRangeAction } from '@/lib/actions';
+import { getPreflopExplanationAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { CheckCircle, Info, Loader2, Shuffle, XCircle } from 'lucide-react';
@@ -29,7 +29,7 @@ import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
 import type { HandRange } from '@/lib/types';
-import { expandRange } from '@/lib/range-expander';
+import { allRanges } from '@/lib/gto-ranges';
 
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
@@ -84,8 +84,6 @@ type Feedback = {
     explanation?: GetPreflopExplanationOutput;
 }
 
-type RangeCache = Record<string, HandRange>;
-
 const generateCacheKey = (pos: Position, stack: number, type: TableType, prevAction: 'none' | 'raise') =>
   `${pos}-${stack}-${type}-${prevAction}`;
 
@@ -101,56 +99,17 @@ export function PracticeModule() {
   const [isPending, startTransition] = useTransition();
   const [isExplanationLoading, startExplanationTransition] = useTransition();
   
-  const [isRangeCacheLoading, setIsRangeCacheLoading] = useState(true);
-  const [handRangeCache, setHandRangeCache] = useState<RangeCache>({});
   const [currentHandRange, setCurrentHandRange] = useState<HandRange | null>(null);
 
   const { toast } = useToast();
   const { recordHand } = useStats();
 
-  // Pre-fetch all hand ranges on initial load
-  useEffect(() => {
-    const prefetchAllRanges = async () => {
-      setIsRangeCacheLoading(true);
-      const cache: RangeCache = {};
-      const allScenarios: { pos: Position, stack: number, type: TableType, prevAction: 'none' | 'raise' }[] = [];
-
-      for (const pos of POSITIONS) {
-        for (const stack of STACK_SIZES) {
-          for (const type of TABLE_TYPES) {
-            for (const prevAction of ['none', 'raise'] as const) {
-              allScenarios.push({ pos, stack, type, prevAction });
-            }
-          }
-        }
-      }
-
-      await Promise.all(allScenarios.map(async ({ pos, stack, type, prevAction }) => {
-        try {
-          const result = await getHandRangeAction({ position: pos, stackSize: stack, tableType: type, previousAction: prevAction });
-          if (result.success && result.data) {
-            const key = generateCacheKey(pos, stack, type, prevAction);
-            cache[key] = expandRange(result.data);
-          }
-        } catch (e) {
-          console.error(`Failed to fetch range for ${pos}-${stack}-${type}-${prevAction}`, e);
-        }
-      }));
-
-      setHandRangeCache(cache);
-      setIsRangeCacheLoading(false);
-    };
-
-    prefetchAllRanges();
-  }, []);
   
   // Update current range and hand when scenario changes or cache loads
   useEffect(() => {
-    if (isRangeCacheLoading) return;
-
     startTransition(() => {
         const key = generateCacheKey(position, stackSize, tableType, previousAction);
-        const range = handRangeCache[key] || null;
+        const range = (allRanges as Record<string, HandRange>)[key] || null;
         setCurrentHandRange(range);
         
         if (!range) {
@@ -167,7 +126,7 @@ export function PracticeModule() {
         setLastInput(null);
     });
 
-  }, [position, stackSize, tableType, previousAction, handRangeCache, isRangeCacheLoading, toast]);
+  }, [position, stackSize, tableType, previousAction, toast]);
 
 
   const handleNextHand = useCallback(() => {
@@ -254,21 +213,7 @@ export function PracticeModule() {
       return <PokerCard rank={rank} suit={suit} />;
   }
   
-  const isUIBlocked = isPending || isRangeCacheLoading;
-
-  if (isRangeCacheLoading) {
-      return (
-          <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[500px]">
-              <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
-              <p className="mt-4 text-muted-foreground font-semibold">
-                Cargando todos los rangos GTO por única vez...
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Esto puede tardar un minuto, pero después la experiencia será instantánea.
-              </p>
-            </div>
-      )
-  }
+  const isUIBlocked = isPending;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -435,5 +380,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
