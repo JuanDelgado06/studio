@@ -5,7 +5,17 @@
     "call": [],
     "fold": []
   },
+  "SB-80-cash-none": {
+    "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"],
+    "call": [],
+    "fold": []
+  },
   "SB-60-cash-none": {
+    "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"],
+    "call": [],
+    "fold": []
+  },
+    "SB-50-cash-none": {
     "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"],
     "call": [],
     "fold": []
@@ -35,7 +45,17 @@
     "call": ["22-99", "A2s-AJs", "K9s-KQs", "Q9s-QJs", "J9s+", "T8s+", "97s+", "86s+", "75s+", "64s+", "54s", "AJo", "ATo", "KQo"],
     "fold": []
   },
+  "BB-80-cash-raise": {
+    "raise": ["TT+", "AQs+", "AKo"],
+    "call": ["22-99", "A2s-AJs", "K9s-KQs", "Q9s-QJs", "J9s+", "T8s+", "97s+", "86s+", "75s+", "64s+", "54s", "AJo", "ATo", "KQo"],
+    "fold": []
+  },
   "BB-60-cash-raise": {
+    "raise": ["TT+", "AQs+", "AKo"],
+    "call": ["22-99", "A2s-AJs", "K9s-KQs", "Q9s-QJs", "J9s+", "T8s+", "97s+", "86s+", "75s+", "64s+", "54s", "AJo", "ATo", "KQo"],
+    "fold": []
+  },
+  "BB-50-cash-raise": {
     "raise": ["TT+", "AQs+", "AKo"],
     "call": ["22-99", "A2s-AJs", "K9s-KQs", "Q9s-QJs", "J9s+", "T8s+", "97s+", "86s+", "75s+", "64s+", "54s", "AJo", "ATo", "KQo"],
     "fold": []
@@ -65,7 +85,17 @@
     "call": [],
     "fold": []
   },
+  "UTG-80-cash-none": {
+    "raise": ["66+", "A4s+", "K9s+", "QJs", "JTs", "T9s", "98s", "87s", "76s", "AJo+", "KQo"],
+    "call": [],
+    "fold": []
+  },
   "UTG-60-cash-none": {
+    "raise": ["66+", "A4s+", "K9s+", "QJs", "JTs", "T9s", "98s", "87s", "76s", "AJo+", "KQo"],
+    "call": [],
+    "fold": []
+  },
+  "UTG-50-cash-none": {
     "raise": ["66+", "A4s+", "K9s+", "QJs", "JTs", "T9s", "98s", "87s", "76s", "AJo+", "KQo"],
     "call": [],
     "fold": []
@@ -95,7 +125,17 @@
     "call": [],
     "fold": []
   },
+  "MP-80-cash-none": {
+    "raise": ["33+", "A2s+", "K7s+", "Q9s+", "J9s+", "T8s+", "97s+", "87s", "76s", "65s", "ATo+", "KJo+", "QJo"],
+    "call": [],
+    "fold": []
+  },
   "MP-60-cash-none": {
+    "raise": ["33+", "A2s+", "K7s+", "Q9s+", "J9s+", "T8s+", "97s+", "87s", "76s", "65s", "ATo+", "KJo+", "QJo"],
+    "call": [],
+    "fold": []
+  },
+  "MP-50-cash-none": {
     "raise": ["33+", "A2s+", "K7s+", "Q9s+", "J9s+", "T8s+", "97s+", "87s", "76s", "65s", "ATo+", "KJo+", "QJo"],
     "call": [],
     "fold": []
@@ -125,7 +165,17 @@
     "call": [],
     "fold": []
   },
+  "CO-80-cash-none": {
+    "raise": ["22+", "A2s+", "K4s+", "Q7s+", "J7s+", "T7s+", "97s+", "86s+", "76s", "65s", "54s", "A7o+", "KTo+", "QTo+", "JTo"],
+    "call": [],
+    "fold": []
+  },
   "CO-60-cash-none": {
+    "raise": ["22+", "A2s+", "K4s+", "Q7s+", "J7s+", "T7s+", "97s+", "86s+", "76s", "65s", "54s", "A7o+", "KTo+", "QTo+", "JTo"],
+    "call": [],
+    "fold": []
+  },
+  "CO-50-cash-none": {
     "raise": ["22+", "A2s+", "K4s+", "Q7s+", "J7s+", "T7s+", "97s+", "86s+", "76s", "65s", "54s", "A7o+", "KTo+", "QTo+", "JTo"],
     "call": [],
     "fold": []
@@ -155,7 +205,17 @@
     "call": [],
     "fold": []
   },
+  "BTN-80-cash-none": {
+    "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J2s+", "T2s+", "95s+", "85s+", "75s+", "64s+", "54s", "A2o+", "K2o+", "Q5o+", "J7o+", "T8o+", "98o"],
+    "call": [],
+    "fold": []
+  },
   "BTN-60-cash-none": {
+    "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J2s+", "T2s+", "95s+", "85s+", "75s+", "64s+", "54s", "A2o+", "K2o+", "Q5o+", "J7o+", "T8o+", "98o"],
+    "call": [],
+    "fold": []
+  },
+  "BTN-50-cash-none": {
     "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J2s+", "T2s+", "95s+", "85s+", "75s+", "64s+", "54s", "A2o+", "K2o+", "Q5o+", "J7o+", "T8o+", "98o"],
     "call": [],
     "fold": []
@@ -185,7 +245,17 @@
     "call": [],
     "fold": []
   },
+  "SB-80-tournament-none": {
+    "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"],
+    "call": [],
+    "fold": []
+  },
   "SB-60-tournament-none": {
+    "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"],
+    "call": [],
+    "fold": []
+  },
+  "SB-50-tournament-none": {
     "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"],
     "call": [],
     "fold": []
@@ -215,7 +285,17 @@
     "call": ["22-99", "A2s-AJs", "K9s-KQs", "Q9s-QJs", "J9s+", "T8s+", "97s+", "86s+", "75s+", "64s+", "54s", "AJo", "ATo", "KQo"],
     "fold": []
   },
+  "BB-80-tournament-raise": {
+    "raise": ["TT+", "AQs+", "AKo"],
+    "call": ["22-99", "A2s-AJs", "K9s-KQs", "Q9s-QJs", "J9s+", "T8s+", "97s+", "86s+", "75s+", "64s+", "54s", "AJo", "ATo", "KQo"],
+    "fold": []
+  },
   "BB-60-tournament-raise": {
+    "raise": ["TT+", "AQs+", "AKo"],
+    "call": ["22-99", "A2s-AJs", "K9s-KQs", "Q9s-QJs", "J9s+", "T8s+", "97s+", "86s+", "75s+", "64s+", "54s", "AJo", "ATo", "KQo"],
+    "fold": []
+  },
+  "BB-50-tournament-raise": {
     "raise": ["TT+", "AQs+", "AKo"],
     "call": ["22-99", "A2s-AJs", "K9s-KQs", "Q9s-QJs", "J9s+", "T8s+", "97s+", "86s+", "75s+", "64s+", "54s", "AJo", "ATo", "KQo"],
     "fold": []
@@ -245,7 +325,17 @@
     "call": [],
     "fold": []
   },
+  "UTG-80-tournament-none": {
+    "raise": ["66+", "A4s+", "K9s+", "QJs", "JTs", "T9s", "98s", "87s", "76s", "AJo+", "KQo"],
+    "call": [],
+    "fold": []
+  },
   "UTG-60-tournament-none": {
+    "raise": ["66+", "A4s+", "K9s+", "QJs", "JTs", "T9s", "98s", "87s", "76s", "AJo+", "KQo"],
+    "call": [],
+    "fold": []
+  },
+  "UTG-50-tournament-none": {
     "raise": ["66+", "A4s+", "K9s+", "QJs", "JTs", "T9s", "98s", "87s", "76s", "AJo+", "KQo"],
     "call": [],
     "fold": []
@@ -275,7 +365,17 @@
     "call": [],
     "fold": []
   },
+  "MP-80-tournament-none": {
+    "raise": ["33+", "A2s+", "K7s+", "Q9s+", "J9s+", "T8s+", "97s+", "87s", "76s", "65s", "ATo+", "KJo+", "QJo"],
+    "call": [],
+    "fold": []
+  },
   "MP-60-tournament-none": {
+    "raise": ["33+", "A2s+", "K7s+", "Q9s+", "J9s+", "T8s+", "97s+", "87s", "76s", "65s", "ATo+", "KJo+", "QJo"],
+    "call": [],
+    "fold": []
+  },
+  "MP-50-tournament-none": {
     "raise": ["33+", "A2s+", "K7s+", "Q9s+", "J9s+", "T8s+", "97s+", "87s", "76s", "65s", "ATo+", "KJo+", "QJo"],
     "call": [],
     "fold": []
@@ -305,7 +405,17 @@
     "call": [],
     "fold": []
   },
+  "CO-80-tournament-none": {
+    "raise": ["22+", "A2s+", "K4s+", "Q7s+", "J7s+", "T7s+", "97s+", "86s+", "76s", "65s", "54s", "A7o+", "KTo+", "QTo+", "JTo"],
+    "call": [],
+    "fold": []
+  },
   "CO-60-tournament-none": {
+    "raise": ["22+", "A2s+", "K4s+", "Q7s+", "J7s+", "T7s+", "97s+", "86s+", "76s", "65s", "54s", "A7o+", "KTo+", "QTo+", "JTo"],
+    "call": [],
+    "fold": []
+  },
+  "CO-50-tournament-none": {
     "raise": ["22+", "A2s+", "K4s+", "Q7s+", "J7s+", "T7s+", "97s+", "86s+", "76s", "65s", "54s", "A7o+", "KTo+", "QTo+", "JTo"],
     "call": [],
     "fold": []
@@ -335,7 +445,17 @@
     "call": [],
     "fold": []
   },
+  "BTN-80-tournament-none": {
+    "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J2s+", "T2s+", "95s+", "85s+", "75s+", "64s+", "54s", "A2o+", "K2o+", "Q5o+", "J7o+", "T8o+", "98o"],
+    "call": [],
+    "fold": []
+  },
   "BTN-60-tournament-none": {
+    "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J2s+", "T2s+", "95s+", "85s+", "75s+", "64s+", "54s", "A2o+", "K2o+", "Q5o+", "J7o+", "T8o+", "98o"],
+    "call": [],
+    "fold": []
+  },
+  "BTN-50-tournament-none": {
     "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J2s+", "T2s+", "95s+", "85s+", "75s+", "64s+", "54s", "A2o+", "K2o+", "Q5o+", "J7o+", "T8o+", "98o"],
     "call": [],
     "fold": []
