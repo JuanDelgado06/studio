@@ -32,7 +32,6 @@ import type { HandRange } from '@/lib/types';
 import { expandRange } from '@/lib/range-expander';
 import { allRanges } from '@/lib/gto-ranges';
 
-
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const SUITS = ['s', 'h', 'd', 'c']; // spades, hearts, diamonds, clubs
 
@@ -54,7 +53,6 @@ function getNewHand() {
   const { card: card1, remainingDeck: deckAfterCard1 } = getRandomCard(deck);
   const { card: card2 } = getRandomCard(deckAfterCard1);
 
-  // GTO hand notation: AKs, AKo, 77
   const rank1Index = RANKS.indexOf(card1[0]);
   const rank2Index = RANKS.indexOf(card2[0]);
 
@@ -94,7 +92,6 @@ function generateCacheKey(
   return `${position}-${stackSize}-${tableType}-${previousAction}`;
 }
 
-
 export function PracticeModule() {
   const [position, setPosition] = useState<Position>('BTN');
   const [stackSize, setStackSize] = useState<number>(100);
@@ -108,68 +105,47 @@ export function PracticeModule() {
   const [isExplanationLoading, startExplanationTransition] = useTransition();
   
   const [currentHandRange, setCurrentHandRange] = useState<HandRange | null>(null);
-  const [isRangeLoading, startRangeTransition] = useTransition();
+  const [isRangeLoading, setIsRangeLoading] = useState(true);
 
   const { toast } = useToast();
   const { recordHand } = useStats();
-
-  const handleScenarioChange = useCallback(
-    (
-      newPosition: Position,
-      newStackSize: number,
-      newTableType: TableType,
-      newPreviousAction: 'none' | 'raise'
-    ) => {
-      startRangeTransition(() => {
-        setPosition(newPosition);
-        setStackSize(newStackSize);
-        setTableType(newTableType);
-        setPreviousAction(newPreviousAction);
-
-        const key = generateCacheKey(
-          newPosition,
-          newStackSize,
-          newTableType,
-          newPreviousAction
-        );
-        const rangeData = (allRanges as Record<string, any>)[key];
-
-        if (rangeData) {
-          const expandedRange = expandRange(rangeData);
-          setCurrentHandRange(expandedRange);
-        } else {
-          setCurrentHandRange(null);
-          toast({
-            variant: 'destructive',
-            title: 'Error de Rango',
-            description: 'No se pudo cargar el rango para este escenario.',
-          });
-        }
-        
-        setCurrentHand(getNewHand());
-        setFeedback(null);
-        setShowExplanation(false);
-        setLastInput(null);
-      });
-    },
-    [toast]
-  );
   
-  // Load initial range on mount
   useEffect(() => {
-    handleScenarioChange(position, stackSize, tableType, previousAction);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setIsRangeLoading(true);
+    const key = generateCacheKey(position, stackSize, tableType, previousAction);
+    const rangeData = (allRanges as Record<string, any>)[key];
 
+    if (rangeData) {
+      const expandedRange = expandRange(rangeData);
+      setCurrentHandRange(expandedRange);
+    } else {
+      setCurrentHandRange(null);
+      toast({
+        variant: 'destructive',
+        title: 'Error de Rango',
+        description: 'No se pudo cargar el rango para este escenario.',
+      });
+    }
 
-  const handleNextHand = useCallback(() => {
-    startTransition(() => {
+    if (!currentHand) {
       setCurrentHand(getNewHand());
-      setFeedback(null);
-      setShowExplanation(false);
-      setLastInput(null);
+    }
+    
+    setIsRangeLoading(false);
+  }, [position, stackSize, tableType, previousAction, toast, currentHand]);
+
+  const resetHandAndFeedback = () => {
+    setCurrentHand(getNewHand());
+    setFeedback(null);
+    setShowExplanation(false);
+    setLastInput(null);
+  };
+
+  const handleNextHand = () => {
+     startTransition(() => {
+      resetHandAndFeedback();
     });
-  }, []);
+  }
 
   const handleAction = (action: Action) => {
     if (!currentHand || isPending || isRangeLoading) return;
@@ -223,12 +199,19 @@ export function PracticeModule() {
   }
   
   const handleRandomizeScenario = () => {
-    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
-    const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
-    const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
-    const randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
-    
-    handleScenarioChange(randomPosition, randomStackSize, randomTableType, randomPreviousAction);
+    startTransition(() => {
+        const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+        const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
+        const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
+        const randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
+        
+        setPosition(randomPosition);
+        setStackSize(randomStackSize);
+        setTableType(randomTableType);
+        setPreviousAction(randomPreviousAction);
+
+        resetHandAndFeedback();
+    });
   };
   
   const renderCard = (cardStr: string) => {
@@ -255,7 +238,7 @@ export function PracticeModule() {
             </Button>
           <div className="space-y-2">
             <Label htmlFor="position">Posición</Label>
-            <Select value={position} onValueChange={(v) => handleScenarioChange(v as Position, stackSize, tableType, previousAction)} disabled={isUIBlocked}>
+            <Select value={position} onValueChange={(v) => { setPosition(v as Position); resetHandAndFeedback(); }} disabled={isUIBlocked}>
               <SelectTrigger id="position">
                 <SelectValue placeholder="Selecciona posición" />
               </SelectTrigger>
@@ -270,7 +253,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="stack-size">Stack (BBs)</Label>
-            <Select value={String(stackSize)} onValueChange={(v) => handleScenarioChange(position, Number(v), tableType, previousAction)} disabled={isUIBlocked}>
+            <Select value={String(stackSize)} onValueChange={(v) => { setStackSize(Number(v)); resetHandAndFeedback(); }} disabled={isUIBlocked}>
               <SelectTrigger id="stack-size">
                 <SelectValue placeholder="Selecciona stack" />
               </SelectTrigger>
@@ -285,7 +268,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="table-type">Tipo de Mesa</Label>
-            <Select value={tableType} onValueChange={(v) => handleScenarioChange(position, stackSize, v as TableType, previousAction)} disabled={isUIBlocked}>
+            <Select value={tableType} onValueChange={(v) => { setTableType(v as TableType); resetHandAndFeedback(); }} disabled={isUIBlocked}>
               <SelectTrigger id="table-type">
                 <SelectValue placeholder="Selecciona tipo de mesa" />
               </SelectTrigger>
@@ -300,7 +283,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="previous-action">Acción Previa</Label>
-            <Select value={previousAction} onValueChange={(v) => handleScenarioChange(position, stackSize, tableType, v as 'none' | 'raise')} disabled={isUIBlocked}>
+            <Select value={previousAction} onValueChange={(v) => { setPreviousAction(v as 'none' | 'raise'); resetHandAndFeedback(); }} disabled={isUIBlocked}>
               <SelectTrigger id="previous-action">
                 <SelectValue placeholder="Selecciona acción previa" />
               </SelectTrigger>
@@ -408,3 +391,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
