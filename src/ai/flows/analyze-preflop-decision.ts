@@ -58,8 +58,9 @@ Se te proporciona la siguiente información sobre una mano de poker:
 *   Acción: {{{action}}}
 *   Tamaño de la Apuesta (si aplica): {{#if betSize}}{{{betSize}}} BB{{else}}N/A{{/if}}
 
-Analiza la decisión del jugador basándote en los principios GTO y proporciona feedback detallado en español.
-Explica si la decisión fue óptima y por qué. Incluye una explicación del valor esperado (EV) de la jugada.
+Analiza la decisión del jugador basándote en los principios GTO.
+Proporciona feedback conciso y directo en español. No traduzcas términos de poker como 'equity', 'range', 'fold', 'call', 'raise', 'GTO', 'EV', 'pot odds'.
+Explica si la decisión fue óptima y por qué. Incluye una explicación breve del valor esperado (EV) de la jugada.
 
 Asegúrate de que tu respuesta coincida con el siguiente esquema: {{outputSchema}}`,
 });
