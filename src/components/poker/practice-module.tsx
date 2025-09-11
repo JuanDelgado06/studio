@@ -21,13 +21,10 @@ import { Button } from '@/components/ui/button';
 import { PokerCard } from './poker-card';
 import { POSITIONS, STACK_SIZES, TABLE_TYPES } from '@/lib/data';
 import type { Position, TableType, Action } from '@/lib/types';
-import { getPreflopAnalysis, getPreflopExplanationAction, getHandRangeAction } from '@/lib/actions';
+import { getPreflopExplanationAction, getHandRangeAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { CheckCircle, Info, Loader2, XCircle } from 'lucide-react';
-import type {
-  AnalyzePreflopDecisionInput,
-} from '@/ai/flows/analyze-preflop-decision';
 import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
@@ -73,6 +70,14 @@ function getNewHand() {
   return { handNotation, cards: [card1, card2] as [string, string] };
 }
 
+type LastInput = {
+    position: Position,
+    stackSize: number,
+    tableType: TableType,
+    hand: string,
+    action: Action
+}
+
 type Feedback = {
     isOptimal: boolean;
     action: Action;
@@ -85,12 +90,12 @@ export function PracticeModule() {
   const [stackSize, setStackSize] = useState<number>(100);
   const [tableType, setTableType] = useState<TableType>('cash');
   const [currentHand, setCurrentHand] = useState<{ handNotation: string; cards: [string, string] } | null>(null);
-  const [lastInput, setLastInput] = useState<AnalyzePreflopDecisionInput | null>(null);
+  const [lastInput, setLastInput] = useState<LastInput | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isExplanationLoading, startExplanationTransition] = useTransition();
-  const [isRangeLoading, setIsRangeLoading] = useState(false);
+  const [isRangeLoading, setIsRangeLoading] = useState(true);
   const [handRange, setHandRange] = useState<HandRange | null>(null);
 
   const { toast } = useToast();
@@ -132,30 +137,23 @@ export function PracticeModule() {
   }, [position, stackSize, tableType, fetchHandRange]);
 
   const handleAction = (action: Action) => {
-    if (!currentHand) return;
-    setFeedback(null);
-    setShowExplanation(false);
-    startTransition(async () => {
-      const input: AnalyzePreflopDecisionInput = {
+    if (!currentHand || !handRange) return;
+    
+    startTransition(() => {
+      const correctAction = handRange[currentHand.handNotation] || 'fold';
+      const isOptimal = action === correctAction;
+      
+      const input = {
         position,
         stackSize,
         tableType,
         hand: currentHand.handNotation,
         action,
-      }
-      const result = await getPreflopAnalysis(input);
+      };
 
-      if (result.success && result.data) {
-        setFeedback({ isOptimal: result.data.isOptimal, action });
-        setLastInput(input);
-        recordHand(input, result.data.isOptimal);
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Error de Análisis',
-          description: result.error || 'No se pudo obtener el análisis de la IA.',
-        });
-      }
+      setFeedback({ isOptimal, action });
+      setLastInput(input);
+      recordHand(input, isOptimal);
     });
   };
 
@@ -259,7 +257,7 @@ export function PracticeModule() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center gap-8 min-h-[350px]">
-          {currentHand ? (
+          {currentHand && !isRangeLoading ? (
             <div className="flex gap-4">
               {renderCard(currentHand.cards[0])}
               {renderCard(currentHand.cards[1])}
@@ -334,5 +332,7 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
 
     
