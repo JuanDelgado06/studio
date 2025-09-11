@@ -65,6 +65,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     setIsClient(true);
+    // You can also load stats from localStorage here if needed
   }, []);
 
   const recordHand = (position: Position, isCorrect: boolean) => {
@@ -101,26 +102,24 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
       const handsPlayedToday = isNewDay ? 1 : prevStats.handsPlayedToday + 1;
       let newStreak = prevStats.streak;
 
-      if (handsPlayedToday === 10) {
-        if (isNewDay) {
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            if (prevStats.lastPracticeDate === yesterday.toDateString()) {
-                newStreak += 1;
-            } else {
-                newStreak = 1;
-            }
-        }
-      }
-       if (handsPlayedToday === 1 && isNewDay) {
-          if (prevStats.lastPracticeDate !== null) {
-            const lastDate = new Date(prevStats.lastPracticeDate);
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            if (lastDate.toDateString() !== yesterday.toDateString()) {
-              newStreak = 0; // Reset if a day was missed
-            }
+      if (isNewDay && prevStats.lastPracticeDate !== null) {
+          const lastDate = new Date(prevStats.lastPracticeDate);
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          if (lastDate.toDateString() !== yesterday.toDateString()) {
+            newStreak = 0; // Reset streak if a day was missed
           }
+      }
+
+      if (handsPlayedToday === 10) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        if (prevStats.lastPracticeDate === yesterday.toDateString()) {
+            newStreak += 1; // Continue streak
+        } else {
+            newStreak = 1; // Start a new streak
+        }
       }
 
 
