@@ -146,13 +146,18 @@ export function PracticeModule() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    fetchHandRange(position, stackSize, tableType, previousAction);
-  }, [position, stackSize, tableType, previousAction, fetchHandRange]);
+  const handleScenarioChange = (newPosition: Position, newStackSize: number, newTableType: TableType, newPreviousAction: 'none' | 'raise') => {
+    setPosition(newPosition);
+    setStackSize(newStackSize);
+    setTableType(newTableType);
+    setPreviousAction(newPreviousAction);
+    fetchHandRange(newPosition, newStackSize, newTableType, newPreviousAction);
+  };
 
   const handleAction = (action: Action) => {
     if (!currentHand || isRangeLoading) return;
     
+    setIsRangeLoading(true);
     startTransition(() => {
         if (!handRange) {
              toast({
@@ -204,17 +209,12 @@ export function PracticeModule() {
   }
   
   const handleRandomizeScenario = () => {
-    startTransition(() => {
-        const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
-        const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
-        const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
-        const randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
+    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+    const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
+    const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
+    const randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
 
-        setPosition(randomPosition);
-        setStackSize(randomStackSize);
-        setTableType(randomTableType);
-        setPreviousAction(randomPreviousAction);
-    });
+    handleScenarioChange(randomPosition, randomStackSize, randomTableType, randomPreviousAction);
   };
   
   const renderCard = (cardStr: string) => {
@@ -239,7 +239,7 @@ export function PracticeModule() {
             </Button>
           <div className="space-y-2">
             <Label htmlFor="position">Posición</Label>
-            <Select value={position} onValueChange={(v) => setPosition(v as Position)} disabled={isPending || isRangeLoading}>
+            <Select value={position} onValueChange={(v) => handleScenarioChange(v as Position, stackSize, tableType, previousAction)} disabled={isPending || isRangeLoading}>
               <SelectTrigger id="position">
                 <SelectValue placeholder="Selecciona posición" />
               </SelectTrigger>
@@ -254,7 +254,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="stack-size">Stack (BBs)</Label>
-            <Select value={String(stackSize)} onValueChange={(v) => setStackSize(Number(v))} disabled={isPending || isRangeLoading}>
+            <Select value={String(stackSize)} onValueChange={(v) => handleScenarioChange(position, Number(v), tableType, previousAction)} disabled={isPending || isRangeLoading}>
               <SelectTrigger id="stack-size">
                 <SelectValue placeholder="Selecciona stack" />
               </SelectTrigger>
@@ -269,7 +269,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="table-type">Tipo de Mesa</Label>
-            <Select value={tableType} onValueChange={(v) => setTableType(v as TableType)} disabled={isPending || isRangeLoading}>
+            <Select value={tableType} onValueChange={(v) => handleScenarioChange(position, stackSize, v as TableType, previousAction)} disabled={isPending || isRangeLoading}>
               <SelectTrigger id="table-type">
                 <SelectValue placeholder="Selecciona tipo de mesa" />
               </SelectTrigger>
@@ -284,7 +284,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="previous-action">Acción Previa</Label>
-            <Select value={previousAction} onValueChange={(v) => setPreviousAction(v as 'none' | 'raise')} disabled={isPending || isRangeLoading}>
+            <Select value={previousAction} onValueChange={(v) => handleScenarioChange(position, stackSize, tableType, v as 'none' | 'raise')} disabled={isPending || isRangeLoading}>
               <SelectTrigger id="previous-action">
                 <SelectValue placeholder="Selecciona acción previa" />
               </SelectTrigger>
@@ -319,7 +319,7 @@ export function PracticeModule() {
                         <div className="flex items-center">
                             {feedback.isOptimal ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                             <AlertTitle className="font-headline ml-2">
-                            {feedback.isOptimal ? "Respuesta Correcta" : "Respuesta Incorrecta"}
+                                {feedback.isOptimal ? "Respuesta Correcta" : "Respuesta Incorrecta"}
                             </AlertTitle>
                         </div>
                         <Button variant="ghost" size="sm" onClick={handleShowExplanation} disabled={isExplanationLoading}>
@@ -388,3 +388,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
