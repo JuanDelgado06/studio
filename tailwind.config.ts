@@ -14,7 +14,7 @@ export default {
       },
       fontFamily: {
         body: ['PT Sans', 'sans-serif'],
-        headline: ['Poppins', 'sans-serif'],
+        headline: ['Alegreya Sans SC', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
