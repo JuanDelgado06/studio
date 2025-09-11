@@ -3,6 +3,8 @@
 
 import type { Position } from '@/lib/types';
 import * as React from 'react';
+import { adaptDifficultyBasedOnProgress } from '@/ai/flows/adapt-difficulty-based-on-progress';
+import { getAdaptedDifficulty } from '@/lib/actions';
 
 type AccuracyData = {
   position: string;
@@ -90,14 +92,49 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
           return pos;
       });
 
-      return {
+      // Simple placeholder logic for streak and weekly goal
+      const newStreak = isCorrect ? prevStats.streak + 1 : 0;
+      const newWeeklyGoal = Math.min(100, Math.round((newCorrectDecisions / (newHandsPlayed + 10)) * 100)); // Example goal logic
+
+      const updatedStats = {
         ...prevStats,
         handsPlayed: newHandsPlayed,
         correctDecisions: newCorrectDecisions,
         commonErrors: newCommonErrors,
         overallAccuracy: newOverallAccuracy,
         accuracyByPosition: newAccuracyByPosition,
+        streak: newStreak,
+        weeklyGoal: newWeeklyGoal,
       };
+
+      // Every 10 hands, ask the AI for new focus areas
+      if (newHandsPlayed > 0 && newHandsPlayed % 10 === 0) {
+        const fetchFocusAreas = async () => {
+          const positionalAccuracy: Record<string, number> = {};
+          updatedStats.accuracyByPosition.forEach(p => {
+            positionalAccuracy[p.position] = p.accuracy / 100;
+          });
+
+          const result = await getAdaptedDifficulty({
+            userStats: {
+              overallAccuracy: (updatedStats.overallAccuracy as number) / 100,
+              positionalAccuracy,
+              // These are placeholders for now
+              handTypeAccuracy: {}, 
+              commonMistakes: [],
+              weeklyGoalSuccessRate: updatedStats.weeklyGoal / 100,
+            },
+            currentDifficulty: 'beginner',
+          });
+          if (result.success && result.data) {
+            setStats(s => ({...s, focusAreas: result.data.suggestedFocusAreas}));
+          }
+        }
+        fetchFocusAreas();
+      }
+
+
+      return updatedStats;
     });
   };
 
