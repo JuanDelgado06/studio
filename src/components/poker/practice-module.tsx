@@ -107,29 +107,28 @@ export function PracticeModule() {
     setHandRange(null);
     setFeedback(null);
     setCurrentHand(getNewHand());
-    startTransition(async () => {
-      try {
-        const result = await getHandRangeAction({ position: pos, stackSize: stack, tableType: type, previousAction: prevAction });
-        if (result.success && result.data) {
-          const expanded = expandRange(result.data);
-          setHandRange(expanded);
-        } else {
-          toast({
-            variant: 'destructive',
-            title: 'Error de Rango',
-            description: result.error || 'No se pudo obtener el rango de manos.',
-          });
-        }
-      } catch(error) {
-         toast({
-            variant: 'destructive',
-            title: 'Error de Rango',
-            description: 'Ocurrió un error inesperado al buscar el rango de manos.',
-          });
-      } finally {
-          setIsRangeLoading(false);
+    
+    try {
+      const result = await getHandRangeAction({ position: pos, stackSize: stack, tableType: type, previousAction: prevAction });
+      if (result.success && result.data) {
+        const expanded = expandRange(result.data);
+        setHandRange(expanded);
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error de Rango',
+          description: result.error || 'No se pudo obtener el rango de manos.',
+        });
       }
-    });
+    } catch(error) {
+       toast({
+          variant: 'destructive',
+          title: 'Error de Rango',
+          description: 'Ocurrió un error inesperado al buscar el rango de manos.',
+        });
+    } finally {
+        setIsRangeLoading(false);
+    }
   }, [toast]);
 
   const handleNextHand = useCallback(() => {
@@ -147,17 +146,18 @@ export function PracticeModule() {
   }, []);
 
   const handleScenarioChange = (newPosition: Position, newStackSize: number, newTableType: TableType, newPreviousAction: 'none' | 'raise') => {
-    setPosition(newPosition);
-    setStackSize(newStackSize);
-    setTableType(newTableType);
-    setPreviousAction(newPreviousAction);
-    fetchHandRange(newPosition, newStackSize, newTableType, newPreviousAction);
+    startTransition(() => {
+      setPosition(newPosition);
+      setStackSize(newStackSize);
+      setTableType(newTableType);
+      setPreviousAction(newPreviousAction);
+      fetchHandRange(newPosition, newStackSize, newTableType, newPreviousAction);
+    });
   };
 
   const handleAction = (action: Action) => {
-    if (!currentHand || isRangeLoading) return;
+    if (!currentHand || isPending) return;
     
-    setIsRangeLoading(true);
     startTransition(() => {
         if (!handRange) {
              toast({
@@ -165,7 +165,6 @@ export function PracticeModule() {
                 title: 'Error de Rango',
                 description: 'El rango de manos no está disponible. Intenta de nuevo.',
             });
-            setIsRangeLoading(false);
             return;
         }
 
@@ -183,7 +182,6 @@ export function PracticeModule() {
       setFeedback({ isOptimal, action });
       setLastInput(input);
       recordHand(input, isOptimal);
-      setIsRangeLoading(false);
     });
   };
 
@@ -345,13 +343,13 @@ export function PracticeModule() {
 
           {!feedback && !isPending && !isRangeLoading && (
             <div className="flex gap-4">
-              <Button variant="destructive" size="lg" onClick={() => handleAction('fold')} disabled={isPending || isRangeLoading}>
+              <Button variant="destructive" size="lg" onClick={() => handleAction('fold')} disabled={isPending}>
                 Fold 🤚
               </Button>
-              <Button variant="secondary" size="lg" onClick={() => handleAction('call')} disabled={isPending || isRangeLoading}>
+              <Button variant="secondary" size="lg" onClick={() => handleAction('call')} disabled={isPending}>
                 Call 💰
               </Button>
-              <Button variant="default" size="lg" onClick={() => handleAction('raise')} disabled={isPending || isRangeLoading}>
+              <Button variant="default" size="lg" onClick={() => handleAction('raise')} disabled={isPending}>
                 Raise 🚀
               </Button>
             </div>
@@ -366,7 +364,7 @@ export function PracticeModule() {
         </CardContent>
       </Card>
       <div className="lg:col-span-3">
-        {isRangeLoading && (
+        {(isRangeLoading || isPending) && (
             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               <p className="mt-4 text-muted-foreground">
@@ -374,10 +372,10 @@ export function PracticeModule() {
               </p>
             </div>
         )}
-        {!isRangeLoading && feedback && handRange && (
+        {!isRangeLoading && !isPending && feedback && handRange && (
             <HandRangeGrid currentHand={currentHand?.handNotation} range={handRange} />
         )}
-         {!isRangeLoading && !feedback && (
+         {!isRangeLoading && !isPending && !feedback && (
           <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
             <p className="text-muted-foreground">
               El rango de manos aparecerá aquí después de que tomes una decisión.
@@ -388,5 +386,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
