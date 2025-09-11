@@ -232,7 +232,7 @@ export function PracticeModule() {
         )})`,
       });
     }
-  }, [state.currentHandRange, state.isLoading, state.scenario]);
+  }, [state.currentHandRange, state.isLoading, state.scenario, toast]);
 
   // Effect to record hand history after feedback is given
   useEffect(() => {
@@ -311,8 +311,10 @@ export function PracticeModule() {
     let randomPreviousAction: 'none' | 'raise' = 'none';
 
     // Only BB can face a raise in our current data
-    if (randomPosition === 'BB') {
-        if (Math.random() > 0.5) {
+    if (randomPosition !== 'BB') {
+        randomPreviousAction = 'none';
+    } else {
+       if (Math.random() > 0.5) {
             randomPreviousAction = 'raise';
         }
     }
@@ -327,11 +329,12 @@ export function PracticeModule() {
 
 
   const handleSetScenario = (payload: Partial<Scenario>) => {
-    if (payload.position && payload.position !== 'BB') {
+    const newScenario = { ...state.scenario, ...payload };
+    if (newScenario.position && newScenario.position !== 'BB') {
       // If position is changed to anything other than BB, reset previousAction
-      payload.previousAction = 'none';
+      newScenario.previousAction = 'none';
     }
-    dispatch({ type: 'SET_SCENARIO', payload });
+    dispatch({ type: 'SET_SCENARIO', payload: newScenario });
   };
 
   const isPreviousActionDisabled = state.scenario.position !== 'BB';
@@ -453,7 +456,7 @@ export function PracticeModule() {
             </Select>
             {isPreviousActionDisabled && (
               <p className="text-xs text-muted-foreground">
-                Solo aplicable para la posición BB.
+                Esta opción solo aplica para la posición BB.
               </p>
             )}
           </div>
@@ -594,3 +597,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
