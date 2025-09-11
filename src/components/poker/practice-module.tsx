@@ -232,7 +232,7 @@ export function PracticeModule() {
         )})`,
       });
     }
-  }, [state.currentHandRange, state.isLoading, state.scenario, toast]);
+  }, [state.currentHandRange, state.isLoading, state.scenario]);
 
   // Effect to record hand history after feedback is given
   useEffect(() => {
@@ -304,13 +304,12 @@ export function PracticeModule() {
   };
 
   const handleRandomizeScenario = () => {
-    let randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
     
     let randomPreviousAction: 'none' | 'raise' = 'none';
 
-    // Only BB can face a raise in our current GTO data.
     if (randomPosition === 'BB') {
         // 50/50 chance of facing a raise or getting a walk
         if (Math.random() > 0.5) {
@@ -328,7 +327,6 @@ export function PracticeModule() {
 
 
   const handleSetScenario = (payload: Partial<Scenario>) => {
-    // When position changes, if it's not BB, force previousAction to 'none'.
     if (payload.position && payload.position !== 'BB') {
       payload.previousAction = 'none';
     }
@@ -454,7 +452,7 @@ export function PracticeModule() {
             </Select>
             {isPreviousActionDisabled && (
               <p className="text-xs text-muted-foreground">
-                La acción previa solo es aplicable a la posición BB en los rangos actuales.
+                La acción previa solo es aplicable a la posición BB.
               </p>
             )}
           </div>
@@ -581,13 +579,13 @@ export function PracticeModule() {
             currentHand={state.currentHand?.handNotation}
             range={state.currentHandRange}
           />
-        ) : !state.currentHandRange ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
+        ) : !state.currentHandRange && !state.isLoading ? (
+          <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-destructive/50 bg-destructive/10 p-8 text-center min-h-[300px]">
             <XCircle className="h-10 w-10 text-destructive mb-2" />
             <p className="font-semibold text-destructive">Error de Rango</p>
-            <p className="text-muted-foreground text-sm">
-              El rango para este escenario no está disponible. Por favor,
-              selecciona otro.
+            <p className="text-destructive/80 text-sm">
+              No se pudo cargar el rango para este escenario.
+               <span className="font-mono text-xs block mt-1 p-1 bg-destructive/10 rounded-sm">({generateCacheKey(state.scenario)})</span>
             </p>
           </div>
         ) : null}
