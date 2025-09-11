@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useTransition, useEffect, useCallback } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -89,8 +89,7 @@ function generateCacheKey(
   tableType: TableType,
   previousAction: 'none' | 'raise'
 ): string {
-    const actionKey = previousAction === 'raise' ? 'raise' : 'none';
-    return `${position}-${stackSize}-${tableType}-${actionKey}`;
+    return `${position}-${stackSize}-${tableType}-${previousAction}`;
 }
 
 
@@ -200,19 +199,21 @@ export function PracticeModule() {
   }
 
   const handleRandomizeScenario = () => {
-    startTransition(() => {
-      const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
-      const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
-      const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
-      
-      // Only BB can face a raise in this simplified model for now, to ensure valid keys.
-      const randomPreviousAction = (randomPosition === 'BB' && Math.random() > 0.5) ? 'raise' : 'none';
+    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+    const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
+    const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
+    
+    // Only BB can face a raise in this simplified model for now, to ensure valid keys.
+    let randomPreviousAction: 'none' | 'raise' = 'none';
+    const keyForRaise = `${randomPosition}-${randomStackSize}-${randomTableType}-raise`;
+    if ((allRanges as Record<string, any>)[keyForRaise] && Math.random() > 0.5) {
+        randomPreviousAction = 'raise';
+    }
 
-      setPosition(randomPosition);
-      setStackSize(randomStackSize);
-      setTableType(randomTableType);
-      setPreviousAction(randomPreviousAction);
-    });
+    setPosition(randomPosition);
+    setStackSize(randomStackSize);
+    setTableType(randomTableType);
+    setPreviousAction(randomPreviousAction);
   };
   
   const renderCard = (cardStr: string) => {
@@ -233,7 +234,7 @@ export function PracticeModule() {
             </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-           <Button variant="secondary" onClick={handleRandomizeScenario} className="w-full" disabled={isUIBlocked}>
+           <Button variant="secondary" onClick={handleRandomizeScenario} className="w-full" disabled={isPending}>
               <Shuffle className="mr-2 h-4 w-4" />
               Escenario Aleatorio
             </Button>
@@ -392,5 +393,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
