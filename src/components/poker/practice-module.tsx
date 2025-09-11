@@ -24,7 +24,7 @@ import type { Position, TableType, Action } from '@/lib/types';
 import { getPreflopExplanationAction, getHandRangeAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { CheckCircle, Info, Loader2, XCircle } from 'lucide-react';
+import { CheckCircle, Info, Loader2, Shuffle, XCircle } from 'lucide-react';
 import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
@@ -132,6 +132,7 @@ export function PracticeModule() {
 
   useEffect(() => {
     setCurrentHand(getNewHand());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -190,10 +191,24 @@ export function PracticeModule() {
   }
   
   const handleNextHand = () => {
-    setCurrentHand(getNewHand());
-    setFeedback(null);
-    setShowExplanation(false);
-    setLastInput(null);
+    startTransition(() => {
+      setCurrentHand(getNewHand());
+      setFeedback(null);
+      setShowExplanation(false);
+      setLastInput(null);
+    });
+  };
+  
+  const handleRandomizeScenario = () => {
+    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+    const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
+    const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
+    const randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
+
+    setPosition(randomPosition);
+    setStackSize(randomStackSize);
+    setTableType(randomTableType);
+    setPreviousAction(randomPreviousAction);
   };
   
   const renderCard = (cardStr: string) => {
@@ -206,10 +221,17 @@ export function PracticeModule() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Card className="lg:col-span-1">
         <CardHeader>
-          <CardTitle className="font-headline">Configurar Escenario</CardTitle>
-          <CardDescription>
-            Elige las condiciones para tu sesión de práctica.
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div className="space-y-1.5">
+              <CardTitle className="font-headline">Configurar Escenario</CardTitle>
+              <CardDescription>
+                Elige las condiciones para tu sesión de práctica.
+              </CardDescription>
+            </div>
+            <Button variant="ghost" size="icon" onClick={handleRandomizeScenario} title="Aleatorizar Escenario" disabled={isPending || isRangeLoading}>
+              <Shuffle className="h-5 w-5" />
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
