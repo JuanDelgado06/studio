@@ -62,7 +62,7 @@ export default function LearnPage() {
   const handleGenerateExercises = async () => {
     setIsLoading(true);
     setSuggestedExercises('');
-    const decisionHistory = JSON.stringify(stats.decisionHistory, null, 2);
+    const decisionHistory = JSON.stringify(stats.decisionHistory || [], null, 2);
 
     const result = await suggestImprovementExercises({
       decisionRecords: decisionHistory,
