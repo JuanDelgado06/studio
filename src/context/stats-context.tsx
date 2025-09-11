@@ -70,7 +70,12 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
     try {
       const savedStats = window.localStorage.getItem(STATS_STORAGE_KEY);
       if (savedStats) {
-        setStats(JSON.parse(savedStats));
+        const parsedStats = JSON.parse(savedStats);
+        // Ensure accuracyByPosition is initialized correctly if it's missing from storage
+        if (!parsedStats.accuracyByPosition || parsedStats.accuracyByPosition.length === 0) {
+          parsedStats.accuracyByPosition = initialAccuracyByPosition;
+        }
+        setStats(parsedStats);
       }
     } catch (error) {
       console.error("Failed to load stats from localStorage", error);
@@ -95,30 +100,34 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (isClient && stats.handsPlayed > 0 && stats.handsPlayed % 10 === 0) {
       const fetchFocusAreas = async () => {
-        if (stats.overallAccuracy === 'N/A') return;
+        if (stats.overallAccuracy === 'N/A' || typeof stats.overallAccuracy !== 'number') return;
 
         const positionalAccuracy: Record<string, number> = {};
         stats.accuracyByPosition.forEach(p => {
           positionalAccuracy[p.position] = p.accuracy / 100;
         });
 
-        const result = await getAdaptedDifficulty({
-          userStats: {
-            overallAccuracy: stats.overallAccuracy / 100,
-            positionalAccuracy,
-            handTypeAccuracy: {},
-            commonMistakes: [],
-            weeklyGoalSuccessRate: stats.weeklyGoal / 100,
-          },
-          currentDifficulty: 'beginner',
-        });
-        if (result.success && result.data) {
-          setStats(s => ({...s, focusAreas: result.data!.suggestedFocusAreas}));
+        try {
+          const result = await getAdaptedDifficulty({
+            userStats: {
+              overallAccuracy: stats.overallAccuracy / 100,
+              positionalAccuracy,
+              handTypeAccuracy: {},
+              commonMistakes: [],
+              weeklyGoalSuccessRate: stats.weeklyGoal / 100,
+            },
+            currentDifficulty: 'beginner',
+          });
+          if (result.success && result.data) {
+            setStats(s => ({...s, focusAreas: result.data!.suggestedFocusAreas}));
+          }
+        } catch(e) {
+          console.error("Error fetching adapted difficulty:", e);
         }
       }
       fetchFocusAreas();
     }
-  }, [stats.handsPlayed, isClient]);
+  }, [stats.handsPlayed, stats.overallAccuracy, stats.accuracyByPosition, stats.weeklyGoal, isClient]);
 
 
   const recordHand = (position: Position, isCorrect: boolean) => {
@@ -137,48 +146,50 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
           ? Math.round((newCorrectDecisions / newHandsPlayed) * 100)
           : 'N/A';
       
-      const newAccuracyByPosition = prevStats.accuracyByPosition.map((pos) => {
-          if (pos.position === position) {
-              const newTotal = pos.total + 1;
-              const newCorrect = isCorrect ? pos.correct + 1 : pos.correct;
+      const newAccuracyByPosition = prevStats.accuracyByPosition.map((posData) => {
+          if (posData.position === position) {
+              const newTotal = posData.total + 1;
+              const newCorrect = isCorrect ? posData.correct + 1 : posData.correct;
               return {
-                  ...pos,
+                  ...posData,
                   total: newTotal,
                   correct: newCorrect,
-                  accuracy: Math.round((newCorrect / newTotal) * 100),
+                  accuracy: newTotal > 0 ? Math.round((newCorrect / newTotal) * 100) : 0,
               }
           }
-          return pos;
+          return posData;
       });
 
       const isNewDay = prevStats.lastPracticeDate !== today;
       let handsPlayedToday = isNewDay ? 1 : (prevStats.handsPlayedToday || 0) + 1;
       let newStreak = prevStats.streak || 0;
 
-      if (handsPlayedToday === 10) {
-          if (!prevStats.lastPracticeDate) {
-              newStreak = 1;
-          } else {
+      if (isNewDay) {
+          if (prevStats.lastPracticeDate) {
               const lastDate = new Date(prevStats.lastPracticeDate);
               const yesterday = new Date();
               yesterday.setDate(yesterday.getDate() - 1);
+              if (lastDate.toDateString() !== yesterday.toDateString()) {
+                  newStreak = 0; // Reset streak if a day was missed
+              }
+          }
+      }
+      
+      if (handsPlayedToday === 10) {
+          if (prevStats.lastPracticeDate) {
+              const lastDate = new Date(prevStats.lastPracticeDate);
+              const yesterday = new Date();
+              yesterday.setDate(yesterday.getDate() - 1);
+
               if (lastDate.toDateString() === yesterday.toDateString()) {
                   newStreak += 1; // Continue streak
               } else if (lastDate.toDateString() !== today) {
                   newStreak = 1; // Start new streak after a gap
               }
+          } else {
+              newStreak = 1; // First time reaching 10 hands
           }
-      } else if (isNewDay && newStreak > 0) {
-         if (prevStats.lastPracticeDate) {
-            const lastDate = new Date(prevStats.lastPracticeDate);
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            if (lastDate.toDateString() !== yesterday.toDateString()) {
-                newStreak = 0;
-            }
-         }
       }
-
 
       const newWeeklyGoal = Math.min(100, Math.round((newCorrectDecisions / (newHandsPlayed + 10)) * 100));
 
@@ -188,7 +199,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
         correctDecisions: newCorrectDecisions,
         commonErrors: newCommonErrors,
         overallAccuracy: newOverallAccuracy,
-        accuracyByPosition: [...newAccuracyByPosition],
+        accuracyByPosition: newAccuracyByPosition,
         streak: newStreak,
         weeklyGoal: newWeeklyGoal,
         lastPracticeDate: today,
