@@ -242,13 +242,15 @@ export function PracticeModule() {
 
   useEffect(() => {
     if (!state.currentHandRange && !state.isLoading) {
-      toast({
-        variant: 'destructive',
-        title: 'Error de Rango',
-        description: `No se pudo cargar el rango para este escenario. (${generateCacheKey(
-          state.scenario
-        )})`,
-      });
+      const scenarioKey = generateCacheKey(state.scenario);
+      // Only show toast if a range for this scenario is supposed to exist
+      if (Object.keys(allRanges).includes(scenarioKey)) {
+        toast({
+            variant: 'destructive',
+            title: 'Error de Rango',
+            description: `No se pudo cargar el rango para este escenario. (${scenarioKey})`,
+        });
+      }
     }
   }, [state.currentHandRange, state.isLoading, state.scenario, toast]);
 
@@ -312,8 +314,9 @@ export function PracticeModule() {
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
     
+    // 50% chance of facing a raise, unless we are SB (where it's always open-raise)
     let randomPreviousAction: 'none' | 'raise' = 'none';
-    if (randomPosition === 'BB') {
+    if (randomPosition !== 'SB' && Math.random() < 0.5) {
         randomPreviousAction = 'raise';
     }
 
@@ -327,17 +330,11 @@ export function PracticeModule() {
 
 
   const handleSetScenario = (payload: Partial<Scenario>) => {
-    const newScenario = { ...state.scenario, ...payload };
-    if (newScenario.position && newScenario.position !== 'BB') {
-      newScenario.previousAction = 'none';
-    }
-    if (newScenario.position === 'BB' && payload.position) {
-      newScenario.previousAction = 'raise';
-    }
-    dispatch({ type: 'SET_SCENARIO', payload: newScenario });
+    dispatch({ type: 'SET_SCENARIO', payload });
   };
 
-  const isPreviousActionDisabled = state.scenario.position !== 'BB';
+  const isBBvsLimp =
+    state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
 
   if (state.isLoading || !state.currentHand) {
     return (
@@ -350,8 +347,9 @@ export function PracticeModule() {
     );
   }
 
-  const isBBvsLimp =
-    state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
+  const descriptionText = state.scenario.previousAction === 'raise'
+    ? `Un oponente ha subido. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`
+    : `Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
 
   return (
     <div className="space-y-6">
@@ -441,25 +439,19 @@ export function PracticeModule() {
                         onValueChange={(v) =>
                             handleSetScenario({ previousAction: v as 'none' | 'raise' })
                         }
-                        disabled={isPreviousActionDisabled}
                         >
                         <SelectTrigger id="previous-action-sheet">
                             <SelectValue placeholder="Selecciona acción previa" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="none">
-                                Nadie ha apostado (Limp)
+                                Nadie ha apostado (Open Raise)
                             </SelectItem>
                             <SelectItem value="raise">
-                                Hubo un Raise antes de mí
+                                Enfrentando un Raise
                             </SelectItem>
                         </SelectContent>
                         </Select>
-                        {isPreviousActionDisabled && (
-                        <p className="text-xs text-muted-foreground">
-                            Solo aplicable para la posición BB.
-                        </p>
-                        )}
                     </div>
                 </div>
             </SheetContent>
@@ -469,10 +461,7 @@ export function PracticeModule() {
             <CardHeader className="text-center">
             <CardTitle className="font-headline">Tu Mano</CardTitle>
             <CardDescription>
-                Estás en{' '}
-                <span className="font-bold">{state.scenario.position}</span> con{' '}
-                <span className="font-bold">{state.scenario.stackSize} BB</span>.
-                ¿Qué haces?
+                {descriptionText}
             </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center gap-8 min-h-[350px]">
@@ -608,3 +597,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
