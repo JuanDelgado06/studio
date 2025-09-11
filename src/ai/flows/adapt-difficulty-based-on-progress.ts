@@ -52,7 +52,7 @@ const prompt = ai.definePrompt({
   name: 'adaptDifficultyBasedOnProgressPrompt',
   input: {schema: AdaptDifficultyBasedOnProgressInputSchema},
   output: {schema: AdaptDifficultyBasedOnProgressOutputSchema},
-  prompt: `You are an AI poker coach that adapts content difficulty based on user performance.
+  prompt: `You are an AI poker coach that adapts content difficulty based on user performance. Your response should be in Spanish.
 
 You are provided with user statistics and the current difficulty level.
 
@@ -62,7 +62,11 @@ User Stats:
 Current Difficulty: {{{currentDifficulty}}}
 
 Based on this information, determine the new difficulty level and suggest focus areas for the user.
-The focus areas should be an array of short, actionable suggestions.
+
+**Instructions:**
+1.  **Language:** Respond **completely in Spanish**.
+2.  **Terminology:** **DO NOT translate** common poker terms like 'equity', 'range', 'fold', 'call', 'raise', 'GTO', 'EV', 'pot odds', 'nuts', 'bluff', 'semi-bluff', 'implied odds'.
+3.  **Focus Areas:** The focus areas should be an array of short, actionable suggestions.
 
 Difficulty levels:
 - beginner
