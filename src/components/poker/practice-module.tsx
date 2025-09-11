@@ -24,7 +24,7 @@ import type { Position, TableType, Action } from '@/lib/types';
 import { getPreflopAnalysis } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { CheckCircle, Loader2, XCircle } from 'lucide-react';
+import { CheckCircle, Info, Loader2, XCircle } from 'lucide-react';
 import type { AnalyzePreflopDecisionOutput } from '@/ai/flows/analyze-preflop-decision';
 import { useStats } from '@/context/stats-context';
 
@@ -72,6 +72,7 @@ export function PracticeModule() {
   const [tableType, setTableType] = useState<TableType>('cash');
   const [currentHand, setCurrentHand] = useState<{ handNotation: string; cards: [string, string] } | null>(null);
   const [feedback, setFeedback] = useState<AnalyzePreflopDecisionOutput & {action: Action} | null>(null);
+  const [showExplanation, setShowExplanation] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const { recordHand } = useStats();
@@ -83,6 +84,7 @@ export function PracticeModule() {
   const handleAction = (action: Action) => {
     if (!currentHand) return;
     setFeedback(null);
+    setShowExplanation(false);
     startTransition(async () => {
       const result = await getPreflopAnalysis({
         position,
@@ -108,6 +110,7 @@ export function PracticeModule() {
   const handleNextHand = () => {
     setCurrentHand(getNewHand());
     setFeedback(null);
+    setShowExplanation(false);
   };
   
   const renderCard = (cardStr: string) => {
@@ -190,16 +193,28 @@ export function PracticeModule() {
           ) : <Loader2 className="animate-spin h-12 w-12" />}
 
           {feedback && (
-             <Alert variant={feedback.isOptimal ? 'default' : 'destructive'} className="w-full max-w-md">
-                {feedback.isOptimal ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-                <AlertTitle className="font-headline flex items-center gap-2">
-                  {feedback.isOptimal ? "¡Decisión Óptima!" : "Decisión Subóptima"}
-                </AlertTitle>
-                <AlertDescription className="space-y-2 pt-2">
-                  <p>{feedback.feedback}</p>
-                  <p className="text-xs text-muted-foreground">{feedback.evExplanation}</p>
-                </AlertDescription>
-            </Alert>
+             <div className="w-full max-w-md space-y-2">
+                <Alert variant={feedback.isOptimal ? 'default' : 'destructive'}>
+                    <div className='flex items-center justify-between'>
+                        <div className="flex items-center">
+                            {feedback.isOptimal ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+                            <AlertTitle className="font-headline ml-2">
+                            {feedback.isOptimal ? "¡Decisión Óptima!" : "Decisión Subóptima"}
+                            </AlertTitle>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => setShowExplanation(!showExplanation)}>
+                            <Info className="mr-2 h-4 w-4" />
+                            {showExplanation ? 'Ocultar' : 'Explicación'}
+                        </Button>
+                    </div>
+                    {showExplanation && (
+                        <AlertDescription className="space-y-2 pt-2">
+                            <p>{feedback.feedback}</p>
+                            <p className="text-xs text-muted-foreground">{feedback.evExplanation}</p>
+                        </AlertDescription>
+                    )}
+                </Alert>
+             </div>
           )}
 
           {isPending && <Loader2 className="animate-spin h-8 w-8 text-primary" />}
