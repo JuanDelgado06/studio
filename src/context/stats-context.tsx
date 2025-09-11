@@ -68,6 +68,34 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
     // You can also load stats from localStorage here if needed
   }, []);
 
+  // Effect to fetch focus areas when hands played is a multiple of 10
+  React.useEffect(() => {
+    if (stats.handsPlayed > 0 && stats.handsPlayed % 10 === 0) {
+      const fetchFocusAreas = async () => {
+        const positionalAccuracy: Record<string, number> = {};
+        stats.accuracyByPosition.forEach(p => {
+          positionalAccuracy[p.position] = p.accuracy / 100;
+        });
+
+        const result = await getAdaptedDifficulty({
+          userStats: {
+            overallAccuracy: (stats.overallAccuracy as number) / 100,
+            positionalAccuracy,
+            handTypeAccuracy: {},
+            commonMistakes: [],
+            weeklyGoalSuccessRate: stats.weeklyGoal / 100,
+          },
+          currentDifficulty: 'beginner',
+        });
+        if (result.success && result.data) {
+          setStats(s => ({...s, focusAreas: result.data.suggestedFocusAreas}));
+        }
+      }
+      fetchFocusAreas();
+    }
+  }, [stats.handsPlayed]);
+
+
   const recordHand = (position: Position, isCorrect: boolean) => {
     setStats((prevStats) => {
       const today = new Date().toDateString();
@@ -99,33 +127,40 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
       });
 
       const isNewDay = prevStats.lastPracticeDate !== today;
-      const handsPlayedToday = isNewDay ? 1 : prevStats.handsPlayedToday + 1;
+      let handsPlayedToday = isNewDay ? 1 : prevStats.handsPlayedToday + 1;
       let newStreak = prevStats.streak;
 
-      if (isNewDay && prevStats.lastPracticeDate !== null) {
-          const lastDate = new Date(prevStats.lastPracticeDate);
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          if (lastDate.toDateString() !== yesterday.toDateString()) {
-            newStreak = 0; // Reset streak if a day was missed
-          }
-      }
-
       if (handsPlayedToday === 10) {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        
-        if (prevStats.lastPracticeDate === yesterday.toDateString()) {
-            newStreak += 1; // Continue streak
-        } else {
-            newStreak = 1; // Start a new streak
-        }
+          if (prevStats.lastPracticeDate) {
+              const lastDate = new Date(prevStats.lastPracticeDate);
+              const yesterday = new Date();
+              yesterday.setDate(yesterday.getDate() - 1);
+              if (lastDate.toDateString() === yesterday.toDateString()) {
+                  newStreak += 1; // Continue streak
+              } else {
+                  newStreak = 1; // Start new streak after a gap
+              }
+          } else {
+              newStreak = 1; // First streak ever
+          }
+      } else if (isNewDay) {
+         // Check if a day was missed
+         if (prevStats.lastPracticeDate) {
+            const lastDate = new Date(prevStats.lastPracticeDate);
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            // If the last practice wasn't today or yesterday, reset streak.
+            if (lastDate.toDateString() !== yesterday.toDateString()) {
+                newStreak = 0;
+            }
+         }
       }
 
 
       const newWeeklyGoal = Math.min(100, Math.round((newCorrectDecisions / (newHandsPlayed + 10)) * 100));
 
-      const updatedStats = {
+      return {
         ...prevStats,
         handsPlayed: newHandsPlayed,
         correctDecisions: newCorrectDecisions,
@@ -137,33 +172,6 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
         lastPracticeDate: today,
         handsPlayedToday: handsPlayedToday,
       };
-
-      if (newHandsPlayed > 0 && newHandsPlayed % 10 === 0) {
-        const fetchFocusAreas = async () => {
-          const positionalAccuracy: Record<string, number> = {};
-          updatedStats.accuracyByPosition.forEach(p => {
-            positionalAccuracy[p.position] = p.accuracy / 100;
-          });
-
-          const result = await getAdaptedDifficulty({
-            userStats: {
-              overallAccuracy: (updatedStats.overallAccuracy as number) / 100,
-              positionalAccuracy,
-              handTypeAccuracy: {}, 
-              commonMistakes: [],
-              weeklyGoalSuccessRate: updatedStats.weeklyGoal / 100,
-            },
-            currentDifficulty: 'beginner',
-          });
-          if (result.success && result.data) {
-            setStats(s => ({...s, focusAreas: result.data.suggestedFocusAreas}));
-          }
-        }
-        fetchFocusAreas();
-      }
-
-
-      return updatedStats;
     });
   };
 
