@@ -311,29 +311,28 @@ export function PracticeModule() {
   };
 
   const handleRandomizeScenario = () => {
-    const randomPreviousAction = Math.random() < 0.5 ? 'none' : 'raise';
-    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
-    const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
-    const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
-
-    let payload: Partial<Scenario> = {
-        position: randomPosition,
-        stackSize: randomStackSize,
-        tableType: randomTableType,
-        previousAction: randomPreviousAction,
-    };
+    let payload: Partial<Scenario> = {};
+    let scenarioKey = '';
     
-    const scenarioKey = generateCacheKey(payload as Scenario);
-    if(!(allRanges as Record<string,any>)[scenarioKey]) {
-        // If the scenario doesn't exist, default to something that does to avoid errors
+    // Keep trying until we find a valid scenario from gto-ranges.json
+    while(true) {
+        const randomPreviousAction = Math.random() < 0.5 ? 'none' : 'raise';
+        const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+        const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
+        const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
+
         payload = {
-            position: 'BTN',
-            stackSize: 100,
-            tableType: 'cash',
-            previousAction: 'none'
+            position: randomPosition,
+            stackSize: randomStackSize,
+            tableType: randomTableType,
+            previousAction: randomPreviousAction,
+        };
+        
+        scenarioKey = generateCacheKey(payload as Scenario);
+        if((allRanges as Record<string,any>)[scenarioKey]) {
+            break; // Valid scenario found
         }
     }
-
 
     dispatch({ type: 'SET_SCENARIO', payload });
   }
@@ -625,3 +624,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
