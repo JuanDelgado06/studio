@@ -308,15 +308,9 @@ export function PracticeModule() {
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
     
-    let randomPreviousAction: 'none' | 'raise' = 'none';
-
-    // Only BB can face a raise in our current data
+    let randomPreviousAction: 'none' | 'raise' = 'raise';
     if (randomPosition !== 'BB') {
         randomPreviousAction = 'none';
-    } else {
-       if (Math.random() > 0.5) {
-            randomPreviousAction = 'raise';
-        }
     }
 
     dispatch({ type: 'SET_SCENARIO', payload: {
@@ -554,19 +548,21 @@ export function PracticeModule() {
                 </Button>
               )}
               <Button
-                variant="secondary"
+                variant={isBBvsLimp ? 'default' : 'secondary'}
                 size="lg"
-                onClick={() => handleAction('call' as Action)}
+                onClick={() => handleAction(isBBvsLimp ? ('raise' as Action) : ('call' as Action))}
               >
-                {isBBvsLimp ? 'Bet' : 'Call'} 💰
+                {isBBvsLimp ? 'Bet 🚀' : 'Call 💰'}
               </Button>
-              <Button
-                variant="default"
-                size="lg"
-                onClick={() => handleAction('raise' as Action)}
-              >
-                Raise 🚀
-              </Button>
+              {!isBBvsLimp &&
+                <Button
+                    variant="default"
+                    size="lg"
+                    onClick={() => handleAction('raise' as Action)}
+                >
+                    Raise 🚀
+                </Button>
+              }
             </div>
           )}
 
@@ -597,5 +593,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
