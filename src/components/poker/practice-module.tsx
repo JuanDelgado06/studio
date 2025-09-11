@@ -24,14 +24,14 @@ import type { Position, TableType, Action } from '@/lib/types';
 import { getPreflopExplanationAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { CheckCircle, Info, Loader2, Shuffle, XCircle } from 'lucide-react';
+import { CheckCircle, Info, Loader2, Settings, Shuffle, XCircle } from 'lucide-react';
 import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
 import { expandRange } from '@/lib/range-expander';
 import allRanges from '@/lib/gto-ranges.json';
 import type { HandRange } from '@/lib/types';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const SUITS = ['s', 'h', 'd', 'c'];
@@ -154,6 +154,15 @@ const reducer = (state: State, action: ActionPayload): State => {
         state.currentHandRange[state.currentHand.handNotation] || 'fold';
       const isOptimal = actionTaken === correctAction;
 
+      recordHand(
+        {
+          ...state.scenario,
+          hand: state.currentHand.handNotation,
+          action: actionTaken,
+        },
+        isOptimal
+      );
+
       return {
         ...state,
         feedback: { isOptimal, action: actionTaken },
@@ -190,9 +199,14 @@ const reducer = (state: State, action: ActionPayload): State => {
   }
 };
 
+// This needs to be defined outside to avoid being recreated on each render
+// and breaking the memoization of the useStats hook.
+let recordHand: (handData: any, isCorrect: boolean) => void;
+
 export function PracticeModule() {
   const { toast } = useToast();
-  const { recordHand } = useStats();
+  const statsHook = useStats();
+  recordHand = statsHook.recordHand;
 
   const [state, dispatch] = useReducer(reducer, {
     scenario: {
@@ -235,20 +249,6 @@ export function PracticeModule() {
     }
   }, [state.currentHandRange, state.isLoading, state.scenario, toast]);
 
-  // Effect to record hand history after feedback is given
-  useEffect(() => {
-    if (state.feedback && state.currentHand) {
-      recordHand(
-        {
-          ...state.scenario,
-          hand: state.currentHand.handNotation,
-          action: state.feedback.action,
-        },
-        state.feedback.isOptimal
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.feedback]);
 
   const handleShowExplanation = async () => {
     // If explanation is already showing, just hide it.
@@ -338,7 +338,7 @@ export function PracticeModule() {
 
   if (state.isLoading || !state.currentHand) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         <div className="lg:col-span-3 flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[600px]">
           <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
           <p className="mt-4 text-muted-foreground">
@@ -353,254 +353,364 @@ export function PracticeModule() {
     state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <Card className="lg:col-span-1">
-        <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
-            <AccordionItem value="item-1">
-                <AccordionTrigger className="px-6">
-                    <div className="text-left">
-                        <h3 className="font-headline text-lg">Configurar Escenario</h3>
-                        <p className="text-sm text-muted-foreground">
-                            Elige las condiciones para tu práctica.
-                        </p>
-                    </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-6">
-                    <div className="space-y-4 pt-4">
-                        <Button
-                            variant="secondary"
-                            onClick={handleRandomizeScenario}
-                            className="w-full"
+    <div className="grid grid-cols-1 gap-6">
+        <Sheet>
+            <SheetTrigger asChild>
+                 <Button variant="outline" className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full shadow-lg lg:hidden">
+                    <Settings />
+                 </Button>
+            </SheetTrigger>
+             <SheetContent>
+                <SheetHeader>
+                    <SheetTitle>Configurar Escenario</SheetTitle>
+                </SheetHeader>
+                <div className="space-y-4 pt-4">
+                    <Button
+                        variant="secondary"
+                        onClick={handleRandomizeScenario}
+                        className="w-full"
+                    >
+                        <Shuffle className="mr-2 h-4 w-4" />
+                        Escenario Aleatorio
+                    </Button>
+                    <div className="space-y-2">
+                        <Label htmlFor="position-sheet">Posición</Label>
+                        <Select
+                        value={state.scenario.position}
+                        onValueChange={(v) =>
+                            handleSetScenario({ position: v as Position })
+                        }
                         >
-                            <Shuffle className="mr-2 h-4 w-4" />
-                            Escenario Aleatorio
-                        </Button>
-                        <div className="space-y-2">
-                            <Label htmlFor="position">Posición</Label>
-                            <Select
-                            value={state.scenario.position}
-                            onValueChange={(v) =>
-                                handleSetScenario({ position: v as Position })
-                            }
-                            >
-                            <SelectTrigger id="position">
-                                <SelectValue placeholder="Selecciona posición" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {POSITIONS.map((pos) => (
-                                <SelectItem key={pos} value={pos}>
-                                    {pos}
-                                </SelectItem>
-                                ))}
-                            </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="stack-size">Stack (BBs)</Label>
-                            <Select
-                            value={String(state.scenario.stackSize)}
-                            onValueChange={(v) =>
-                                handleSetScenario({ stackSize: Number(v) })
-                            }
-                            >
-                            <SelectTrigger id="stack-size">
-                                <SelectValue placeholder="Selecciona stack" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {STACK_SIZES.map((size) => (
-                                <SelectItem key={size} value={String(size)}>
-                                    {size} BB
-                                </SelectItem>
-                                ))}
-                            </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="table-type">Tipo de Mesa</Label>
-                            <Select
-                            value={state.scenario.tableType}
-                            onValueChange={(v) =>
-                                handleSetScenario({ tableType: v as TableType })
-                            }
-                            >
-                            <SelectTrigger id="table-type">
-                                <SelectValue placeholder="Selecciona tipo de mesa" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {TABLE_TYPES.map((type) => (
-                                <SelectItem key={type} value={type}>
-                                    {type === 'cash' ? 'Cash Game' : 'Torneo'}
-                                </SelectItem>
-                                ))}
-                            </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="previous-action">Acción Previa</Label>
-                            <Select
-                            value={state.scenario.previousAction}
-                            onValueChange={(v) =>
-                                handleSetScenario({ previousAction: v as 'none' | 'raise' })
-                            }
-                            disabled={isPreviousActionDisabled}
-                            >
-                            <SelectTrigger id="previous-action">
-                                <SelectValue placeholder="Selecciona acción previa" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="none">
-                                Nadie ha apostado (Open-Raise)
-                                </SelectItem>
-                                <SelectItem value="raise">
-                                Hubo un Raise antes de mí
-                                </SelectItem>
-                            </SelectContent>
-                            </Select>
-                            {isPreviousActionDisabled && (
-                            <p className="text-xs text-muted-foreground">
-                                Solo aplicable para la posición BB.
-                            </p>
-                            )}
-                        </div>
+                        <SelectTrigger id="position-sheet">
+                            <SelectValue placeholder="Selecciona posición" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {POSITIONS.map((pos) => (
+                            <SelectItem key={pos} value={pos}>
+                                {pos}
+                            </SelectItem>
+                            ))}
+                        </SelectContent>
+                        </Select>
                     </div>
-                </AccordionContent>
-            </AccordionItem>
-        </Accordion>
-      </Card>
-
-      <Card className="lg:col-span-2">
-        <CardHeader>
-          <CardTitle className="font-headline">Tu Mano</CardTitle>
-          <CardDescription>
-            Estás en{' '}
-            <span className="font-bold">{state.scenario.position}</span> con{' '}
-            <span className="font-bold">{state.scenario.stackSize} BB</span>.
-            ¿Qué haces?
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center gap-8 min-h-[350px]">
-          {state.currentHand ? (
-            <div className="flex gap-4">
-              {renderCard(state.currentHand.cards[0])}
-              {renderCard(state.currentHand.cards[1])}
-            </div>
-          ) : (
-            <Loader2 className="animate-spin h-12 w-12" />
-          )}
-
-          {state.feedback && (
-            <div className="w-full max-w-md space-y-2">
-              <Alert
-                variant={state.feedback.isOptimal ? 'default' : 'destructive'}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    {state.feedback.isOptimal ? (
-                      <CheckCircle className="h-4 w-4" />
-                    ) : (
-                      <XCircle className="h-4 w-4" />
-                    )}
-                    <AlertTitle className="font-headline ml-2">
-                      {state.feedback.isOptimal
-                        ? 'Respuesta Correcta'
-                        : 'Respuesta Incorrecta'}
-                    </AlertTitle>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleShowExplanation}
-                    disabled={state.explanationIsLoading}
-                  >
-                    {state.explanationIsLoading ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Info className="mr-2 h-4 w-4" />
-                    )}
-                    {state.showExplanation ? 'Ocultar' : 'Explicación'}
-                  </Button>
-                </div>
-                {state.showExplanation && (
-                  <AlertDescription className="space-y-2 pt-2">
-                    {state.explanationIsLoading &&
-                    !state.feedback.explanation ? (
-                      <p>Cargando explicación...</p>
-                    ) : (
-                      <>
-                        <p>{state.feedback.explanation?.feedback}</p>
+                    <div className="space-y-2">
+                        <Label htmlFor="stack-size-sheet">Stack (BBs)</Label>
+                        <Select
+                        value={String(state.scenario.stackSize)}
+                        onValueChange={(v) =>
+                            handleSetScenario({ stackSize: Number(v) })
+                        }
+                        >
+                        <SelectTrigger id="stack-size-sheet">
+                            <SelectValue placeholder="Selecciona stack" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {STACK_SIZES.map((size) => (
+                            <SelectItem key={size} value={String(size)}>
+                                {size} BB
+                            </SelectItem>
+                            ))}
+                        </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="table-type-sheet">Tipo de Mesa</Label>
+                        <Select
+                        value={state.scenario.tableType}
+                        onValueChange={(v) =>
+                            handleSetScenario({ tableType: v as TableType })
+                        }
+                        >
+                        <SelectTrigger id="table-type-sheet">
+                            <SelectValue placeholder="Selecciona tipo de mesa" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {TABLE_TYPES.map((type) => (
+                            <SelectItem key={type} value={type}>
+                                {type === 'cash' ? 'Cash Game' : 'Torneo'}
+                            </SelectItem>
+                            ))}
+                        </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="previous-action-sheet">Acción Previa</Label>
+                        <Select
+                        value={state.scenario.previousAction}
+                        onValueChange={(v) =>
+                            handleSetScenario({ previousAction: v as 'none' | 'raise' })
+                        }
+                        disabled={isPreviousActionDisabled}
+                        >
+                        <SelectTrigger id="previous-action-sheet">
+                            <SelectValue placeholder="Selecciona acción previa" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="none">
+                            Nadie ha apostado (Open-Raise)
+                            </SelectItem>
+                            <SelectItem value="raise">
+                            Hubo un Raise antes de mí
+                            </SelectItem>
+                        </SelectContent>
+                        </Select>
+                        {isPreviousActionDisabled && (
                         <p className="text-xs text-muted-foreground">
-                          {state.feedback.explanation?.evExplanation}
+                            Solo aplicable para la posición BB.
                         </p>
-                      </>
+                        )}
+                    </div>
+                </div>
+            </SheetContent>
+        </Sheet>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="hidden lg:block lg:col-span-1">
+                 <Card>
+                    <CardHeader>
+                        <CardTitle className="font-headline text-lg">Configurar Escenario</CardTitle>
+                         <CardDescription>
+                            Elige las condiciones para tu práctica.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            <Button
+                                variant="secondary"
+                                onClick={handleRandomizeScenario}
+                                className="w-full"
+                            >
+                                <Shuffle className="mr-2 h-4 w-4" />
+                                Escenario Aleatorio
+                            </Button>
+                            <div className="space-y-2">
+                                <Label htmlFor="position">Posición</Label>
+                                <Select
+                                value={state.scenario.position}
+                                onValueChange={(v) =>
+                                    handleSetScenario({ position: v as Position })
+                                }
+                                >
+                                <SelectTrigger id="position">
+                                    <SelectValue placeholder="Selecciona posición" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {POSITIONS.map((pos) => (
+                                    <SelectItem key={pos} value={pos}>
+                                        {pos}
+                                    </SelectItem>
+                                    ))}
+                                </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="stack-size">Stack (BBs)</Label>
+                                <Select
+                                value={String(state.scenario.stackSize)}
+                                onValueChange={(v) =>
+                                    handleSetScenario({ stackSize: Number(v) })
+                                }
+                                >
+                                <SelectTrigger id="stack-size">
+                                    <SelectValue placeholder="Selecciona stack" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {STACK_SIZES.map((size) => (
+                                    <SelectItem key={size} value={String(size)}>
+                                        {size} BB
+                                    </SelectItem>
+                                    ))}
+                                </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="table-type">Tipo de Mesa</Label>
+                                <Select
+                                value={state.scenario.tableType}
+                                onValueChange={(v) =>
+                                    handleSetScenario({ tableType: v as TableType })
+                                }
+                                >
+                                <SelectTrigger id="table-type">
+                                    <SelectValue placeholder="Selecciona tipo de mesa" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {TABLE_TYPES.map((type) => (
+                                    <SelectItem key={type} value={type}>
+                                        {type === 'cash' ? 'Cash Game' : 'Torneo'}
+                                    </SelectItem>
+                                    ))}
+                                </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="previous-action">Acción Previa</Label>
+                                <Select
+                                value={state.scenario.previousAction}
+                                onValueChange={(v) =>
+                                    handleSetScenario({ previousAction: v as 'none' | 'raise' })
+                                }
+                                disabled={isPreviousActionDisabled}
+                                >
+                                <SelectTrigger id="previous-action">
+                                    <SelectValue placeholder="Selecciona acción previa" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">
+                                    Nadie ha apostado (Open-Raise)
+                                    </SelectItem>
+                                    <SelectItem value="raise">
+                                    Hubo un Raise antes de mí
+                                    </SelectItem>
+                                </SelectContent>
+                                </Select>
+                                {!isPreviousActionDisabled && (
+                                <p className="text-xs text-muted-foreground">
+                                    Solo aplicable para la posición BB.
+                                </p>
+                                )}
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+            
+            <div className="lg:col-span-2 space-y-6">
+                <Card>
+                    <CardHeader>
+                    <CardTitle className="font-headline">Tu Mano</CardTitle>
+                    <CardDescription>
+                        Estás en{' '}
+                        <span className="font-bold">{state.scenario.position}</span> con{' '}
+                        <span className="font-bold">{state.scenario.stackSize} BB</span>.
+                        ¿Qué haces?
+                    </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col items-center justify-center gap-8 min-h-[350px]">
+                    {state.currentHand ? (
+                        <div className="flex gap-4">
+                        {renderCard(state.currentHand.cards[0])}
+                        {renderCard(state.currentHand.cards[1])}
+                        </div>
+                    ) : (
+                        <Loader2 className="animate-spin h-12 w-12" />
                     )}
-                  </AlertDescription>
-                )}
-              </Alert>
-            </div>
-          )}
 
-          {!state.feedback && state.currentHandRange && (
-            <div className="flex gap-4">
-              {isBBvsLimp ? (
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  onClick={() => handleAction('call' as Action)}
-                >
-                  Check ✅
-                </Button>
-              ) : (
-                <Button
-                  variant="destructive"
-                  size="lg"
-                  onClick={() => handleAction('fold' as Action)}
-                >
-                  Fold 🤚
-                </Button>
-              )}
-              <Button
-                variant={isBBvsLimp ? 'default' : 'secondary'}
-                size="lg"
-                onClick={() => handleAction(isBBvsLimp ? ('raise' as Action) : ('call' as Action))}
-              >
-                {isBBvsLimp ? 'Bet 🚀' : 'Call 💰'}
-              </Button>
-              {!isBBvsLimp &&
-                <Button
-                    variant="default"
-                    size="lg"
-                    onClick={() => handleAction('raise' as Action)}
-                >
-                    Raise 🚀
-                </Button>
-              }
-            </div>
-          )}
+                    {state.feedback && (
+                        <div className="w-full max-w-md space-y-2">
+                        <Alert
+                            variant={state.feedback.isOptimal ? 'default' : 'destructive'}
+                        >
+                            <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                                {state.feedback.isOptimal ? (
+                                <CheckCircle className="h-4 w-4" />
+                                ) : (
+                                <XCircle className="h-4 w-4" />
+                                )}
+                                <AlertTitle className="font-headline ml-2">
+                                {state.feedback.isOptimal
+                                    ? 'Respuesta Correcta'
+                                    : 'Respuesta Incorrecta'}
+                                </AlertTitle>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleShowExplanation}
+                                disabled={state.explanationIsLoading}
+                            >
+                                {state.explanationIsLoading ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                <Info className="mr-2 h-4 w-4" />
+                                )}
+                                {state.showExplanation ? 'Ocultar' : 'Explicación'}
+                            </Button>
+                            </div>
+                            {state.showExplanation && (
+                            <AlertDescription className="space-y-2 pt-2">
+                                {state.explanationIsLoading &&
+                                !state.feedback.explanation ? (
+                                <p>Cargando explicación...</p>
+                                ) : (
+                                <>
+                                    <p>{state.feedback.explanation?.feedback}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                    {state.feedback.explanation?.evExplanation}
+                                    </p>
+                                </>
+                                )}
+                            </AlertDescription>
+                            )}
+                        </Alert>
+                        </div>
+                    )}
 
-          {state.feedback && (
-            <Button size="lg" onClick={handleNextHand}>
-              Siguiente Mano
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-      <div className="lg:col-span-3">
-        {state.currentHandRange && state.feedback ? (
-          <HandRangeGrid
-            currentHand={state.currentHand?.handNotation}
-            range={state.currentHandRange}
-          />
-        ) : !state.currentHandRange && !state.isLoading ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-destructive/50 bg-destructive/10 p-8 text-center min-h-[300px]">
-            <XCircle className="h-10 w-10 text-destructive mb-2" />
-            <p className="font-semibold text-destructive">Error de Rango</p>
-            <p className="text-destructive/80 text-sm">
-              No se pudo cargar el rango para este escenario.
-               <span className="font-mono text-xs block mt-1 p-1 bg-destructive/10 rounded-sm">({generateCacheKey(state.scenario)})</span>
-            </p>
-          </div>
-        ) : null}
-      </div>
+                    {!state.feedback && state.currentHandRange && (
+                        <div className="flex gap-4">
+                        {isBBvsLimp ? (
+                            <Button
+                            variant="secondary"
+                            size="lg"
+                            onClick={() => handleAction('call' as Action)}
+                            >
+                            Check ✅
+                            </Button>
+                        ) : (
+                            <Button
+                            variant="destructive"
+                            size="lg"
+                            onClick={() => handleAction('fold' as Action)}
+                            >
+                            Fold 🤚
+                            </Button>
+                        )}
+                        <Button
+                            variant={isBBvsLimp ? 'default' : 'secondary'}
+                            size="lg"
+                            onClick={() => handleAction(isBBvsLimp ? ('raise' as Action) : ('call' as Action))}
+                        >
+                            {isBBvsLimp ? 'Bet 🚀' : 'Call 💰'}
+                        </Button>
+                        {!isBBvsLimp &&
+                            <Button
+                                variant="default"
+                                size="lg"
+                                onClick={() => handleAction('raise' as Action)}
+                            >
+                                Raise 🚀
+                            </Button>
+                        }
+                        </div>
+                    )}
+
+                    {state.feedback && (
+                        <Button size="lg" onClick={handleNextHand}>
+                        Siguiente Mano
+                        </Button>
+                    )}
+                    </CardContent>
+                </Card>
+                 <div className="col-span-full">
+                    {state.currentHandRange && state.feedback ? (
+                    <HandRangeGrid
+                        currentHand={state.currentHand?.handNotation}
+                        range={state.currentHandRange}
+                    />
+                    ) : !state.currentHandRange && !state.isLoading ? (
+                    <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-destructive/50 bg-destructive/10 p-8 text-center min-h-[300px]">
+                        <XCircle className="h-10 w-10 text-destructive mb-2" />
+                        <p className="font-semibold text-destructive">Error de Rango</p>
+                        <p className="text-destructive/80 text-sm">
+                        No se pudo cargar el rango para este escenario.
+                        <span className="font-mono text-xs block mt-1 p-1 bg-destructive/10 rounded-sm">({generateCacheKey(state.scenario)})</span>
+                        </p>
+                    </div>
+                    ) : null}
+                </div>
+            </div>
+        </div>
     </div>
   );
 }
