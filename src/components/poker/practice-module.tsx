@@ -330,15 +330,23 @@ export function PracticeModule() {
         </CardContent>
       </Card>
       <div className="lg:col-span-3">
-        {isRangeLoading && !handRange ? (
+        {isRangeLoading && !feedback && (
             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               <p className="mt-4 text-muted-foreground">
                 Cargando rango de manos GTO...
               </p>
             </div>
-        ) : (
+        )}
+        {feedback && handRange && (
             <HandRangeGrid currentHand={currentHand?.handNotation} range={handRange} />
+        )}
+         {!isRangeLoading && !feedback && (
+          <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
+            <p className="text-muted-foreground">
+              El rango de manos aparecerá aquí después de que tomes una decisión.
+            </p>
+          </div>
         )}
       </div>
     </div>
