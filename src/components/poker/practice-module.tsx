@@ -20,7 +20,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { PokerCard } from './poker-card';
 import { POSITIONS, STACK_SIZES, TABLE_TYPES } from '@/lib/data';
-import type { Position, TableType, Action } from '@/lib/types';
+import type { Position, TableType, Action, PreviousAction } from '@/lib/types';
 import { getPreflopExplanationAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
@@ -40,7 +40,7 @@ type Scenario = {
   position: Position;
   stackSize: number;
   tableType: TableType;
-  previousAction: 'none' | 'raise';
+  previousAction: PreviousAction;
 };
 
 type State = {
@@ -104,7 +104,8 @@ function getNewHand() {
 }
 
 function generateCacheKey(scenario: Scenario): string {
-  return `${scenario.position}-${scenario.stackSize}-${scenario.tableType}-${scenario.previousAction}`;
+  const internalPreviousAction = scenario.previousAction === 'none' ? 'none' : 'raise';
+  return `${scenario.position}-${scenario.stackSize}-${scenario.tableType}-${internalPreviousAction}`;
 }
 
 function loadRangeAndHand(scenario: Scenario): {
@@ -157,7 +158,7 @@ const reducer = (state: State, action: ActionPayload): State => {
       // If the correct action is '3-bet' or 'all-in', a 'raise' is also acceptable
       const isAggressiveActionCorrect = ['3-bet', 'all-in'].includes(correctAction) && actionTaken === 'raise';
       // If the correct action is 'raise', a '3-bet' is also acceptable in a vs-raise scenario
-      const isRaiseSynonymCorrect = correctAction === 'raise' && actionTaken === '3-bet' && state.scenario.previousAction === 'raise';
+      const isRaiseSynonymCorrect = correctAction === 'raise' && actionTaken === '3-bet' && state.scenario.previousAction !== 'none';
 
       const isOptimal = actionTaken === correctAction || isAggressiveActionCorrect || isRaiseSynonymCorrect;
 
@@ -364,12 +365,26 @@ export function PracticeModule() {
     );
   }
 
-  const descriptionText = state.scenario.previousAction === 'raise'
-    ? `Un oponente ha subido. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`
-    : `Nadie ha apostado todavía. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+  let descriptionText = '';
+  switch (state.scenario.previousAction) {
+    case 'none':
+      descriptionText = `Nadie ha apostado todavía. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      break;
+    case 'raise':
+      descriptionText = `Un oponente ha subido. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      break;
+    case '3-bet':
+      descriptionText = `Te enfrentas a un 3-bet. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      break;
+    case '4-bet':
+        descriptionText = `Un oponente ha hecho 4-bet. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+        break;
+    default:
+      descriptionText = `Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+  }
   
   const showOpenRaiseActions = state.scenario.previousAction === 'none' && !isBBvsLimp;
-  const showVsRaiseActions = state.scenario.previousAction === 'raise';
+  const showVsRaiseActions = state.scenario.previousAction !== 'none';
 
 
   return (
@@ -398,7 +413,7 @@ export function PracticeModule() {
                         <Select
                         value={state.scenario.previousAction}
                         onValueChange={(v) =>
-                            handleSetScenario({ previousAction: v as 'none' | 'raise' })
+                            handleSetScenario({ previousAction: v as PreviousAction })
                         }
                         >
                         <SelectTrigger id="previous-action-sheet">
@@ -409,7 +424,13 @@ export function PracticeModule() {
                                 Nadie ha apostado (Open Raise)
                             </SelectItem>
                             <SelectItem value="raise">
-                                Enfrentando un Raise
+                                Enfrentando un Open-Raise
+                            </SelectItem>
+                             <SelectItem value="3-bet">
+                                Enfrentando un 3-Bet
+                            </SelectItem>
+                             <SelectItem value="4-bet">
+                                Enfrentando un 4-Bet
                             </SelectItem>
                         </SelectContent>
                         </Select>
@@ -418,7 +439,7 @@ export function PracticeModule() {
                         <Label htmlFor="position-sheet">Posición</Label>
                         <Select
                         value={state.scenario.position}
-                        onValueChange={(v) =>
+                        onValuechange={(v) =>
                             handleSetScenario({ position: v as Position })
                         }
                         >
@@ -664,3 +685,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
