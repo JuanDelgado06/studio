@@ -18,10 +18,10 @@ const suitSymbols: Record<Suit, string> = {
 };
 
 const suitColors: Record<Suit, string> = {
-  s: 'text-foreground',
+  s: 'text-zinc-800',
   h: 'text-destructive',
   d: 'text-destructive',
-  c: 'text-foreground',
+  c: 'text-zinc-800',
 };
 
 
@@ -29,7 +29,7 @@ export const PokerCard: React.FC<PokerCardProps> = ({ rank, suit, className }) =
   return (
     <div
       className={cn(
-        'relative flex h-28 w-20 flex-col justify-between rounded-lg border-2 bg-card p-2 shadow-md',
+        'relative flex h-28 w-20 flex-col justify-between rounded-lg border-2 bg-white p-2 shadow-md',
         'sm:h-36 sm:w-24',
         suitColors[suit],
         className
