@@ -228,7 +228,7 @@ export function PracticeModule() {
             </div>
           ) : <Loader2 className="animate-spin h-12 w-12" />}
 
-          {feedback && (
+          {feedback && !isPending && (
              <div className="w-full max-w-md space-y-2">
                 <Alert variant={feedback.isOptimal ? 'default' : 'destructive'}>
                     <div className='flex items-center justify-between'>
@@ -259,15 +259,15 @@ export function PracticeModule() {
 
           {isPending && <Loader2 className="animate-spin h-8 w-8 text-primary" />}
 
-          {!feedback && !isPending && (
+          {!feedback && (
             <div className="flex gap-4">
-              <Button variant="destructive" size="lg" onClick={() => handleAction('fold')}>
+              <Button variant="destructive" size="lg" onClick={() => handleAction('fold')} disabled={isPending}>
                 Fold 🤚
               </Button>
-              <Button variant="secondary" size="lg" onClick={() => handleAction('call')}>
+              <Button variant="secondary" size="lg" onClick={() => handleAction('call')} disabled={isPending}>
                 Call 💰
               </Button>
-              <Button variant="default" size="lg" onClick={() => handleAction('raise')}>
+              <Button variant="default" size="lg" onClick={() => handleAction('raise')} disabled={isPending}>
                 Raise 🚀
               </Button>
             </div>
