@@ -11,6 +11,7 @@ import {
   SidebarFooter,
   SidebarTrigger,
   SidebarInset,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import {
   BarChart3,
@@ -31,6 +32,33 @@ const menuItems = [
   { href: '/settings', label: 'Ajustes', icon: Settings },
 ];
 
+function Menu() {
+  const pathname = usePathname();
+  const { setOpenMobile } = useSidebar();
+
+  return (
+    <SidebarMenu>
+      {menuItems.map((item) => (
+        <SidebarMenuItem key={item.label} onClick={() => setOpenMobile(false)}>
+          <Link href={item.href}>
+            <SidebarMenuButton
+              isActive={pathname === item.href}
+              tooltip={item.label}
+              asChild
+            >
+              <div>
+                <item.icon />
+                <span>{item.label}</span>
+              </div>
+            </SidebarMenuButton>
+          </Link>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
+}
+
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
@@ -48,24 +76,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu>
-            {menuItems.map((item) => (
-              <SidebarMenuItem key={item.label}>
-                <Link href={item.href}>
-                  <SidebarMenuButton
-                    isActive={pathname === item.href}
-                    tooltip={item.label}
-                    asChild
-                  >
-                    <div>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </div>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
+          <Menu />
         </SidebarContent>
         <SidebarFooter>
           <div className="flex items-center gap-3 p-2">
