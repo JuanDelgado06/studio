@@ -19,8 +19,8 @@ export default function DashboardPage() {
           <BarChart3 className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">1,254</div>
-          <p className="text-xs text-muted-foreground">+20.1% desde el mes pasado</p>
+          <div className="text-2xl font-bold">25</div>
+          <p className="text-xs text-muted-foreground">Sesión actual</p>
         </CardContent>
       </Card>
       <Card>
@@ -29,8 +29,8 @@ export default function DashboardPage() {
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">88.5%</div>
-          <p className="text-xs text-muted-foreground">+2.5% desde la semana pasada</p>
+          <div className="text-2xl font-bold">84%</div>
+          <p className="text-xs text-muted-foreground">Aún no hay datos de tendencia</p>
         </CardContent>
       </Card>
       <Card>
@@ -39,7 +39,7 @@ export default function DashboardPage() {
           <CheckCircle className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">1,109</div>
+          <div className="text-2xl font-bold">21</div>
           <p className="text-xs text-muted-foreground">Total de aciertos</p>
         </CardContent>
       </Card>
@@ -49,8 +49,8 @@ export default function DashboardPage() {
           <XCircle className="h-4 w-4 text-destructive" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">145</div>
-          <p className="text-xs text-muted-foreground">Fold incorrecto en SB</p>
+          <div className="text-2xl font-bold">4</div>
+          <p className="text-xs text-muted-foreground">Call incorrecto en BB</p>
         </CardContent>
       </Card>
 
@@ -76,24 +76,22 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent className="space-y-6">
             <div className="text-center">
-                <span className="text-5xl">🔥</span>
-                <p className="text-2xl font-bold font-headline">Racha de 5 días</p>
-                <p className="text-sm text-muted-foreground">Completaste tu práctica diaria.</p>
+                <span className="text-5xl">🎉</span>
+                <p className="text-2xl font-bold font-headline">Racha de 1 día</p>
+                <p className="text-sm text-muted-foreground">¡Completaste tu primera práctica!</p>
             </div>
             <div className="space-y-2">
                 <div className="flex justify-between items-baseline">
-                    <p className="font-semibold">Meta Semanal: Mejorar en SB</p>
-                    <p className="text-sm font-bold text-primary">75%</p>
+                    <p className="font-semibold">Meta Semanal: Mejorar en BB</p>
+                    <p className="text-sm font-bold text-primary">60%</p>
                 </div>
-                <Progress value={75} />
-                <p className="text-xs text-muted-foreground">Objetivo: 90% de precisión en Small Blind.</p>
+                <Progress value={60} />
+                <p className="text-xs text-muted-foreground">Objetivo: 85% de precisión en Big Blind.</p>
             </div>
              <div className="space-y-2">
                 <p className="font-semibold">Áreas de Enfoque Sugeridas por IA</p>
                 <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">3-bet vs CO</Badge>
                     <Badge variant="secondary">Defensa de BB vs BTN</Badge>
-                    <Badge variant="secondary">Folds con Pares Bajos</Badge>
                 </div>
             </div>
         </CardContent>
