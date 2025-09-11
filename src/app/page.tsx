@@ -1,3 +1,9 @@
-export default function Home() {
-  return <></>;
+import { PracticeModule } from "@/components/poker/practice-module";
+
+export default function PracticePage() {
+  return (
+    <div className="w-full">
+        <PracticeModule />
+    </div>
+  );
 }

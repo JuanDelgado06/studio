@@ -1,1 +1,6 @@
-// Flows will be imported for their side effects in this file.
+import { config } from 'dotenv';
+config();
+
+import '@/ai/flows/adapt-difficulty-based-on-progress.ts';
+import '@/ai/flows/analyze-preflop-decision.ts';
+import '@/ai/flows/suggest-improvement-exercises.ts';
