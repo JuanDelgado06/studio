@@ -309,10 +309,8 @@ export function PracticeModule() {
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
     
-    let randomPreviousAction: 'none' | 'raise' = 'raise';
-    if (randomPosition !== 'BB') {
-        randomPreviousAction = 'none';
-    } else {
+    let randomPreviousAction: 'none' | 'raise' = 'none';
+    if (randomPosition === 'BB') {
         randomPreviousAction = 'raise';
     }
 
@@ -328,8 +326,10 @@ export function PracticeModule() {
   const handleSetScenario = (payload: Partial<Scenario>) => {
     const newScenario = { ...state.scenario, ...payload };
     if (newScenario.position && newScenario.position !== 'BB') {
-      // If position is changed to anything other than BB, reset previousAction
       newScenario.previousAction = 'none';
+    }
+    if (newScenario.position === 'BB' && payload.position) {
+      newScenario.previousAction = 'raise';
     }
     dispatch({ type: 'SET_SCENARIO', payload: newScenario });
   };
@@ -338,13 +338,11 @@ export function PracticeModule() {
 
   if (state.isLoading || !state.currentHand) {
     return (
-      <div className="grid grid-cols-1 gap-6">
-        <div className="lg:col-span-3 flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[600px]">
-          <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
-          <p className="mt-4 text-muted-foreground">
-            Cargando módulo de práctica...
-          </p>
-        </div>
+      <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[600px]">
+        <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
+        <p className="mt-4 text-muted-foreground">
+          Cargando módulo de práctica...
+        </p>
       </div>
     );
   }
@@ -353,11 +351,11 @@ export function PracticeModule() {
     state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
 
   return (
-    <div className="grid grid-cols-1 gap-6">
+    <div className="space-y-6">
         <Sheet>
             <SheetTrigger asChild>
-                 <Button variant="outline" className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full shadow-lg lg:hidden">
-                    <Settings />
+                 <Button variant="outline" className="fixed bottom-4 right-4 z-50 h-14 w-14 rounded-full shadow-lg">
+                    <Settings className="h-6 w-6" />
                  </Button>
             </SheetTrigger>
              <SheetContent>
@@ -447,10 +445,10 @@ export function PracticeModule() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="none">
-                            Nadie ha apostado (Open-Raise)
+                                Nadie ha apostado (Limp)
                             </SelectItem>
                             <SelectItem value="raise">
-                            Hubo un Raise antes de mí
+                                Hubo un Raise antes de mí
                             </SelectItem>
                         </SelectContent>
                         </Select>
@@ -464,255 +462,146 @@ export function PracticeModule() {
             </SheetContent>
         </Sheet>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="hidden lg:block lg:col-span-1">
-                 <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline text-lg">Configurar Escenario</CardTitle>
-                         <CardDescription>
-                            Elige las condiciones para tu práctica.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <Button
-                                variant="secondary"
-                                onClick={handleRandomizeScenario}
-                                className="w-full"
-                            >
-                                <Shuffle className="mr-2 h-4 w-4" />
-                                Escenario Aleatorio
-                            </Button>
-                            <div className="space-y-2">
-                                <Label htmlFor="position">Posición</Label>
-                                <Select
-                                value={state.scenario.position}
-                                onValueChange={(v) =>
-                                    handleSetScenario({ position: v as Position })
-                                }
-                                >
-                                <SelectTrigger id="position">
-                                    <SelectValue placeholder="Selecciona posición" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {POSITIONS.map((pos) => (
-                                    <SelectItem key={pos} value={pos}>
-                                        {pos}
-                                    </SelectItem>
-                                    ))}
-                                </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="stack-size">Stack (BBs)</Label>
-                                <Select
-                                value={String(state.scenario.stackSize)}
-                                onValueChange={(v) =>
-                                    handleSetScenario({ stackSize: Number(v) })
-                                }
-                                >
-                                <SelectTrigger id="stack-size">
-                                    <SelectValue placeholder="Selecciona stack" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {STACK_SIZES.map((size) => (
-                                    <SelectItem key={size} value={String(size)}>
-                                        {size} BB
-                                    </SelectItem>
-                                    ))}
-                                </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="table-type">Tipo de Mesa</Label>
-                                <Select
-                                value={state.scenario.tableType}
-                                onValueChange={(v) =>
-                                    handleSetScenario({ tableType: v as TableType })
-                                }
-                                >
-                                <SelectTrigger id="table-type">
-                                    <SelectValue placeholder="Selecciona tipo de mesa" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {TABLE_TYPES.map((type) => (
-                                    <SelectItem key={type} value={type}>
-                                        {type === 'cash' ? 'Cash Game' : 'Torneo'}
-                                    </SelectItem>
-                                    ))}
-                                </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="previous-action">Acción Previa</Label>
-                                <Select
-                                value={state.scenario.previousAction}
-                                onValueChange={(v) =>
-                                    handleSetScenario({ previousAction: v as 'none' | 'raise' })
-                                }
-                                disabled={isPreviousActionDisabled}
-                                >
-                                <SelectTrigger id="previous-action">
-                                    <SelectValue placeholder="Selecciona acción previa" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="none">
-                                    Nadie ha apostado (Open-Raise)
-                                    </SelectItem>
-                                    <SelectItem value="raise">
-                                    Hubo un Raise antes de mí
-                                    </SelectItem>
-                                </SelectContent>
-                                </Select>
-                                {isPreviousActionDisabled && (
-                                <p className="text-xs text-muted-foreground">
-                                    Solo aplicable para la posición BB.
-                                </p>
-                                )}
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-            
-            <div className="lg:col-span-2 space-y-6">
-                <Card>
-                    <CardHeader>
-                    <CardTitle className="font-headline">Tu Mano</CardTitle>
-                    <CardDescription>
-                        Estás en{' '}
-                        <span className="font-bold">{state.scenario.position}</span> con{' '}
-                        <span className="font-bold">{state.scenario.stackSize} BB</span>.
-                        ¿Qué haces?
-                    </CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-center justify-center gap-8 min-h-[350px]">
-                    {state.currentHand ? (
-                        <div className="flex gap-4">
-                        {renderCard(state.currentHand.cards[0])}
-                        {renderCard(state.currentHand.cards[1])}
-                        </div>
-                    ) : (
-                        <Loader2 className="animate-spin h-12 w-12" />
-                    )}
+        <Card>
+            <CardHeader>
+            <CardTitle className="font-headline">Tu Mano</CardTitle>
+            <CardDescription>
+                Estás en{' '}
+                <span className="font-bold">{state.scenario.position}</span> con{' '}
+                <span className="font-bold">{state.scenario.stackSize} BB</span>.
+                ¿Qué haces?
+            </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center justify-center gap-8 min-h-[350px]">
+            {state.currentHand ? (
+                <div className="flex gap-4">
+                {renderCard(state.currentHand.cards[0])}
+                {renderCard(state.currentHand.cards[1])}
+                </div>
+            ) : (
+                <Loader2 className="animate-spin h-12 w-12" />
+            )}
 
-                    {state.feedback && (
-                        <div className="w-full max-w-md space-y-2">
-                        <Alert
-                            variant={state.feedback.isOptimal ? 'default' : 'destructive'}
-                        >
-                            <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                                {state.feedback.isOptimal ? (
-                                <CheckCircle className="h-4 w-4" />
-                                ) : (
-                                <XCircle className="h-4 w-4" />
-                                )}
-                                <AlertTitle className="font-headline ml-2">
-                                {state.feedback.isOptimal
-                                    ? 'Respuesta Correcta'
-                                    : 'Respuesta Incorrecta'}
-                                </AlertTitle>
-                            </div>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleShowExplanation}
-                                disabled={state.explanationIsLoading}
-                            >
-                                {state.explanationIsLoading ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                ) : (
-                                <Info className="mr-2 h-4 w-4" />
-                                )}
-                                {state.showExplanation ? 'Ocultar' : 'Explicación'}
-                            </Button>
-                            </div>
-                            {state.showExplanation && (
-                            <AlertDescription className="space-y-2 pt-2">
-                                {state.explanationIsLoading &&
-                                !state.feedback.explanation ? (
-                                <p>Cargando explicación...</p>
-                                ) : (
-                                <>
-                                    <p>{state.feedback.explanation?.feedback}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                    {state.feedback.explanation?.evExplanation}
-                                    </p>
-                                </>
-                                )}
-                            </AlertDescription>
-                            )}
-                        </Alert>
-                        </div>
+            {state.feedback && (
+                <div className="w-full max-w-md space-y-2">
+                <Alert
+                    variant={state.feedback.isOptimal ? 'default' : 'destructive'}
+                >
+                    <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                        {state.feedback.isOptimal ? (
+                        <CheckCircle className="h-4 w-4" />
+                        ) : (
+                        <XCircle className="h-4 w-4" />
+                        )}
+                        <AlertTitle className="font-headline ml-2">
+                        {state.feedback.isOptimal
+                            ? 'Respuesta Correcta'
+                            : 'Respuesta Incorrecta'}
+                        </AlertTitle>
+                    </div>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleShowExplanation}
+                        disabled={state.explanationIsLoading}
+                    >
+                        {state.explanationIsLoading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                        <Info className="mr-2 h-4 w-4" />
+                        )}
+                        {state.showExplanation ? 'Ocultar' : 'Explicación'}
+                    </Button>
+                    </div>
+                    {state.showExplanation && (
+                    <AlertDescription className="space-y-2 pt-2">
+                        {state.explanationIsLoading &&
+                        !state.feedback.explanation ? (
+                        <p>Cargando explicación...</p>
+                        ) : (
+                        <>
+                            <p>{state.feedback.explanation?.feedback}</p>
+                            <p className="text-xs text-muted-foreground">
+                            {state.feedback.explanation?.evExplanation}
+                            </p>
+                        </>
+                        )}
+                    </AlertDescription>
                     )}
+                </Alert>
+                </div>
+            )}
 
-                    {!state.feedback && state.currentHandRange && (
-                        <div className="flex gap-4">
-                        {isBBvsLimp ? (
-                            <Button
+            {!state.feedback && state.currentHandRange && (
+                <div className="flex gap-4">
+                {isBBvsLimp ? (
+                    <>
+                        <Button
                             variant="secondary"
                             size="lg"
                             onClick={() => handleAction('call' as Action)}
-                            >
+                        >
                             Check ✅
-                            </Button>
-                        ) : (
-                            <Button
+                        </Button>
+                         <Button
+                            variant="default"
+                            size="lg"
+                            onClick={() => handleAction('raise' as Action)}
+                        >
+                            Bet 🚀
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Button
                             variant="destructive"
                             size="lg"
                             onClick={() => handleAction('fold' as Action)}
-                            >
-                            Fold 🤚
-                            </Button>
-                        )}
-                        <Button
-                            variant={isBBvsLimp ? 'default' : 'secondary'}
-                            size="lg"
-                            onClick={() => handleAction(isBBvsLimp ? ('raise' as Action) : ('call' as Action))}
                         >
-                            {isBBvsLimp ? 'Bet 🚀' : 'Call 💰'}
+                            Fold 🤚
                         </Button>
-                        {!isBBvsLimp &&
-                            <Button
-                                variant="default"
-                                size="lg"
-                                onClick={() => handleAction('raise' as Action)}
-                            >
-                                Raise 🚀
-                            </Button>
-                        }
-                        </div>
-                    )}
-
-                    {state.feedback && (
-                        <Button size="lg" onClick={handleNextHand}>
-                        Siguiente Mano
+                         <Button
+                            variant="secondary"
+                            size="lg"
+                            onClick={() => handleAction('call' as Action)}
+                        >
+                            Call 💰
                         </Button>
-                    )}
-                    </CardContent>
-                </Card>
-                 <div className="col-span-full">
-                    {state.currentHandRange && state.feedback ? (
-                    <HandRangeGrid
-                        currentHand={state.currentHand?.handNotation}
-                        range={state.currentHandRange}
-                    />
-                    ) : !state.currentHandRange && !state.isLoading ? (
-                    <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-destructive/50 bg-destructive/10 p-8 text-center min-h-[300px]">
-                        <XCircle className="h-10 w-10 text-destructive mb-2" />
-                        <p className="font-semibold text-destructive">Error de Rango</p>
-                        <p className="text-destructive/80 text-sm">
-                        No se pudo cargar el rango para este escenario.
-                        <span className="font-mono text-xs block mt-1 p-1 bg-destructive/10 rounded-sm">({generateCacheKey(state.scenario)})</span>
-                        </p>
-                    </div>
-                    ) : null}
+                        <Button
+                            variant="default"
+                            size="lg"
+                            onClick={() => handleAction('raise' as Action)}
+                        >
+                            Raise 🚀
+                        </Button>
+                    </>
+                )}
                 </div>
-            </div>
+            )}
+
+            {state.feedback && (
+                <Button size="lg" onClick={handleNextHand}>
+                Siguiente Mano
+                </Button>
+            )}
+            </CardContent>
+        </Card>
+        {state.currentHandRange && state.feedback ? (
+        <HandRangeGrid
+            currentHand={state.currentHand?.handNotation}
+            range={state.currentHandRange}
+        />
+        ) : !state.currentHandRange && !state.isLoading ? (
+        <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-destructive/50 bg-destructive/10 p-8 text-center min-h-[300px]">
+            <XCircle className="h-10 w-10 text-destructive mb-2" />
+            <p className="font-semibold text-destructive">Error de Rango</p>
+            <p className="text-destructive/80 text-sm">
+            No se pudo cargar el rango para este escenario.
+            <span className="font-mono text-xs block mt-1 p-1 bg-destructive/10 rounded-sm">({generateCacheKey(state.scenario)})</span>
+            </p>
         </div>
+        ) : null}
     </div>
   );
 }
-
-    
