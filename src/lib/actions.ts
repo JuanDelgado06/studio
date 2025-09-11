@@ -83,6 +83,7 @@ const HandRangeSchema = z.object({
     position: z.string(),
     stackSize: z.number(),
     tableType: z.enum(['cash', 'tournament']),
+    previousAction: z.enum(['none', 'raise']).optional(),
 });
 
 export async function getHandRangeAction(input: z.infer<typeof HandRangeSchema>) {
@@ -99,5 +100,3 @@ export async function getHandRangeAction(input: z.infer<typeof HandRangeSchema>)
         return { success: false, error: 'Failed to get hand range from AI.' };
     }
 }
-
-    

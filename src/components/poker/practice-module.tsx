@@ -89,6 +89,7 @@ export function PracticeModule() {
   const [position, setPosition] = useState<Position>('BTN');
   const [stackSize, setStackSize] = useState<number>(100);
   const [tableType, setTableType] = useState<TableType>('cash');
+  const [previousAction, setPreviousAction] = useState<'none' | 'raise'>('none');
   const [currentHand, setCurrentHand] = useState<{ handNotation: string; cards: [string, string] } | null>(null);
   const [lastInput, setLastInput] = useState<LastInput | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
@@ -101,11 +102,11 @@ export function PracticeModule() {
   const { toast } = useToast();
   const { recordHand } = useStats();
 
-  const fetchHandRange = useCallback(async (pos: Position, stack: number, type: TableType) => {
+  const fetchHandRange = useCallback(async (pos: Position, stack: number, type: TableType, prevAction: 'none' | 'raise') => {
     setIsRangeLoading(true);
     setHandRange(null);
     try {
-      const result = await getHandRangeAction({ position: pos, stackSize: stack, tableType: type });
+      const result = await getHandRangeAction({ position: pos, stackSize: stack, tableType: type, previousAction: prevAction });
       if (result.success && result.data) {
         const expanded = expandRange(result.data);
         setHandRange(expanded);
@@ -129,12 +130,11 @@ export function PracticeModule() {
 
   useEffect(() => {
     setCurrentHand(getNewHand());
-    fetchHandRange(position, stackSize, tableType);
   }, []);
 
   useEffect(() => {
-    fetchHandRange(position, stackSize, tableType);
-  }, [position, stackSize, tableType, fetchHandRange]);
+    fetchHandRange(position, stackSize, tableType, previousAction);
+  }, [position, stackSize, tableType, previousAction, fetchHandRange]);
 
   const handleAction = (action: Action) => {
     if (!currentHand || !handRange) return;
@@ -246,6 +246,18 @@ export function PracticeModule() {
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="previous-action">Acción Previa</Label>
+            <Select value={previousAction} onValueChange={(v) => setPreviousAction(v as 'none' | 'raise')} disabled={isPending || isRangeLoading}>
+              <SelectTrigger id="previous-action">
+                <SelectValue placeholder="Selecciona acción previa" />
+              </SelectTrigger>
+              <SelectContent>
+                  <SelectItem value='none'>Nadie ha apostado (Open-Raise)</SelectItem>
+                  <SelectItem value='raise'>Hubo un Raise antes de mí</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardContent>
       </Card>
 
@@ -332,7 +344,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
-
-    
