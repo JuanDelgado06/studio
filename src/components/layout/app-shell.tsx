@@ -93,7 +93,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/50 px-4 backdrop-blur-sm md:px-6">
-            <SidebarTrigger className="md:hidden" />
+            <SidebarTrigger />
             <h2 className="text-xl font-headline font-semibold">
                 {menuItems.find(item => item.href === pathname)?.label || 'Preflop Pro Trainer'}
             </h2>
