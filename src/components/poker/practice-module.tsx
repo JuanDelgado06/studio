@@ -105,28 +105,37 @@ export function PracticeModule() {
   const { recordHand } = useStats();
 
   
-  // Update current range and hand when scenario changes or cache loads
-  useEffect(() => {
+  const handleScenarioChange = useCallback((newPosition: Position, newStackSize: number, newTableType: TableType, newPreviousAction: 'none' | 'raise') => {
     startTransition(() => {
-        const key = generateCacheKey(position, stackSize, tableType, previousAction);
-        const range = (allRanges as Record<string, HandRange>)[key] || null;
-        setCurrentHandRange(range);
-        
-        if (!range) {
-             toast({
-                variant: 'destructive',
-                title: 'Error de Rango',
-                description: 'No se pudo cargar el rango para este escenario.',
-            });
-        }
-    
-        setCurrentHand(getNewHand());
-        setFeedback(null);
-        setShowExplanation(false);
-        setLastInput(null);
+      setPosition(newPosition);
+      setStackSize(newStackSize);
+      setTableType(newTableType);
+      setPreviousAction(newPreviousAction);
+      
+      const key = generateCacheKey(newPosition, newStackSize, newTableType, newPreviousAction);
+      const range = (allRanges as Record<string, HandRange>)[key] || null;
+      setCurrentHandRange(range);
+      
+      if (!range) {
+        toast({
+          variant: 'destructive',
+          title: 'Error de Rango',
+          description: 'No se pudo cargar el rango para este escenario.',
+        });
+      }
+  
+      setCurrentHand(getNewHand());
+      setFeedback(null);
+      setShowExplanation(false);
+      setLastInput(null);
     });
+  }, [toast]);
 
-  }, [position, stackSize, tableType, previousAction, toast]);
+  // Load initial range
+  useEffect(() => {
+    handleScenarioChange(position, stackSize, tableType, previousAction);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
 
   const handleNextHand = useCallback(() => {
@@ -137,15 +146,6 @@ export function PracticeModule() {
       setLastInput(null);
     });
   }, []);
-
-  const handleScenarioChange = (newPosition: Position, newStackSize: number, newTableType: TableType, newPreviousAction: 'none' | 'raise') => {
-    startTransition(() => {
-      setPosition(newPosition);
-      setStackSize(newStackSize);
-      setTableType(newTableType);
-      setPreviousAction(newPreviousAction);
-    });
-  };
 
   const handleAction = (action: Action) => {
     if (!currentHand || isPending) return;
@@ -199,34 +199,12 @@ export function PracticeModule() {
   }
   
   const handleRandomizeScenario = () => {
-    startTransition(() => {
-        const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
-        const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
-        const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
-        const randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
-        
-        setPosition(randomPosition);
-        setStackSize(randomStackSize);
-        setTableType(randomTableType);
-        setPreviousAction(randomPreviousAction);
-
-        const key = generateCacheKey(randomPosition, randomStackSize, randomTableType, randomPreviousAction);
-        const range = (allRanges as Record<string, HandRange>)[key] || null;
-        
-        setCurrentHandRange(range);
-        setCurrentHand(getNewHand());
-        setFeedback(null);
-        setShowExplanation(false);
-        setLastInput(null);
-
-        if (!range) {
-             toast({
-                variant: 'destructive',
-                title: 'Error de Rango',
-                description: 'No se pudo cargar el rango para este escenario.',
-            });
-        }
-    });
+    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+    const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
+    const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
+    const randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
+    
+    handleScenarioChange(randomPosition, randomStackSize, randomTableType, randomPreviousAction);
   };
   
   const renderCard = (cardStr: string) => {
