@@ -358,18 +358,16 @@ export function PracticeModule() {
         </CardContent>
       </Card>
       <div className="lg:col-span-3">
-        {isPending && (
+        {isPending ? (
             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               <p className="mt-4 text-muted-foreground">
                 Cargando...
               </p>
             </div>
-        )}
-        {!isPending && feedback && currentHandRange && (
+        ) : feedback && currentHandRange ? (
             <HandRangeGrid currentHand={currentHand?.handNotation} range={currentHandRange} />
-        )}
-         {!isPending && !feedback && (
+        ) : (
           <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
             <p className="text-muted-foreground">
               El rango de manos aparecerá aquí después de que tomes una decisión.
@@ -380,3 +378,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
