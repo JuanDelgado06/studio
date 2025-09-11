@@ -66,7 +66,7 @@ Based on this information, determine the new difficulty level and suggest focus 
 **Instructions:**
 1.  **Language:** Respond **completely in Spanish**.
 2.  **Terminology:** **DO NOT translate** common poker terms like 'equity', 'range', 'fold', 'call', 'raise', 'GTO', 'EV', 'pot odds', 'nuts', 'bluff', 'semi-bluff', 'implied odds'.
-3.  **Focus Areas:** The focus areas should be an array of short, actionable suggestions.
+3.  **Focus Areas:** The focus areas must be an array of short, actionable suggestions.
 
 Difficulty levels:
 - beginner
