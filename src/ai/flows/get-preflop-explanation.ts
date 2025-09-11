@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Provides a detailed explanation for a preflop poker decision.
@@ -26,10 +27,10 @@ export type GetPreflopExplanationInput = z.infer<
 >;
 
 const GetPreflopExplanationOutputSchema = z.object({
-  feedback: z.string().describe('Detailed feedback on the decision.'),
+  feedback: z.string().describe('Análisis conciso y directo sobre la decisión.'),
   evExplanation: z
     .string()
-    .describe('Explanation of the expected value of the play.'),
+    .describe('Breve explicación del valor esperado (EV) de la jugada.'),
 });
 export type GetPreflopExplanationOutput = z.infer<
   typeof GetPreflopExplanationOutputSchema
@@ -45,22 +46,27 @@ const getPreflopExplanationPrompt = ai.definePrompt({
   name: 'getPreflopExplanationPrompt',
   input: {schema: GetPreflopExplanationInputSchema},
   output: {schema: GetPreflopExplanationOutputSchema},
-  prompt: `Eres un entrenador de poker experto, especializado en el juego preflop.
+  prompt: `Eres un entrenador de poker experto que se comunica en español.
 
-Se te proporciona la siguiente información sobre una mano de poker:
+Analiza la siguiente mano de poker preflop y proporciona una explicación concisa y directa.
 
 *   Posición: {{{position}}}
-*   Stack Size: {{{stackSize}}} BB
-*   Tipo de Mesa: {{{tableType}}}
+*   Stack: {{{stackSize}}} BB
+*   Mesa: {{{tableType}}}
 *   Mano: {{{hand}}}
-*   Acción: {{{action}}}
-*   Tamaño de la Apuesta (si aplica): {{#if betSize}}{{{betSize}}} BB{{else}}N/A{{/if}}
-*   La decisión fue: {{#if isOptimal}}Óptima{{else}}Subóptima{{/if}}
+*   Acción del jugador: {{{action}}}
+*   Tamaño de la Apuesta: {{#if betSize}}{{{betSize}}} BB{{else}}N/A{{/if}}
+*   La decisión fue: {{#if isOptimal}}Correcta{{else}}Incorrecta{{/if}}
 
-Proporciona feedback conciso y directo en español. No traduzcas términos de poker como 'equity', 'range', 'fold', 'call', 'raise', 'GTO', 'EV', 'pot odds'.
-Explica por qué la decisión fue óptima o no. Incluye una explicación breve del valor esperado (EV) de la jugada.
+**Instrucciones:**
+1.  **Idioma:** Responde **completamente en español**.
+2.  **Claridad:** Sé directo y fácil de entender.
+3.  **Terminología:** **NO traduzcas** términos comunes de poker como 'equity', 'range', 'fold', 'call', 'raise', 'GTO', 'EV', 'pot odds', 'nuts', 'bluff', 'semi-bluff', 'implied odds'.
+4.  **Contenido:**
+    *   **Feedback:** Explica por qué la jugada fue correcta o incorrecta basándote en principios GTO.
+    *   **EV Explanation:** Proporciona una explicación muy breve sobre el valor esperado (EV) de la acción realizada.
 
-Asegúrate de que tu respuesta coincida con el siguiente esquema: {{outputSchema}}`,
+Asegúrate de que tu respuesta coincida con el esquema JSON de salida.`,
 });
 
 const getPreflopExplanationFlow = ai.defineFlow(

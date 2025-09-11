@@ -26,7 +26,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { CheckCircle, Info, Loader2, XCircle } from 'lucide-react';
 import type {
-  AnalyzePreflopDecisionOutput,
   AnalyzePreflopDecisionInput,
 } from '@/ai/flows/analyze-preflop-decision';
 import { useStats } from '@/context/stats-context';
@@ -236,7 +235,7 @@ export function PracticeModule() {
                         <div className="flex items-center">
                             {feedback.isOptimal ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                             <AlertTitle className="font-headline ml-2">
-                            {feedback.isOptimal ? "¡Decisión Óptima!" : "Decisión Subóptima"}
+                            {feedback.isOptimal ? "Respuesta Correcta" : "Respuesta Incorrecta"}
                             </AlertTitle>
                         </div>
                         <Button variant="ghost" size="sm" onClick={handleShowExplanation} disabled={isExplanationLoading}>
