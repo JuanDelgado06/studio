@@ -90,15 +90,16 @@ export function PracticeModule() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isExplanationLoading, startExplanationTransition] = useTransition();
-  const [isRangeLoading, startRangeTransition] = useTransition();
+  const [isRangeLoading, setIsRangeLoading] = useState(false);
   const [handRange, setHandRange] = useState<HandRange | null>(null);
 
   const { toast } = useToast();
   const { recordHand } = useStats();
 
-  const fetchHandRange = useCallback((pos: Position, stack: number, type: TableType) => {
-    startRangeTransition(async () => {
-      setHandRange(null);
+  const fetchHandRange = useCallback(async (pos: Position, stack: number, type: TableType) => {
+    setIsRangeLoading(true);
+    setHandRange(null);
+    try {
       const result = await getHandRangeAction({ position: pos, stackSize: stack, tableType: type });
       if (result.success && result.data) {
         const expanded = expandRange(result.data);
@@ -110,7 +111,15 @@ export function PracticeModule() {
           description: result.error || 'No se pudo obtener el rango de manos.',
         });
       }
-    });
+    } catch(error) {
+       toast({
+          variant: 'destructive',
+          title: 'Error de Rango',
+          description: 'Ocurrió un error inesperado al buscar el rango de manos.',
+        });
+    } finally {
+        setIsRangeLoading(false);
+    }
   }, [toast]);
 
   useEffect(() => {
@@ -325,3 +334,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
