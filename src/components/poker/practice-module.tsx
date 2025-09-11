@@ -310,11 +310,18 @@ export function PracticeModule() {
   };
 
   const handleRandomizeScenario = () => {
-    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+    const randomPreviousAction = Math.random() < 0.5 ? 'none' : 'raise';
+    
+    let availablePositions = POSITIONS;
+    if (randomPreviousAction === 'raise') {
+        availablePositions = ['BB'];
+    } else {
+        availablePositions = POSITIONS.filter(p => p !== 'BB');
+    }
+    
+    const randomPosition = availablePositions[Math.floor(Math.random() * availablePositions.length)];
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
-    
-    const randomPreviousAction = Math.random() < 0.5 ? 'none' : 'raise';
 
     dispatch({ type: 'SET_SCENARIO', payload: {
         position: randomPosition,
@@ -326,7 +333,24 @@ export function PracticeModule() {
 
 
   const handleSetScenario = (payload: Partial<Scenario>) => {
-    dispatch({ type: 'SET_SCENARIO', payload });
+    let newPayload = { ...payload };
+    // If previous action is 'raise', force position to 'BB'
+    if (newPayload.previousAction === 'raise') {
+        newPayload.position = 'BB';
+    }
+    // If position is 'BB', force previous action to 'raise' if it's not already
+    if (newPayload.position === 'BB' && state.scenario.previousAction !== 'raise') {
+        if (newPayload.previousAction !== 'raise') {
+            newPayload.previousAction = 'raise';
+        }
+    }
+    // If we change to an open-raise scenario, and the position is BB, pick another position
+    if (newPayload.previousAction === 'none' && (newPayload.position === 'BB' || state.scenario.position === 'BB')) {
+       const otherPositions = POSITIONS.filter(p => p !== 'BB');
+       newPayload.position = otherPositions[Math.floor(Math.random() * otherPositions.length)];
+    }
+
+    dispatch({ type: 'SET_SCENARIO', payload: newPayload });
   };
 
   const isBBvsLimp =
@@ -368,10 +392,32 @@ export function PracticeModule() {
                         <Shuffle className="mr-2 h-4 w-4" />
                         Escenario Aleatorio
                     </Button>
+                     <div className="space-y-2">
+                        <Label htmlFor="previous-action-sheet">Acción Previa</Label>
+                        <Select
+                        value={state.scenario.previousAction}
+                        onValueChange={(v) =>
+                            handleSetScenario({ previousAction: v as 'none' | 'raise' })
+                        }
+                        >
+                        <SelectTrigger id="previous-action-sheet">
+                            <SelectValue placeholder="Selecciona acción previa" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="none">
+                                Nadie ha apostado (Open Raise)
+                            </SelectItem>
+                            <SelectItem value="raise">
+                                Enfrentando un Raise
+                            </SelectItem>
+                        </SelectContent>
+                        </Select>
+                    </div>
                     <div className="space-y-2">
                         <Label htmlFor="position-sheet">Posición</Label>
                         <Select
                         value={state.scenario.position}
+                        disabled={state.scenario.previousAction === 'raise'}
                         onValueChange={(v) =>
                             handleSetScenario({ position: v as Position })
                         }
@@ -380,13 +426,14 @@ export function PracticeModule() {
                             <SelectValue placeholder="Selecciona posición" />
                         </SelectTrigger>
                         <SelectContent>
-                            {POSITIONS.map((pos) => (
+                            {POSITIONS.filter(p => state.scenario.previousAction === 'raise' ? p === 'BB' : p !== 'BB').map((pos) => (
                             <SelectItem key={pos} value={pos}>
                                 {pos}
                             </SelectItem>
                             ))}
                         </SelectContent>
                         </Select>
+                         {state.scenario.previousAction === 'raise' && <p className="text-xs text-muted-foreground">La posición se establece en BB al enfrentar un raise.</p>}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="stack-size-sheet">Stack (BBs)</Label>
@@ -428,27 +475,7 @@ export function PracticeModule() {
                         </SelectContent>
                         </Select>
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="previous-action-sheet">Acción Previa</Label>
-                        <Select
-                        value={state.scenario.previousAction}
-                        onValueChange={(v) =>
-                            handleSetScenario({ previousAction: v as 'none' | 'raise' })
-                        }
-                        >
-                        <SelectTrigger id="previous-action-sheet">
-                            <SelectValue placeholder="Selecciona acción previa" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="none">
-                                Nadie ha apostado (Open Raise)
-                            </SelectItem>
-                            <SelectItem value="raise">
-                                Enfrentando un Raise
-                            </SelectItem>
-                        </SelectContent>
-                        </Select>
-                    </div>
+                   
                 </div>
             </SheetContent>
         </Sheet>
@@ -567,6 +594,16 @@ export function PracticeModule() {
                 )}
                 </div>
             )}
+             {!state.feedback && !state.currentHandRange && (
+                <div className="flex flex-col items-center justify-center text-center">
+                    <XCircle className="h-10 w-10 text-destructive mb-2" />
+                    <p className="font-semibold text-destructive">Sin Rango Definido</p>
+                    <p className="text-destructive/80 text-sm max-w-xs">
+                        No hay un rango GTO definido para este escenario específico. Prueba a ajustar la configuración.
+                    </p>
+                </div>
+            )}
+
 
             {state.feedback && (
                 <Button size="lg" onClick={handleNextHand}>
@@ -593,3 +630,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
