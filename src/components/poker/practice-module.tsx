@@ -564,7 +564,7 @@ export function PracticeModule() {
                                     </SelectItem>
                                 </SelectContent>
                                 </Select>
-                                {!isPreviousActionDisabled && (
+                                {isPreviousActionDisabled && (
                                 <p className="text-xs text-muted-foreground">
                                     Solo aplicable para la posición BB.
                                 </p>
@@ -714,3 +714,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
