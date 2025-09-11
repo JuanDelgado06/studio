@@ -218,6 +218,7 @@ export function PracticeModule() {
         previousAction: 'none',
       },
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -244,7 +245,8 @@ export function PracticeModule() {
         state.feedback.isOptimal
       );
     }
-  }, [state.feedback, state.currentHand, state.scenario, recordHand]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.feedback]);
 
   const handleShowExplanation = async () => {
     // If explanation is already showing, just hide it.
@@ -307,7 +309,6 @@ export function PracticeModule() {
     
     let randomPreviousAction: 'none' | 'raise' = 'none';
 
-    // Only BB can face a raise in our current data set.
     if (randomPosition === 'BB') {
         randomPreviousAction = 'raise';
     }
@@ -322,6 +323,10 @@ export function PracticeModule() {
 
 
   const handleSetScenario = (payload: Partial<Scenario>) => {
+    // When position changes, if it's not BB, force previousAction to 'none'.
+    if (payload.position && payload.position !== 'BB') {
+      payload.previousAction = 'none';
+    }
     dispatch({ type: 'SET_SCENARIO', payload });
   };
 
@@ -442,11 +447,6 @@ export function PracticeModule() {
                 </SelectItem>
               </SelectContent>
             </Select>
-            {isPreviousActionDisabled && (
-              <p className="text-xs text-muted-foreground pt-1">
-                Solo aplicable para la posición BB.
-              </p>
-            )}
           </div>
         </CardContent>
       </Card>
