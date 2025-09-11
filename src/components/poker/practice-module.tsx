@@ -203,13 +203,15 @@ export function PracticeModule() {
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
     
-    // Only BB can face a raise in this simplified model for now, to ensure valid keys.
-    let randomPreviousAction: 'none' | 'raise' = 'none';
+    // Check if a 'raise' scenario exists for the chosen random configuration
     const keyForRaise = `${randomPosition}-${randomStackSize}-${randomTableType}-raise`;
-    if ((allRanges as Record<string, any>)[keyForRaise] && Math.random() > 0.5) {
+    const canFaceRaise = (allRanges as Record<string, any>)[keyForRaise];
+
+    let randomPreviousAction: 'none' | 'raise' = 'none';
+    if (canFaceRaise && Math.random() > 0.5) {
         randomPreviousAction = 'raise';
     }
-
+    
     setPosition(randomPosition);
     setStackSize(randomStackSize);
     setTableType(randomTableType);
@@ -393,3 +395,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
