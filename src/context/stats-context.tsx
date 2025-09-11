@@ -3,7 +3,6 @@
 
 import type { Position } from '@/lib/types';
 import * as React from 'react';
-import { adaptDifficultyBasedOnProgress } from '@/ai/flows/adapt-difficulty-based-on-progress';
 import { getAdaptedDifficulty } from '@/lib/actions';
 
 type AccuracyData = {
@@ -55,6 +54,8 @@ const initialStats: Stats = {
   handsPlayedToday: 0,
 };
 
+const STATS_STORAGE_KEY = 'poker-pro-stats';
+
 const StatsContext = React.createContext<StatsContextType | undefined>(
   undefined
 );
@@ -63,15 +64,39 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
   const [stats, setStats] = React.useState<Stats>(initialStats);
   const [isClient, setIsClient] = React.useState(false);
 
+  // Load stats from localStorage on initial client-side render
   React.useEffect(() => {
     setIsClient(true);
-    // You can also load stats from localStorage here if needed
+    try {
+      const savedStats = window.localStorage.getItem(STATS_STORAGE_KEY);
+      if (savedStats) {
+        setStats(JSON.parse(savedStats));
+      }
+    } catch (error) {
+      console.error("Failed to load stats from localStorage", error);
+      // If parsing fails, start with initial stats
+      setStats(initialStats);
+    }
   }, []);
+
+  // Save stats to localStorage whenever they change
+  React.useEffect(() => {
+    if (isClient) {
+      try {
+        window.localStorage.setItem(STATS_STORAGE_KEY, JSON.stringify(stats));
+      } catch (error) {
+        console.error("Failed to save stats to localStorage", error);
+      }
+    }
+  }, [stats, isClient]);
+
 
   // Effect to fetch focus areas when hands played is a multiple of 10
   React.useEffect(() => {
     if (stats.handsPlayed > 0 && stats.handsPlayed % 10 === 0) {
       const fetchFocusAreas = async () => {
+        if (stats.overallAccuracy === 'N/A') return;
+
         const positionalAccuracy: Record<string, number> = {};
         stats.accuracyByPosition.forEach(p => {
           positionalAccuracy[p.position] = p.accuracy / 100;
@@ -79,7 +104,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
 
         const result = await getAdaptedDifficulty({
           userStats: {
-            overallAccuracy: (stats.overallAccuracy as number) / 100,
+            overallAccuracy: stats.overallAccuracy / 100,
             positionalAccuracy,
             handTypeAccuracy: {},
             commonMistakes: [],
@@ -93,7 +118,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
       }
       fetchFocusAreas();
     }
-  }, [stats.handsPlayed]);
+  }, [stats.handsPlayed, stats.overallAccuracy, stats.accuracyByPosition, stats.weeklyGoal]);
 
 
   const recordHand = (position: Position, isCorrect: boolean) => {
@@ -127,8 +152,8 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
       });
 
       const isNewDay = prevStats.lastPracticeDate !== today;
-      let handsPlayedToday = isNewDay ? 1 : prevStats.handsPlayedToday + 1;
-      let newStreak = prevStats.streak;
+      let handsPlayedToday = isNewDay ? 1 : (prevStats.handsPlayedToday || 0) + 1;
+      let newStreak = prevStats.streak || 0;
 
       if (handsPlayedToday === 10) {
           if (prevStats.lastPracticeDate) {
@@ -137,7 +162,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
               yesterday.setDate(yesterday.getDate() - 1);
               if (lastDate.toDateString() === yesterday.toDateString()) {
                   newStreak += 1; // Continue streak
-              } else {
+              } else if (lastDate.toDateString() !== today) {
                   newStreak = 1; // Start new streak after a gap
               }
           } else {
@@ -151,7 +176,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
             yesterday.setDate(yesterday.getDate() - 1);
 
             // If the last practice wasn't today or yesterday, reset streak.
-            if (lastDate.toDateString() !== yesterday.toDateString()) {
+            if (lastDate.toDateString() !== yesterday.toDateString() && lastDate.toDateString() !== today) {
                 newStreak = 0;
             }
          }
@@ -177,6 +202,11 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
 
   const resetStats = () => {
     setStats(initialStats);
+     try {
+        window.localStorage.removeItem(STATS_STORAGE_KEY);
+      } catch (error) {
+        console.error("Failed to remove stats from localStorage", error);
+      }
   };
 
   return (
