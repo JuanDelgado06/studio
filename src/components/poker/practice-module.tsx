@@ -307,7 +307,7 @@ export function PracticeModule() {
           {feedback && !isPending && (
              <div className="w-full max-w-md space-y-2">
                 <Alert variant={feedback.isOptimal ? 'default' : 'destructive'}>
-                    <div className='flex items-center justify-between'>
+                     <div className='flex items-center justify-between'>
                         <div className="flex items-center">
                             {feedback.isOptimal ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                             <AlertTitle className="font-headline ml-2">
