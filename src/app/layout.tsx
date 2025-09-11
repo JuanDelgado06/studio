@@ -7,6 +7,7 @@ import { StatsProvider } from '@/context/stats-context';
 export const metadata: Metadata = {
   title: 'Preflop Pro Trainer',
   description: 'Entrenador de poker preflop con IA',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
