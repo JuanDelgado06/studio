@@ -209,8 +209,6 @@ export function PracticeModule() {
     let randomPreviousAction: 'none' | 'raise' = 'none';
     if (randomPosition === 'BB') {
       randomPreviousAction = 'raise';
-    } else {
-      randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
     }
 
     setPosition(randomPosition);
@@ -396,5 +394,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
