@@ -130,8 +130,17 @@ export function PracticeModule() {
     });
   }, [toast]);
 
+  const handleNextHand = useCallback(() => {
+    startTransition(() => {
+      setCurrentHand(getNewHand());
+      setFeedback(null);
+      setShowExplanation(false);
+      setLastInput(null);
+    });
+  }, []);
+
   useEffect(() => {
-    setCurrentHand(getNewHand());
+    handleNextHand();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -149,6 +158,7 @@ export function PracticeModule() {
                 title: 'Error de Rango',
                 description: 'El rango de manos no está disponible. Intenta de nuevo.',
             });
+            setIsRangeLoading(false);
             return;
         }
 
@@ -166,6 +176,7 @@ export function PracticeModule() {
       setFeedback({ isOptimal, action });
       setLastInput(input);
       recordHand(input, isOptimal);
+      setIsRangeLoading(false);
     });
   };
 
@@ -190,25 +201,20 @@ export function PracticeModule() {
     setShowExplanation(!showExplanation);
   }
   
-  const handleNextHand = () => {
-    startTransition(() => {
-      setCurrentHand(getNewHand());
-      setFeedback(null);
-      setShowExplanation(false);
-      setLastInput(null);
-    });
-  };
-  
   const handleRandomizeScenario = () => {
-    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
-    const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
-    const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
-    const randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
+    startTransition(() => {
+        const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+        const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
+        const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
+        const randomPreviousAction = Math.random() > 0.5 ? 'raise' : 'none';
 
-    setPosition(randomPosition);
-    setStackSize(randomStackSize);
-    setTableType(randomTableType);
-    setPreviousAction(randomPreviousAction);
+        setPosition(randomPosition);
+        setStackSize(randomStackSize);
+        setTableType(randomTableType);
+        setPreviousAction(randomPreviousAction);
+        
+        handleNextHand();
+    });
   };
   
   const renderCard = (cardStr: string) => {
@@ -221,19 +227,16 @@ export function PracticeModule() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Card className="lg:col-span-1">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="space-y-1.5">
-              <CardTitle className="font-headline">Configurar Escenario</CardTitle>
-              <CardDescription>
-                Elige las condiciones para tu sesión de práctica.
-              </CardDescription>
-            </div>
-            <Button variant="ghost" size="icon" onClick={handleRandomizeScenario} title="Aleatorizar Escenario" disabled={isPending || isRangeLoading}>
-              <Shuffle className="h-5 w-5" />
-            </Button>
-          </div>
+            <CardTitle className="font-headline">Configurar Escenario</CardTitle>
+            <CardDescription>
+            Elige las condiciones para tu sesión de práctica.
+            </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+           <Button variant="secondary" onClick={handleRandomizeScenario} className="w-full" disabled={isPending || isRangeLoading}>
+              <Shuffle className="mr-2 h-4 w-4" />
+              Aleatorizar Escenario
+            </Button>
           <div className="space-y-2">
             <Label htmlFor="position">Posición</Label>
             <Select value={position} onValueChange={(v) => setPosition(v as Position)} disabled={isPending || isRangeLoading}>
@@ -302,7 +305,7 @@ export function PracticeModule() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center gap-8 min-h-[350px]">
-          {currentHand && !isRangeLoading ? (
+          {currentHand && !isRangeLoading && !isPending ? (
             <div className="flex gap-4">
               {renderCard(currentHand.cards[0])}
               {renderCard(currentHand.cards[1])}
@@ -363,7 +366,7 @@ export function PracticeModule() {
         </CardContent>
       </Card>
       <div className="lg:col-span-3">
-        {isRangeLoading && !feedback && (
+        {isRangeLoading && (
             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               <p className="mt-4 text-muted-foreground">
@@ -371,7 +374,7 @@ export function PracticeModule() {
               </p>
             </div>
         )}
-        {feedback && handRange && (
+        {!isRangeLoading && feedback && handRange && (
             <HandRangeGrid currentHand={currentHand?.handNotation} range={handRange} />
         )}
          {!isRangeLoading && !feedback && (
