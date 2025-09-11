@@ -14,9 +14,9 @@ function parseRange(rangeStr: string): string[] {
 
     // Case 1: Handle pairs (e.g., "77", "TT+", "JJ-88")
     if (rangeStr.length >= 2 && rangeStr[0] === rangeStr[1]) {
-        const startRank = rangeStr.substring(0, 2);
+        const rank = rangeStr[0];
         if (rangeStr.endsWith('+')) {
-            const startIndex = RANK_MAP[startRank[0]];
+            const startIndex = RANK_MAP[rank];
             for (let i = 0; i <= startIndex; i++) {
                 hands.push(RANKS[i] + RANKS[i]);
             }
@@ -24,7 +24,8 @@ function parseRange(rangeStr: string): string[] {
             const [start, end] = rangeStr.split('-');
             const startIndex = RANK_MAP[start[0]];
             const endIndex = RANK_MAP[end[0]];
-            for (let i = startIndex; i <= endIndex; i++) {
+            const [first, last] = [Math.min(startIndex, endIndex), Math.max(startIndex, endIndex)]
+            for (let i = first; i <= last; i++) {
                 hands.push(RANKS[i] + RANKS[i]);
             }
         }
@@ -50,14 +51,17 @@ function parseRange(rangeStr: string): string[] {
                 hands.push(`${highRank}${RANKS[i]}${type}`);
             }
         } else if (rangeStr.includes('-')) {
-            // e.g. T9s-T6s or A9s-A2s
-             const [start, end] = rangeStr.split('-');
-             const r1_start = start[0];
-             const r2_start_index = RANK_MAP[start[1]];
-             const r2_end_index = RANK_MAP[end[1]];
+             const [start, end] = rangeStr.split('-'); // e.g. "T9s", "T6s"
+             const startRank = start[0];
+             const startKickerIndex = RANK_MAP[start[1]];
+             const endKickerIndex = RANK_MAP[end[1]];
 
-             for (let i = r2_start_index; i <= r2_end_index; i++) {
-                 hands.push(`${r1_start}${RANKS[i]}${type}`);
+             const [first, last] = [Math.min(startKickerIndex, endKickerIndex), Math.max(startKickerIndex, endKickerIndex)]
+
+             for (let i = first; i <= last; i++) {
+                 if (RANK_MAP[startRank] < i) {
+                    hands.push(`${startRank}${RANKS[i]}${type}`);
+                 }
              }
 
         } else {
