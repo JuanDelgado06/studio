@@ -84,6 +84,10 @@ type Feedback = {
     explanation?: GetPreflopExplanationOutput;
 }
 
+type RangeCache = Record<string, HandRange>;
+
+const generateCacheKey = (pos: Position, stack: number, type: TableType, prevAction: 'none' | 'raise') =>
+  `${pos}-${stack}-${type}-${prevAction}`;
 
 export function PracticeModule() {
   const [position, setPosition] = useState<Position>('BTN');
@@ -96,40 +100,75 @@ export function PracticeModule() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isExplanationLoading, startExplanationTransition] = useTransition();
-  const [isRangeLoading, setIsRangeLoading] = useState(true);
-  const [handRange, setHandRange] = useState<HandRange | null>(null);
+  
+  const [isRangeCacheLoading, setIsRangeCacheLoading] = useState(true);
+  const [handRangeCache, setHandRangeCache] = useState<RangeCache>({});
+  const [currentHandRange, setCurrentHandRange] = useState<HandRange | null>(null);
 
   const { toast } = useToast();
   const { recordHand } = useStats();
 
-  const fetchHandRange = useCallback(async (pos: Position, stack: number, type: TableType, prevAction: 'none' | 'raise') => {
-    setIsRangeLoading(true);
-    setHandRange(null);
-    setFeedback(null);
-    setCurrentHand(getNewHand());
-    
-    try {
-      const result = await getHandRangeAction({ position: pos, stackSize: stack, tableType: type, previousAction: prevAction });
-      if (result.success && result.data) {
-        const expanded = expandRange(result.data);
-        setHandRange(expanded);
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Error de Rango',
-          description: result.error || 'No se pudo obtener el rango de manos.',
-        });
+  // Pre-fetch all hand ranges on initial load
+  useEffect(() => {
+    const prefetchAllRanges = async () => {
+      setIsRangeCacheLoading(true);
+      const cache: RangeCache = {};
+      const allScenarios: { pos: Position, stack: number, type: TableType, prevAction: 'none' | 'raise' }[] = [];
+
+      for (const pos of POSITIONS) {
+        for (const stack of STACK_SIZES) {
+          for (const type of TABLE_TYPES) {
+            for (const prevAction of ['none', 'raise'] as const) {
+              allScenarios.push({ pos, stack, type, prevAction });
+            }
+          }
+        }
       }
-    } catch(error) {
-       toast({
-          variant: 'destructive',
-          title: 'Error de Rango',
-          description: 'Ocurrió un error inesperado al buscar el rango de manos.',
-        });
-    } finally {
-        setIsRangeLoading(false);
-    }
-  }, [toast]);
+
+      await Promise.all(allScenarios.map(async ({ pos, stack, type, prevAction }) => {
+        try {
+          const result = await getHandRangeAction({ position: pos, stackSize: stack, tableType: type, previousAction: prevAction });
+          if (result.success && result.data) {
+            const key = generateCacheKey(pos, stack, type, prevAction);
+            cache[key] = expandRange(result.data);
+          }
+        } catch (e) {
+          console.error(`Failed to fetch range for ${pos}-${stack}-${type}-${prevAction}`, e);
+        }
+      }));
+
+      setHandRangeCache(cache);
+      setIsRangeCacheLoading(false);
+    };
+
+    prefetchAllRanges();
+  }, []);
+  
+  // Update current range and hand when scenario changes or cache loads
+  useEffect(() => {
+    if (isRangeCacheLoading) return;
+
+    startTransition(() => {
+        const key = generateCacheKey(position, stackSize, tableType, previousAction);
+        const range = handRangeCache[key] || null;
+        setCurrentHandRange(range);
+        
+        if (!range) {
+             toast({
+                variant: 'destructive',
+                title: 'Error de Rango',
+                description: 'No se pudo cargar el rango para este escenario.',
+            });
+        }
+    
+        setCurrentHand(getNewHand());
+        setFeedback(null);
+        setShowExplanation(false);
+        setLastInput(null);
+    });
+
+  }, [position, stackSize, tableType, previousAction, handRangeCache, isRangeCacheLoading, toast]);
+
 
   const handleNextHand = useCallback(() => {
     startTransition(() => {
@@ -140,18 +179,12 @@ export function PracticeModule() {
     });
   }, []);
 
-  useEffect(() => {
-    fetchHandRange(position, stackSize, tableType, previousAction);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleScenarioChange = (newPosition: Position, newStackSize: number, newTableType: TableType, newPreviousAction: 'none' | 'raise') => {
     startTransition(() => {
       setPosition(newPosition);
       setStackSize(newStackSize);
       setTableType(newTableType);
       setPreviousAction(newPreviousAction);
-      fetchHandRange(newPosition, newStackSize, newTableType, newPreviousAction);
     });
   };
 
@@ -159,7 +192,7 @@ export function PracticeModule() {
     if (!currentHand || isPending) return;
     
     startTransition(() => {
-        if (!handRange) {
+        if (!currentHandRange) {
              toast({
                 variant: 'destructive',
                 title: 'Error de Rango',
@@ -168,7 +201,7 @@ export function PracticeModule() {
             return;
         }
 
-      const correctAction = handRange[currentHand.handNotation] || 'fold';
+      const correctAction = currentHandRange[currentHand.handNotation] || 'fold';
       const isOptimal = action === correctAction;
       
       const input = {
@@ -220,6 +253,22 @@ export function PracticeModule() {
       const suit = cardStr[1] as any;
       return <PokerCard rank={rank} suit={suit} />;
   }
+  
+  const isUIBlocked = isPending || isRangeCacheLoading;
+
+  if (isRangeCacheLoading) {
+      return (
+          <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[500px]">
+              <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
+              <p className="mt-4 text-muted-foreground font-semibold">
+                Cargando todos los rangos GTO por única vez...
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Esto puede tardar un minuto, pero después la experiencia será instantánea.
+              </p>
+            </div>
+      )
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -231,13 +280,13 @@ export function PracticeModule() {
             </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-           <Button variant="secondary" onClick={handleRandomizeScenario} className="w-full" disabled={isPending || isRangeLoading}>
+           <Button variant="secondary" onClick={handleRandomizeScenario} className="w-full" disabled={isUIBlocked}>
               <Shuffle className="mr-2 h-4 w-4" />
               Escenario Aleatorio
             </Button>
           <div className="space-y-2">
             <Label htmlFor="position">Posición</Label>
-            <Select value={position} onValueChange={(v) => handleScenarioChange(v as Position, stackSize, tableType, previousAction)} disabled={isPending || isRangeLoading}>
+            <Select value={position} onValueChange={(v) => handleScenarioChange(v as Position, stackSize, tableType, previousAction)} disabled={isUIBlocked}>
               <SelectTrigger id="position">
                 <SelectValue placeholder="Selecciona posición" />
               </SelectTrigger>
@@ -252,7 +301,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="stack-size">Stack (BBs)</Label>
-            <Select value={String(stackSize)} onValueChange={(v) => handleScenarioChange(position, Number(v), tableType, previousAction)} disabled={isPending || isRangeLoading}>
+            <Select value={String(stackSize)} onValueChange={(v) => handleScenarioChange(position, Number(v), tableType, previousAction)} disabled={isUIBlocked}>
               <SelectTrigger id="stack-size">
                 <SelectValue placeholder="Selecciona stack" />
               </SelectTrigger>
@@ -267,7 +316,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="table-type">Tipo de Mesa</Label>
-            <Select value={tableType} onValueChange={(v) => handleScenarioChange(position, stackSize, v as TableType, previousAction)} disabled={isPending || isRangeLoading}>
+            <Select value={tableType} onValueChange={(v) => handleScenarioChange(position, stackSize, v as TableType, previousAction)} disabled={isUIBlocked}>
               <SelectTrigger id="table-type">
                 <SelectValue placeholder="Selecciona tipo de mesa" />
               </SelectTrigger>
@@ -282,7 +331,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="previous-action">Acción Previa</Label>
-            <Select value={previousAction} onValueChange={(v) => handleScenarioChange(position, stackSize, tableType, v as 'none' | 'raise')} disabled={isPending || isRangeLoading}>
+            <Select value={previousAction} onValueChange={(v) => handleScenarioChange(position, stackSize, tableType, v as 'none' | 'raise')} disabled={isUIBlocked}>
               <SelectTrigger id="previous-action">
                 <SelectValue placeholder="Selecciona acción previa" />
               </SelectTrigger>
@@ -303,7 +352,7 @@ export function PracticeModule() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center gap-8 min-h-[350px]">
-          {currentHand && !isRangeLoading && !isPending ? (
+          {currentHand && !isUIBlocked ? (
             <div className="flex gap-4">
               {renderCard(currentHand.cards[0])}
               {renderCard(currentHand.cards[1])}
@@ -341,7 +390,7 @@ export function PracticeModule() {
 
           {isPending && !feedback && <Loader2 className="animate-spin h-8 w-8 text-primary" />}
 
-          {!feedback && !isPending && !isRangeLoading && (
+          {!feedback && !isUIBlocked && (
             <div className="flex gap-4">
               <Button variant="destructive" size="lg" onClick={() => handleAction('fold')} disabled={isPending}>
                 Fold 🤚
@@ -364,18 +413,18 @@ export function PracticeModule() {
         </CardContent>
       </Card>
       <div className="lg:col-span-3">
-        {(isRangeLoading || isPending) && (
+        {isPending && !feedback && (
             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               <p className="mt-4 text-muted-foreground">
-                Cargando rango de manos GTO...
+                Cargando...
               </p>
             </div>
         )}
-        {!isRangeLoading && !isPending && feedback && handRange && (
-            <HandRangeGrid currentHand={currentHand?.handNotation} range={handRange} />
+        {!isPending && feedback && currentHandRange && (
+            <HandRangeGrid currentHand={currentHand?.handNotation} range={currentHandRange} />
         )}
-         {!isRangeLoading && !isPending && !feedback && (
+         {!isPending && !feedback && (
           <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
             <p className="text-muted-foreground">
               El rango de manos aparecerá aquí después de que tomes una decisión.
@@ -386,3 +435,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
