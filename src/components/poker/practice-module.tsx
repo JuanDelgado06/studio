@@ -377,7 +377,7 @@ export function PracticeModule() {
       descriptionText = `Te enfrentas a un 3-bet. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
       break;
     case '4-bet':
-        descriptionText = `Un oponente ha hecho 4-bet. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+        descriptionText = `Te enfrentas a un 4-bet. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
         break;
     default:
       descriptionText = `Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
@@ -386,6 +386,7 @@ export function PracticeModule() {
   const showOpenRaiseActions = state.scenario.previousAction === 'none' && !isBBvsLimp;
   const showVsRaiseActions = state.scenario.previousAction === 'raise';
   const showVs3BetActions = state.scenario.previousAction === '3-bet';
+  const showVs4BetActions = state.scenario.previousAction === '4-bet';
 
 
   return (
@@ -637,16 +638,6 @@ export function PracticeModule() {
                             >
                                 3-Bet 💣
                             </Button>
-                            {state.scenario.stackSize <= 40 && (
-                                <Button
-                                    variant="destructive"
-                                    className="bg-red-700 hover:bg-red-800"
-                                    size="lg"
-                                    onClick={() => handleAction('all-in')}
-                                >
-                                    All-in 🔥
-                                </Button>
-                            )}
                         </>
                     ) : showVs3BetActions ? (
                          <>
@@ -672,23 +663,31 @@ export function PracticeModule() {
                             >
                                 4-Bet 💣
                             </Button>
-                            {state.scenario.stackSize <= 40 && (
-                                <Button
-                                    variant="destructive"
-                                    className="bg-red-700 hover:bg-red-800"
-                                    size="lg"
-                                    onClick={() => handleAction('all-in')}
-                                >
-                                    All-in 🔥
-                                </Button>
-                            )}
                         </>
+                    ) : showVs4BetActions ? (
+                        <>
+                           <Button
+                               variant="destructive"
+                               size="lg"
+                               onClick={() => handleAction('fold')}
+                           >
+                               Fold 🤚
+                           </Button>
+                            <Button
+                               variant="destructive"
+                               className="bg-red-700 hover:bg-red-800"
+                               size="lg"
+                               onClick={() => handleAction('all-in')}
+                           >
+                               All-in 🔥
+                           </Button>
+                       </>
                     ) : null }
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center text-center">
                         <XCircle className="h-10 w-10 text-destructive mb-2" />
-                        <p className="font-semibold text-destructive">Sin Rango Definido</p>
+                        <p className="font-semibold text-destructive">Sin Rango</p>
                         <p className="text-destructive/80 text-sm max-w-xs">
                             No hay un rango GTO definido para este escenario específico. Prueba a ajustar la configuración.
                         </p>
@@ -710,3 +709,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
