@@ -89,8 +89,6 @@ function generateCacheKey(
   tableType: TableType,
   previousAction: 'none' | 'raise'
 ): string {
-    // For open-raise scenarios, the JSON key uses 'none'.
-    // For all other scenarios, like facing a raise, the key includes 'raise'.
     const actionKey = previousAction === 'raise' ? 'raise' : 'none';
     return `${position}-${stackSize}-${tableType}-${actionKey}`;
 }
@@ -113,50 +111,32 @@ export function PracticeModule() {
 
   const { toast } = useToast();
   const { recordHand } = useStats();
-  
-  const loadRangeAndResetHand = useCallback((
-    pos: Position,
-    stack: number,
-    type: TableType,
-    prevAction: 'none' | 'raise'
-  ) => {
-    startTransition(() => {
-      setIsLoading(true);
-
-      // Update state
-      setPosition(pos);
-      setStackSize(stack);
-      setTableType(type);
-      setPreviousAction(prevAction);
-
-      // Reset feedback and hand
-      setFeedback(null);
-      setShowExplanation(false);
-      setLastInput(null);
-      setCurrentHand(getNewHand());
-      
-      const key = generateCacheKey(pos, stack, type, prevAction);
-      const rangeData = (allRanges as Record<string, any>)[key];
-
-      if (rangeData) {
-        const expandedRange = expandRange(rangeData);
-        setCurrentHandRange(expandedRange);
-      } else {
-        setCurrentHandRange(null);
-        toast({
-          variant: 'destructive',
-          title: 'Error de Rango',
-          description: `No se pudo cargar el rango para este escenario. (${key})`,
-        });
-      }
-      setIsLoading(false);
-    });
-  }, [toast]);
 
   useEffect(() => {
-    loadRangeAndResetHand(position, stackSize, tableType, previousAction);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    startTransition(() => {
+        setIsLoading(true);
+        const key = generateCacheKey(position, stackSize, tableType, previousAction);
+        const rangeData = (allRanges as Record<string, any>)[key];
+
+        if (rangeData) {
+            const expandedRange = expandRange(rangeData);
+            setCurrentHandRange(expandedRange);
+        } else {
+            setCurrentHandRange(null);
+            toast({
+                variant: 'destructive',
+                title: 'Error de Rango',
+                description: `No se pudo cargar el rango para este escenario. (${key})`,
+            });
+        }
+        
+        setFeedback(null);
+        setShowExplanation(false);
+        setLastInput(null);
+        setCurrentHand(getNewHand());
+        setIsLoading(false);
+    });
+  }, [position, stackSize, tableType, previousAction, toast]);
   
 
   const handleNextHand = () => {
@@ -220,16 +200,19 @@ export function PracticeModule() {
   }
 
   const handleRandomizeScenario = () => {
-    const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
-    const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
-    const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
-    
-    let randomPreviousAction: 'none' | 'raise' = 'none';
-    if (randomPosition === 'BB') {
-      randomPreviousAction = 'raise';
-    }
+    startTransition(() => {
+      const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+      const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
+      const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
+      
+      // Only BB can face a raise in this simplified model for now, to ensure valid keys.
+      const randomPreviousAction = (randomPosition === 'BB' && Math.random() > 0.5) ? 'raise' : 'none';
 
-    loadRangeAndResetHand(randomPosition, randomStackSize, randomTableType, randomPreviousAction);
+      setPosition(randomPosition);
+      setStackSize(randomStackSize);
+      setTableType(randomTableType);
+      setPreviousAction(randomPreviousAction);
+    });
   };
   
   const renderCard = (cardStr: string) => {
@@ -256,7 +239,7 @@ export function PracticeModule() {
             </Button>
           <div className="space-y-2">
             <Label htmlFor="position">Posición</Label>
-            <Select value={position} onValueChange={(v) => loadRangeAndResetHand(v as Position, stackSize, tableType, previousAction)} disabled={isUIBlocked}>
+            <Select value={position} onValueChange={(v) => setPosition(v as Position)} disabled={isUIBlocked}>
               <SelectTrigger id="position">
                 <SelectValue placeholder="Selecciona posición" />
               </SelectTrigger>
@@ -271,7 +254,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="stack-size">Stack (BBs)</Label>
-            <Select value={String(stackSize)} onValueChange={(v) => loadRangeAndResetHand(position, Number(v), tableType, previousAction)} disabled={isUIBlocked}>
+            <Select value={String(stackSize)} onValueChange={(v) => setStackSize(Number(v))} disabled={isUIBlocked}>
               <SelectTrigger id="stack-size">
                 <SelectValue placeholder="Selecciona stack" />
               </SelectTrigger>
@@ -286,7 +269,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="table-type">Tipo de Mesa</Label>
-            <Select value={tableType} onValueChange={(v) => loadRangeAndResetHand(position, stackSize, v as TableType, previousAction)} disabled={isUIBlocked}>
+            <Select value={tableType} onValueChange={(v) => setTableType(v as TableType)} disabled={isUIBlocked}>
               <SelectTrigger id="table-type">
                 <SelectValue placeholder="Selecciona tipo de mesa" />
               </SelectTrigger>
@@ -301,7 +284,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="previous-action">Acción Previa</Label>
-            <Select value={previousAction} onValueChange={(v) => loadRangeAndResetHand(position, stackSize, tableType, v as 'none' | 'raise')} disabled={isUIBlocked}>
+            <Select value={previousAction} onValueChange={(v) => setPreviousAction(v as 'none' | 'raise')} disabled={isUIBlocked}>
               <SelectTrigger id="previous-action">
                 <SelectValue placeholder="Selecciona acción previa" />
               </SelectTrigger>
