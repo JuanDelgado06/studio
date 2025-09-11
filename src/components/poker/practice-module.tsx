@@ -50,6 +50,7 @@ type State = {
   feedback: {
     isOptimal: boolean;
     action: Action;
+    correctAction: Action;
     explanation?: GetPreflopExplanationOutput;
   } | null;
   showExplanation: boolean;
@@ -156,7 +157,7 @@ const reducer = (state: State, action: ActionPayload): State => {
 
       return {
         ...state,
-        feedback: { isOptimal, action: actionTaken },
+        feedback: { isOptimal, action: actionTaken, correctAction },
       };
     }
 
@@ -315,12 +316,26 @@ export function PracticeModule() {
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
 
-    dispatch({ type: 'SET_SCENARIO', payload: {
+    let payload: Partial<Scenario> = {
         position: randomPosition,
         stackSize: randomStackSize,
         tableType: randomTableType,
         previousAction: randomPreviousAction,
-    }});
+    };
+    
+    const scenarioKey = generateCacheKey(payload as Scenario);
+    if(!(allRanges as Record<string,any>)[scenarioKey]) {
+        // If the scenario doesn't exist, default to something that does to avoid errors
+        payload = {
+            position: 'BTN',
+            stackSize: 100,
+            tableType: 'cash',
+            previousAction: 'none'
+        }
+    }
+
+
+    dispatch({ type: 'SET_SCENARIO', payload });
   }
 
 
@@ -476,17 +491,24 @@ export function PracticeModule() {
                     variant={state.feedback.isOptimal ? 'default' : 'destructive'}
                 >
                     <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                        {state.feedback.isOptimal ? (
-                        <CheckCircle className="h-4 w-4" />
-                        ) : (
-                        <XCircle className="h-4 w-4" />
+                    <div className="flex flex-col">
+                        <div className="flex items-center">
+                            {state.feedback.isOptimal ? (
+                            <CheckCircle className="h-4 w-4" />
+                            ) : (
+                            <XCircle className="h-4 w-4" />
+                            )}
+                            <AlertTitle className="font-headline ml-2">
+                            {state.feedback.isOptimal
+                                ? 'Respuesta Correcta'
+                                : 'Respuesta Incorrecta'}
+                            </AlertTitle>
+                        </div>
+                         {!state.feedback.isOptimal && (
+                            <p className="text-sm ml-7 capitalize">
+                                La acción correcta era: <strong>{state.feedback.correctAction}</strong>
+                            </p>
                         )}
-                        <AlertTitle className="font-headline ml-2">
-                        {state.feedback.isOptimal
-                            ? 'Respuesta Correcta'
-                            : 'Respuesta Incorrecta'}
-                        </AlertTitle>
                     </div>
                     <Button
                         variant="ghost"
