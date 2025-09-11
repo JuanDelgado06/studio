@@ -105,7 +105,7 @@ export default function LearnPage() {
         <CardHeader>
             <CardTitle className="font-headline">Módulo de IA: Ejercicios Personalizados</CardTitle>
             <CardDescription>El agente de IA puede analizar tu historial y sugerir ejercicios para mejorar tus puntos débiles. (Función en desarrollo)</CardDescription>
-        </Header>
+        </CardHeader>
         <CardContent>
              <div className="flex h-full flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center">
                 <p className="text-muted-foreground">Próximamente: Presiona un botón para que la IA genere ejercicios basados en tus errores más frecuentes.</p>
