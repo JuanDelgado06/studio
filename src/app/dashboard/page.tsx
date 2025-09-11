@@ -1,3 +1,6 @@
+
+'use client';
+
 import { BarChart3, CheckCircle, Target, TrendingUp, XCircle } from 'lucide-react';
 import {
   Card,
@@ -9,8 +12,32 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { AccuracyChart } from '@/components/poker/accuracy-chart';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 export default function DashboardPage() {
+  const { toast } = useToast();
+
+  const handleReset = () => {
+    // Here you would implement the logic to reset the statistics.
+    // For now, we'll just show a toast notification.
+    toast({
+      title: 'Estadísticas Reiniciadas',
+      description: 'Tus estadísticas de práctica han sido borradas.',
+    });
+  };
+
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       <Card>
@@ -19,7 +46,7 @@ export default function DashboardPage() {
           <BarChart3 className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">25</div>
+          <div className="text-2xl font-bold">0</div>
           <p className="text-xs text-muted-foreground">Sesión actual</p>
         </CardContent>
       </Card>
@@ -29,8 +56,8 @@ export default function DashboardPage() {
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">84%</div>
-          <p className="text-xs text-muted-foreground">Aún no hay datos de tendencia</p>
+          <div className="text-2xl font-bold">N/A</div>
+          <p className="text-xs text-muted-foreground">Aún no hay datos</p>
         </CardContent>
       </Card>
       <Card>
@@ -39,7 +66,7 @@ export default function DashboardPage() {
           <CheckCircle className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">21</div>
+          <div className="text-2xl font-bold">0</div>
           <p className="text-xs text-muted-foreground">Total de aciertos</p>
         </CardContent>
       </Card>
@@ -49,8 +76,8 @@ export default function DashboardPage() {
           <XCircle className="h-4 w-4 text-destructive" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">4</div>
-          <p className="text-xs text-muted-foreground">Call incorrecto en BB</p>
+          <div className="text-2xl font-bold">0</div>
+          <p className="text-xs text-muted-foreground">Aún no hay datos</p>
         </CardContent>
       </Card>
 
@@ -77,23 +104,59 @@ export default function DashboardPage() {
         <CardContent className="space-y-6">
             <div className="text-center">
                 <span className="text-5xl">🎉</span>
-                <p className="text-2xl font-bold font-headline">Racha de 1 día</p>
-                <p className="text-sm text-muted-foreground">¡Completaste tu primera práctica!</p>
+                <p className="text-2xl font-bold font-headline">Racha de 0 días</p>
+                <p className="text-sm text-muted-foreground">¡Completa tu primera práctica!</p>
             </div>
             <div className="space-y-2">
                 <div className="flex justify-between items-baseline">
-                    <p className="font-semibold">Meta Semanal: Mejorar en BB</p>
-                    <p className="text-sm font-bold text-primary">60%</p>
+                    <p className="font-semibold">Meta Semanal</p>
+                    <p className="text-sm font-bold text-primary">0%</p>
                 </div>
-                <Progress value={60} />
-                <p className="text-xs text-muted-foreground">Objetivo: 85% de precisión en Big Blind.</p>
+                <Progress value={0} />
+                <p className="text-xs text-muted-foreground">Completa prácticas para progresar.</p>
             </div>
              <div className="space-y-2">
                 <p className="font-semibold">Áreas de Enfoque Sugeridas por IA</p>
                 <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">Defensa de BB vs BTN</Badge>
+                    <Badge variant="secondary">Juega para recibir sugerencias</Badge>
                 </div>
             </div>
+        </CardContent>
+      </Card>
+
+      <Card className="lg:col-span-4">
+        <CardHeader>
+          <CardTitle className="font-headline text-destructive">
+            Zona de Peligro
+          </CardTitle>
+          <CardDescription>
+            Acciones que no se pueden deshacer.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">Reiniciar Estadísticas</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  ¿Estás absolutamente seguro?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta acción no se puede deshacer. Se borrarán
+                  permanentemente todas tus estadísticas de práctica y tu
+                  progreso.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleReset}>
+                  Sí, reiniciar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardContent>
       </Card>
     </div>
