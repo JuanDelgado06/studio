@@ -104,7 +104,7 @@ function getNewHand() {
 }
 
 function generateCacheKey(scenario: Scenario): string {
-  const internalPreviousAction = scenario.previousAction === 'none' ? 'none' : 'raise';
+  const internalPreviousAction = scenario.previousAction === 'none' ? 'none' : scenario.previousAction;
   return `${scenario.position}-${scenario.stackSize}-${scenario.tableType}-${internalPreviousAction}`;
 }
 
@@ -325,7 +325,7 @@ export function PracticeModule() {
     
     // Keep trying until we find a valid scenario from gto-ranges.json
     while(true) {
-        const randomPreviousAction = Math.random() < 0.5 ? 'none' : 'raise';
+        const randomPreviousAction = ['none', 'raise', '3-bet', '4-bet'][Math.floor(Math.random() * 4)] as PreviousAction;
         const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
         const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
         const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
@@ -384,7 +384,8 @@ export function PracticeModule() {
   }
   
   const showOpenRaiseActions = state.scenario.previousAction === 'none' && !isBBvsLimp;
-  const showVsRaiseActions = state.scenario.previousAction !== 'none';
+  const showVsRaiseActions = state.scenario.previousAction === 'raise';
+  const showVs3BetActions = state.scenario.previousAction === '3-bet';
 
 
   return (
@@ -439,7 +440,7 @@ export function PracticeModule() {
                         <Label htmlFor="position-sheet">Posición</Label>
                         <Select
                         value={state.scenario.position}
-                        onValuechange={(v) =>
+                        onValueChange={(v) =>
                             handleSetScenario({ position: v as Position })
                         }
                         >
@@ -634,6 +635,41 @@ export function PracticeModule() {
                             onClick={() => handleAction('3-bet')}
                         >
                             3-Bet 💣
+                        </Button>
+                        {state.scenario.stackSize <= 40 && (
+                            <Button
+                                variant="destructive"
+                                className="bg-red-700 hover:bg-red-800"
+                                size="lg"
+                                onClick={() => handleAction('all-in')}
+                            >
+                                All-in 🔥
+                            </Button>
+                        )}
+                    </>
+                ) : showVs3BetActions ? (
+                     <>
+                        <Button
+                            variant="destructive"
+                            size="lg"
+                            onClick={() => handleAction('fold')}
+                        >
+                            Fold 🤚
+                        </Button>
+                         <Button
+                            variant="secondary"
+                            size="lg"
+                            onClick={() => handleAction('call')}
+                        >
+                            Call 💰
+                        </Button>
+                        <Button
+                            style={{backgroundColor: '#f59e0b'}} // amber-500
+                            className="text-white hover:bg-amber-600"
+                            size="lg"
+                            onClick={() => handleAction('raise')} // This becomes a 4-bet
+                        >
+                            4-Bet 💣
                         </Button>
                         {state.scenario.stackSize <= 40 && (
                             <Button
