@@ -466,7 +466,7 @@ export function PracticeModule() {
         </Sheet>
         
         <Card>
-            <CardHeader>
+            <CardHeader className="text-center">
             <CardTitle className="font-headline">Tu Mano</CardTitle>
             <CardDescription>
                 Estás en{' '}
