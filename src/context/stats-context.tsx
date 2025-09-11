@@ -141,7 +141,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
   }, [stats.handsPlayed, isClient, stats.accuracyByPosition, stats.overallAccuracy, stats.weeklyGoal]);
 
 
-  const recordHand = (handData: AnalyzePreflopDecisionInput, isCorrect: boolean) => {
+  const recordHand = React.useCallback((handData: AnalyzePreflopDecisionInput, isCorrect: boolean) => {
     setStats((prevStats) => {
       const today = new Date().toDateString();
       const newHandsPlayed = prevStats.handsPlayed + 1;
@@ -216,7 +216,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
         decisionHistory: newDecisionHistory,
       };
     });
-  };
+  }, []);
 
   const resetStats = () => {
     setStats(initialStats);

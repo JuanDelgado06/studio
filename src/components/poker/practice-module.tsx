@@ -28,9 +28,9 @@ import { CheckCircle, Info, Loader2, Shuffle, XCircle } from 'lucide-react';
 import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
-import type { HandRange } from '@/lib/types';
 import { expandRange } from '@/lib/range-expander';
 import allRanges from '@/lib/gto-ranges.json';
+import type { HandRange } from '@/lib/types';
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const SUITS = ['s', 'h', 'd', 'c'];
@@ -58,13 +58,16 @@ type State = {
 
 type ActionPayload =
   | { type: 'SET_SCENARIO'; payload: Partial<Scenario> }
-  | { type: 'HANDLE_ACTION'; payload: { action: Action; recordHand: Function } }
+  | { type: 'HANDLE_ACTION'; payload: Action }
   | { type: 'NEXT_HAND' }
   | { type: 'SET_EXPLANATION'; payload: GetPreflopExplanationOutput | null }
   | { type: 'TOGGLE_EXPLANATION' }
-  | { type: 'SET_LOADING'; payload: { main?: boolean, explanation?: boolean } };
+  | { type: 'SET_LOADING'; payload: { main?: boolean; explanation?: boolean } };
 
-function getRandomCard(deck: string[]): { card: string; remainingDeck: string[] } {
+function getRandomCard(deck: string[]): {
+  card: string;
+  remainingDeck: string[];
+} {
   const index = Math.floor(Math.random() * deck.length);
   const card = deck[index];
   const remainingDeck = [...deck.slice(0, index), ...deck.slice(index + 1)];
@@ -99,56 +102,56 @@ function getNewHand() {
 }
 
 function generateCacheKey(scenario: Scenario): string {
-    return `${scenario.position}-${scenario.stackSize}-${scenario.tableType}-${scenario.previousAction}`;
+  return `${scenario.position}-${scenario.stackSize}-${scenario.tableType}-${scenario.previousAction}`;
 }
 
-function loadRangeAndHand(scenario: Scenario): { range: HandRange | null, hand: { handNotation: string; cards: [string, string] }} {
-    const key = generateCacheKey(scenario);
-    const rangeData = (allRanges as Record<string, any>)[key];
-    const newHandRange = rangeData ? expandRange(rangeData) : null;
-    return { range: newHandRange, hand: getNewHand() };
+function loadRangeAndHand(scenario: Scenario): {
+  range: HandRange | null;
+  hand: { handNotation: string; cards: [string, string] };
+} {
+  const key = generateCacheKey(scenario);
+  const rangeData = (allRanges as Record<string, any>)[key];
+  const newHandRange = rangeData ? expandRange(rangeData) : null;
+  return { range: newHandRange, hand: getNewHand() };
 }
 
 const reducer = (state: State, action: ActionPayload): State => {
   switch (action.type) {
     case 'SET_LOADING':
-      return { 
-          ...state, 
-          isLoading: action.payload.main !== undefined ? action.payload.main : state.isLoading,
-          explanationIsLoading: action.payload.explanation !== undefined ? action.payload.explanation : state.explanationIsLoading,
+      return {
+        ...state,
+        isLoading:
+          action.payload.main !== undefined
+            ? action.payload.main
+            : state.isLoading,
+        explanationIsLoading:
+          action.payload.explanation !== undefined
+            ? action.payload.explanation
+            : state.explanationIsLoading,
       };
 
     case 'SET_SCENARIO': {
-        const newScenario = { ...state.scenario, ...action.payload };
-        // If position changes to not be BB, ensure previousAction is 'none'
-        if (action.payload.position && action.payload.position !== 'BB') {
-          newScenario.previousAction = 'none';
-        }
-        const { range, hand } = loadRangeAndHand(newScenario);
-        return {
-            ...state,
-            scenario: newScenario,
-            currentHandRange: range,
-            currentHand: hand,
-            feedback: null,
-            showExplanation: false,
-            isLoading: false,
-        }
+      const newScenario = { ...state.scenario, ...action.payload };
+      const { range, hand } = loadRangeAndHand(newScenario);
+      return {
+        ...state,
+        scenario: newScenario,
+        currentHandRange: range,
+        currentHand: hand,
+        feedback: null,
+        showExplanation: false,
+        isLoading: false,
+      };
     }
-    
+
     case 'HANDLE_ACTION': {
       if (!state.currentHand || !state.currentHandRange) {
         return state;
       }
-      const { action: actionTaken, recordHand } = action.payload;
-      const correctAction = state.currentHandRange[state.currentHand.handNotation] || 'fold';
+      const actionTaken = action.payload;
+      const correctAction =
+        state.currentHandRange[state.currentHand.handNotation] || 'fold';
       const isOptimal = actionTaken === correctAction;
-      
-      recordHand({
-          ...state.scenario,
-          hand: state.currentHand.handNotation,
-          action: actionTaken,
-      }, isOptimal);
 
       return {
         ...state,
@@ -167,11 +170,14 @@ const reducer = (state: State, action: ActionPayload): State => {
     }
 
     case 'SET_EXPLANATION': {
-        if (!state.feedback) return state;
-        return {
-            ...state,
-            feedback: { ...state.feedback, explanation: action.payload || undefined },
-        }
+      if (!state.feedback) return state;
+      return {
+        ...state,
+        feedback: {
+          ...state.feedback,
+          explanation: action.payload || undefined,
+        },
+      };
     }
 
     case 'TOGGLE_EXPLANATION': {
@@ -183,11 +189,10 @@ const reducer = (state: State, action: ActionPayload): State => {
   }
 };
 
-
 export function PracticeModule() {
   const { toast } = useToast();
   const { recordHand } = useStats();
-  
+
   const [state, dispatch] = useReducer(reducer, {
     scenario: {
       position: 'BTN',
@@ -202,14 +207,17 @@ export function PracticeModule() {
     isLoading: true,
     explanationIsLoading: false,
   });
-
+  
   useEffect(() => {
-      dispatch({ type: 'SET_SCENARIO', payload: {
+    dispatch({
+      type: 'SET_SCENARIO',
+      payload: {
         position: 'BTN',
         stackSize: 100,
         tableType: 'cash',
         previousAction: 'none',
-      }});
+      },
+    });
   }, []);
 
   useEffect(() => {
@@ -217,81 +225,92 @@ export function PracticeModule() {
       toast({
         variant: 'destructive',
         title: 'Error de Rango',
-        description: `No se pudo cargar el rango para este escenario. (${generateCacheKey(state.scenario)})`,
+        description: `No se pudo cargar el rango para este escenario. (${generateCacheKey(
+          state.scenario
+        )})`,
       });
     }
   }, [state.currentHandRange, state.isLoading, state.scenario, toast]);
 
+  // Effect to record hand history after feedback is given
+  useEffect(() => {
+    if (state.feedback && state.currentHand) {
+      recordHand(
+        {
+          ...state.scenario,
+          hand: state.currentHand.handNotation,
+          action: state.feedback.action,
+        },
+        state.feedback.isOptimal
+      );
+    }
+  }, [state.feedback, state.currentHand, state.scenario, recordHand]);
+
   const handleShowExplanation = async () => {
     // If explanation is already showing, just hide it.
     if (state.showExplanation) {
-        dispatch({ type: 'TOGGLE_EXPLANATION' });
-        return;
+      dispatch({ type: 'TOGGLE_EXPLANATION' });
+      return;
     }
 
     // If explanation is loaded but hidden, just show it.
     if (state.feedback?.explanation) {
-        dispatch({ type: 'TOGGLE_EXPLANATION' });
-        return;
+      dispatch({ type: 'TOGGLE_EXPLANATION' });
+      return;
     }
 
     // If explanation is not loaded, fetch it.
     if (state.feedback && state.currentHand) {
-        dispatch({ type: 'SET_LOADING', payload: { explanation: true } });
-        dispatch({ type: 'TOGGLE_EXPLANATION' }); // Show loading state
+      dispatch({ type: 'SET_LOADING', payload: { explanation: true } });
+      dispatch({ type: 'TOGGLE_EXPLANATION' }); // Show loading state
 
-        const result = await getPreflopExplanationAction({
-            ...state.scenario,
-            hand: state.currentHand.handNotation,
-            action: state.feedback.action,
-            isOptimal: state.feedback.isOptimal,
+      const result = await getPreflopExplanationAction({
+        ...state.scenario,
+        hand: state.currentHand.handNotation,
+        action: state.feedback.action,
+        isOptimal: state.feedback.isOptimal,
+      });
+
+      if (result.success && result.data) {
+        dispatch({ type: 'SET_EXPLANATION', payload: result.data });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error de Explicación',
+          description:
+            result.error || 'No se pudo obtener la explicación de la IA.',
         });
-
-        if (result.success && result.data) {
-            dispatch({ type: 'SET_EXPLANATION', payload: result.data });
-        } else {
-            toast({
-                variant: 'destructive',
-                title: 'Error de Explicación',
-                description: result.error || 'No se pudo obtener la explicación de la IA.',
-            });
-            dispatch({ type: 'TOGGLE_EXPLANATION' }); // Hide explanation panel on error
-        }
-        dispatch({ type: 'SET_LOADING', payload: { explanation: false } });
+        dispatch({ type: 'TOGGLE_EXPLANATION' }); // Hide explanation panel on error
+      }
+      dispatch({ type: 'SET_LOADING', payload: { explanation: false } });
     }
-  }
+  };
 
   const renderCard = (cardStr: string) => {
-      const rank = cardStr[0] as any;
-      const suit = cardStr[1] as any;
-      return <PokerCard rank={rank} suit={suit} />;
-  }
+    const rank = cardStr[0] as any;
+    const suit = cardStr[1] as any;
+    return <PokerCard rank={rank} suit={suit} />;
+  };
 
   const handleAction = (action: Action) => {
-    dispatch({type: 'HANDLE_ACTION', payload: { action, recordHand }})
-  }
+    dispatch({ type: 'HANDLE_ACTION', payload: action });
+  };
 
   const handleNextHand = () => {
-    dispatch({type: 'NEXT_HAND'});
-  }
+    dispatch({ type: 'NEXT_HAND' });
+  };
 
   const handleRandomizeScenario = () => {
     const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
     const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
     const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
     
-    // Logic to ensure a valid scenario is generated
     let randomPreviousAction: 'none' | 'raise' = 'none';
+
+    // Only BB can face a raise in our current data set.
     if (randomPosition === 'BB') {
-      // BB can face a raise. Let's randomly decide.
-      // We check if a corresponding 'raise' range exists before assigning it.
-      const keyForRaise = `${randomPosition}-${randomStackSize}-${randomTableType}-raise`;
-      if ((allRanges as Record<string, any>)[keyForRaise]) {
-          randomPreviousAction = 'raise';
-      }
+        randomPreviousAction = 'raise';
     }
-    // For all other positions, our data only supports 'none' (open-raise scenarios)
-    // so we don't need to change randomPreviousAction.
 
     dispatch({ type: 'SET_SCENARIO', payload: {
         position: randomPosition,
@@ -301,44 +320,55 @@ export function PracticeModule() {
     }});
   }
 
+
   const handleSetScenario = (payload: Partial<Scenario>) => {
     dispatch({ type: 'SET_SCENARIO', payload });
-  }
-  
+  };
+
   const isPreviousActionDisabled = state.scenario.position !== 'BB';
 
   if (state.isLoading || !state.currentHand) {
     return (
-       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-3 flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[600px]">
-            <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
-            <p className="mt-4 text-muted-foreground">
+          <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
+          <p className="mt-4 text-muted-foreground">
             Cargando módulo de práctica...
-            </p>
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
-  const isBBvsLimp = state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
+  const isBBvsLimp =
+    state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Card className="lg:col-span-1">
         <CardHeader>
-            <CardTitle className="font-headline">Configurar Escenario</CardTitle>
-            <CardDescription>
+          <CardTitle className="font-headline">Configurar Escenario</CardTitle>
+          <CardDescription>
             Elige las condiciones para tu sesión de práctica.
-            </CardDescription>
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-           <Button variant="secondary" onClick={handleRandomizeScenario} className="w-full">
-              <Shuffle className="mr-2 h-4 w-4" />
-              Escenario Aleatorio
-            </Button>
+          <Button
+            variant="secondary"
+            onClick={handleRandomizeScenario}
+            className="w-full"
+          >
+            <Shuffle className="mr-2 h-4 w-4" />
+            Escenario Aleatorio
+          </Button>
           <div className="space-y-2">
             <Label htmlFor="position">Posición</Label>
-            <Select value={state.scenario.position} onValueChange={(v) => handleSetScenario({ position: v as Position })}>
+            <Select
+              value={state.scenario.position}
+              onValueChange={(v) =>
+                handleSetScenario({ position: v as Position })
+              }
+            >
               <SelectTrigger id="position">
                 <SelectValue placeholder="Selecciona posición" />
               </SelectTrigger>
@@ -353,7 +383,12 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="stack-size">Stack (BBs)</Label>
-            <Select value={String(state.scenario.stackSize)} onValueChange={(v) => handleSetScenario({ stackSize: Number(v) })}>
+            <Select
+              value={String(state.scenario.stackSize)}
+              onValueChange={(v) =>
+                handleSetScenario({ stackSize: Number(v) })
+              }
+            >
               <SelectTrigger id="stack-size">
                 <SelectValue placeholder="Selecciona stack" />
               </SelectTrigger>
@@ -368,7 +403,12 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="table-type">Tipo de Mesa</Label>
-            <Select value={state.scenario.tableType} onValueChange={(v) => handleSetScenario({ tableType: v as TableType })}>
+            <Select
+              value={state.scenario.tableType}
+              onValueChange={(v) =>
+                handleSetScenario({ tableType: v as TableType })
+              }
+            >
               <SelectTrigger id="table-type">
                 <SelectValue placeholder="Selecciona tipo de mesa" />
               </SelectTrigger>
@@ -383,20 +423,30 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="previous-action">Acción Previa</Label>
-            <Select 
-                value={state.scenario.previousAction} 
-                onValueChange={(v) => handleSetScenario({ previousAction: v as 'none' | 'raise' })}
-                disabled={isPreviousActionDisabled}
+            <Select
+              value={state.scenario.previousAction}
+              onValueChange={(v) =>
+                handleSetScenario({ previousAction: v as 'none' | 'raise' })
+              }
+              disabled={isPreviousActionDisabled}
             >
               <SelectTrigger id="previous-action">
                 <SelectValue placeholder="Selecciona acción previa" />
               </SelectTrigger>
               <SelectContent>
-                  <SelectItem value='none'>Nadie ha apostado (Open-Raise)</SelectItem>
-                  <SelectItem value='raise'>Hubo un Raise antes de mí</SelectItem>
+                <SelectItem value="none">
+                  Nadie ha apostado (Open-Raise)
+                </SelectItem>
+                <SelectItem value="raise">
+                  Hubo un Raise antes de mí
+                </SelectItem>
               </SelectContent>
             </Select>
-            {isPreviousActionDisabled && <p className="text-xs text-muted-foreground pt-1">Solo aplicable para la posición BB.</p>}
+            {isPreviousActionDisabled && (
+              <p className="text-xs text-muted-foreground pt-1">
+                Solo aplicable para la posición BB.
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -405,7 +455,10 @@ export function PracticeModule() {
         <CardHeader>
           <CardTitle className="font-headline">Tu Mano</CardTitle>
           <CardDescription>
-            Estás en <span className="font-bold">{state.scenario.position}</span> con <span className="font-bold">{state.scenario.stackSize} BB</span>. ¿Qué haces?
+            Estás en{' '}
+            <span className="font-bold">{state.scenario.position}</span> con{' '}
+            <span className="font-bold">{state.scenario.stackSize} BB</span>.
+            ¿Qué haces?
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center gap-8 min-h-[350px]">
@@ -414,52 +467,92 @@ export function PracticeModule() {
               {renderCard(state.currentHand.cards[0])}
               {renderCard(state.currentHand.cards[1])}
             </div>
-          ) : <Loader2 className="animate-spin h-12 w-12" />}
+          ) : (
+            <Loader2 className="animate-spin h-12 w-12" />
+          )}
 
           {state.feedback && (
-             <div className="w-full max-w-md space-y-2">
-                <Alert variant={state.feedback.isOptimal ? 'default' : 'destructive'}>
-                     <div className='flex items-center justify-between'>
-                        <div className="flex items-center">
-                            {state.feedback.isOptimal ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-                            <AlertTitle className="font-headline ml-2">
-                                {state.feedback.isOptimal ? "Respuesta Correcta" : "Respuesta Incorrecta"}
-                            </AlertTitle>
-                        </div>
-                        <Button variant="ghost" size="sm" onClick={handleShowExplanation} disabled={state.explanationIsLoading}>
-                            {state.explanationIsLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Info className="mr-2 h-4 w-4" />}
-                            {state.showExplanation ? 'Ocultar' : 'Explicación'}
-                        </Button>
-                    </div>
-                    {state.showExplanation && (
-                        <AlertDescription className="space-y-2 pt-2">
-                           {state.explanationIsLoading && !state.feedback.explanation ? <p>Cargando explicación...</p> : (
-                               <>
-                                <p>{state.feedback.explanation?.feedback}</p>
-                                <p className="text-xs text-muted-foreground">{state.feedback.explanation?.evExplanation}</p>
-                               </>
-                           )}
-                        </AlertDescription>
+            <div className="w-full max-w-md space-y-2">
+              <Alert
+                variant={state.feedback.isOptimal ? 'default' : 'destructive'}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    {state.feedback.isOptimal ? (
+                      <CheckCircle className="h-4 w-4" />
+                    ) : (
+                      <XCircle className="h-4 w-4" />
                     )}
-                </Alert>
-             </div>
+                    <AlertTitle className="font-headline ml-2">
+                      {state.feedback.isOptimal
+                        ? 'Respuesta Correcta'
+                        : 'Respuesta Incorrecta'}
+                    </AlertTitle>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleShowExplanation}
+                    disabled={state.explanationIsLoading}
+                  >
+                    {state.explanationIsLoading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Info className="mr-2 h-4 w-4" />
+                    )}
+                    {state.showExplanation ? 'Ocultar' : 'Explicación'}
+                  </Button>
+                </div>
+                {state.showExplanation && (
+                  <AlertDescription className="space-y-2 pt-2">
+                    {state.explanationIsLoading &&
+                    !state.feedback.explanation ? (
+                      <p>Cargando explicación...</p>
+                    ) : (
+                      <>
+                        <p>{state.feedback.explanation?.feedback}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {state.feedback.explanation?.evExplanation}
+                        </p>
+                      </>
+                    )}
+                  </AlertDescription>
+                )}
+              </Alert>
+            </div>
           )}
 
           {!state.feedback && state.currentHandRange && (
             <div className="flex gap-4">
               {isBBvsLimp ? (
-                 <Button variant="secondary" size="lg" onClick={() => handleAction('call' as Action)}>
-                    Check ✅
-                 </Button>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={() => handleAction('call' as Action)}
+                >
+                  Check ✅
+                </Button>
               ) : (
-                <Button variant="destructive" size="lg" onClick={() => handleAction('fold' as Action)}>
-                    Fold 🤚
+                <Button
+                  variant="destructive"
+                  size="lg"
+                  onClick={() => handleAction('fold' as Action)}
+                >
+                  Fold 🤚
                 </Button>
               )}
-              <Button variant="secondary" size="lg" onClick={() => handleAction('call' as Action)}>
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={() => handleAction('call' as Action)}
+              >
                 {isBBvsLimp ? 'Bet' : 'Call'} 💰
               </Button>
-              <Button variant="default" size="lg" onClick={() => handleAction('raise' as Action)}>
+              <Button
+                variant="default"
+                size="lg"
+                onClick={() => handleAction('raise' as Action)}
+              >
                 Raise 🚀
               </Button>
             </div>
@@ -473,22 +566,18 @@ export function PracticeModule() {
         </CardContent>
       </Card>
       <div className="lg:col-span-3">
-        {state.feedback && state.currentHandRange ? (
-            <HandRangeGrid currentHand={state.currentHand?.handNotation} range={state.currentHandRange} />
-        ) : !state.currentHandRange ? (
-             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
-                <XCircle className="h-10 w-10 text-destructive mb-2" />
-                <p className="font-semibold text-destructive">
-                    Error de Rango
-                </p>
-                <p className="text-muted-foreground text-sm">
-                    El rango para este escenario no está disponible. Por favor, selecciona otro.
-                </p>
-            </div>
+        {state.currentHandRange ? (
+          <HandRangeGrid
+            currentHand={state.feedback ? state.currentHand?.handNotation : null}
+            range={state.feedback ? state.currentHandRange : null}
+          />
         ) : (
           <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
-            <p className="text-muted-foreground">
-              El rango de manos aparecerá aquí después de que tomes una decisión.
+            <XCircle className="h-10 w-10 text-destructive mb-2" />
+            <p className="font-semibold text-destructive">Error de Rango</p>
+            <p className="text-muted-foreground text-sm">
+              El rango para este escenario no está disponible. Por favor,
+              selecciona otro.
             </p>
           </div>
         )}
@@ -496,5 +585,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
