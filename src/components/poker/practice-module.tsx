@@ -30,6 +30,7 @@ import type {
 } from '@/ai/flows/analyze-preflop-decision';
 import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
+import { HandRangeGrid } from './hand-range-grid';
 
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
@@ -281,6 +282,9 @@ export function PracticeModule() {
           )}
         </CardContent>
       </Card>
+      <div className="lg:col-span-3">
+        <HandRangeGrid currentHand={currentHand?.handNotation} />
+      </div>
     </div>
   );
 }
