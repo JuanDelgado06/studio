@@ -3,59 +3,75 @@ import type { GetHandRangeOutput } from '@/ai/flows/get-hand-range';
 import type { Action, HandRange } from './types';
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+const RANK_MAP = RANKS.reduce((acc, rank, index) => {
+    acc[rank] = index;
+    return acc;
+}, {} as Record<string, number>);
+
 
 function parseRange(rangeStr: string): string[] {
-  const hands: string[] = [];
-  const noPlus = rangeStr.replace('+', '');
-  
-  // Handle pairs like 88+ or 99
-  if (noPlus.length === 2 && noPlus[0] === noPlus[1]) {
-    const rankIndex = RANKS.indexOf(noPlus[0]);
-    if (rangeStr.endsWith('+')) {
-      for (let i = 0; i <= rankIndex; i++) {
-        hands.push(`${RANKS[i]}${RANKS[i]}`);
-      }
-    } else {
-        hands.push(noPlus);
-    }
-    return hands;
-  }
-  
-  // Handle suited/offsuit like AQs+, KJo+, or a range like T9s-T6s
-  if (noPlus.length >= 3) {
-    if (rangeStr.includes('-')) {
-        const [start, end] = rangeStr.split('-');
-        const highRank = start[0];
-        const suitOrOff = start[2];
-        const startLowRankIndex = RANKS.indexOf(start[1]);
-        const endLowRankIndex = RANKS.indexOf(end[1]);
+    const hands: string[] = [];
 
-        for(let i = startLowRankIndex; i <= endLowRankIndex; i++) {
-            hands.push(`${highRank}${RANKS[i]}${suitOrOff}`);
+    // Case 1: Handle pairs (e.g., "77", "TT+", "JJ-88")
+    if (rangeStr.length >= 2 && rangeStr[0] === rangeStr[1]) {
+        const startRank = rangeStr.substring(0, 2);
+        if (rangeStr.endsWith('+')) {
+            const startIndex = RANK_MAP[startRank[0]];
+            for (let i = 0; i <= startIndex; i++) {
+                hands.push(RANKS[i] + RANKS[i]);
+            }
+        } else if (rangeStr.includes('-')) {
+            const [start, end] = rangeStr.split('-');
+            const startIndex = RANK_MAP[start[0]];
+            const endIndex = RANK_MAP[end[0]];
+            for (let i = startIndex; i <= endIndex; i++) {
+                hands.push(RANKS[i] + RANKS[i]);
+            }
         }
-
-    } else if (rangeStr.endsWith('+')) {
-      const highRank = noPlus[0];
-      const lowRank = noPlus[1];
-      const suitOrOff = noPlus[2];
-      const highRankIndex = RANKS.indexOf(highRank);
-      const lowRankIndex = RANKS.indexOf(lowRank);
-
-      for (let i = lowRankIndex; i > highRankIndex; i--) {
-        hands.push(`${highRank}${RANKS[i]}${suitOrOff}`);
-      }
-    } else {
-         hands.push(rangeStr);
+        else {
+            hands.push(rangeStr);
+        }
+        return hands;
     }
-     return hands;
-  }
 
-  // Handle single combos like AKs, QJo
-  if(rangeStr.length >= 2) {
-    hands.push(rangeStr);
-  }
+    // Case 2: Suited/Offsuit hands (e.g., "AKs", "QJo", "ATs+", "KJo+", "T8s-T6s")
+    if (rangeStr.length >= 3) {
+        const type = rangeStr[2]; // 's' or 'o'
+        const r1 = rangeStr[0];
+        const r2 = rangeStr[1];
+        
+        if (rangeStr.endsWith('+')) {
+            const highRank = r1;
+            const lowRank = r2;
+            const highRankIndex = RANK_MAP[highRank];
+            const lowRankIndex = RANK_MAP[lowRank];
 
-  return hands;
+            for (let i = lowRankIndex; i > highRankIndex; i--) {
+                hands.push(`${highRank}${RANKS[i]}${type}`);
+            }
+        } else if (rangeStr.includes('-')) {
+            // e.g. T9s-T6s or A9s-A2s
+             const [start, end] = rangeStr.split('-');
+             const r1_start = start[0];
+             const r2_start_index = RANK_MAP[start[1]];
+             const r2_end_index = RANK_MAP[end[1]];
+
+             for (let i = r2_start_index; i <= r2_end_index; i++) {
+                 hands.push(`${r1_start}${RANKS[i]}${type}`);
+             }
+
+        } else {
+            hands.push(rangeStr);
+        }
+        return hands;
+    }
+    
+    // Fallback for single combos if not matched
+    if(rangeStr.length >= 2) {
+        hands.push(rangeStr);
+    }
+    
+    return hands;
 }
 
 
@@ -92,10 +108,5 @@ export function expandRange(summary: GetHandRangeOutput): HandRange {
   processAction(summary.raise, 'raise');
   processAction(summary.call, 'call');
   
-  // Note: We don't need to process fold explicitly if we default to fold.
-  // However, if the AI provides fold hands, it's good for ensuring nothing was missed.
-  // processAction(summary.fold, 'fold');
-
-
   return handRange;
 }
