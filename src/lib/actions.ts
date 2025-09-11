@@ -106,9 +106,10 @@ export async function getHandRangeAction(input: z.infer<typeof HandRangeSchema>)
         return { success: true, data: result };
     } catch (error) {
         if (error instanceof z.ZodError) {
+            console.log(error.issues);
             return { success: false, error: 'Invalid input for hand range.' };
         }
-        console.error(error);
+        console.error("Error in getHandRangeAction: ", error);
         return { success: false, error: 'Failed to get hand range from AI.' };
     }
 }

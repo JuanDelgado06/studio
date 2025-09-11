@@ -5,3 +5,4 @@ export type Hand = {
     card1: string;
     card2: string;
 }
+export type HandRange = Record<string, Action>;

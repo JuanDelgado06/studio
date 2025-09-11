@@ -31,7 +31,8 @@ import type {
 import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
-import type { GetHandRangeOutput } from '@/ai/flows/get-hand-range';
+import type { HandRange } from '@/lib/types';
+import { expandRange } from '@/lib/range-expander';
 
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
@@ -78,7 +79,6 @@ type Feedback = {
     explanation?: GetPreflopExplanationOutput;
 }
 
-type HandRangeData = GetHandRangeOutput['range'];
 
 export function PracticeModule() {
   const [position, setPosition] = useState<Position>('BTN');
@@ -91,7 +91,7 @@ export function PracticeModule() {
   const [isPending, startTransition] = useTransition();
   const [isExplanationLoading, startExplanationTransition] = useTransition();
   const [isRangeLoading, startRangeTransition] = useTransition();
-  const [handRange, setHandRange] = useState<HandRangeData | null>(null);
+  const [handRange, setHandRange] = useState<HandRange | null>(null);
 
   const { toast } = useToast();
   const { recordHand } = useStats();
@@ -101,7 +101,8 @@ export function PracticeModule() {
       setHandRange(null);
       const result = await getHandRangeAction({ position: pos, stackSize: stack, tableType: type });
       if (result.success && result.data) {
-        setHandRange(result.data.range);
+        const expanded = expandRange(result.data);
+        setHandRange(expanded);
       } else {
         toast({
           variant: 'destructive',
