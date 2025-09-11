@@ -103,7 +103,7 @@ function getNewHand() {
   return { handNotation, cards: [card1, card2] as [string, string] };
 }
 
-function generateCacheKey(scenario: Scenario): string {
+function generateCacheKey(scenario: Partial<Scenario>): string {
   const internalPreviousAction = scenario.previousAction === 'none' ? 'none' : scenario.previousAction;
   return `${scenario.position}-${scenario.stackSize}-${scenario.tableType}-${internalPreviousAction}`;
 }
@@ -576,150 +576,137 @@ export function PracticeModule() {
                 </div>
             )}
 
-            {!state.feedback && state.currentHandRange && (
-                <div className="flex flex-wrap justify-center gap-4">
-                {isBBvsLimp ? (
-                    <>
-                        <Button
-                            variant="secondary"
-                            size="lg"
-                            onClick={() => handleAction('call')}
-                        >
-                            Check ✅
-                        </Button>
-                         <Button
-                            variant="default"
-                            size="lg"
-                            onClick={() => handleAction('raise')}
-                        >
-                            Bet 🚀
-                        </Button>
-                    </>
-                ) : showOpenRaiseActions ? (
-                    <>
-                        <Button
-                            variant="destructive"
-                            size="lg"
-                            onClick={() => handleAction('fold')}
-                        >
-                            Fold 🤚
-                        </Button>
-                        <Button
-                            variant="default"
-                            size="lg"
-                            onClick={() => handleAction('raise')}
-                        >
-                            Raise 🚀
-                        </Button>
-                    </>
-                ) : showVsRaiseActions ? (
-                    <>
-                        <Button
-                            variant="destructive"
-                            size="lg"
-                            onClick={() => handleAction('fold')}
-                        >
-                            Fold 🤚
-                        </Button>
-                         <Button
-                            variant="secondary"
-                            size="lg"
-                            onClick={() => handleAction('call')}
-                        >
-                            Call 💰
-                        </Button>
-                        <Button
-                            style={{backgroundColor: '#f59e0b'}} // amber-500
-                            className="text-white hover:bg-amber-600"
-                            size="lg"
-                            onClick={() => handleAction('3-bet')}
-                        >
-                            3-Bet 💣
-                        </Button>
-                        {state.scenario.stackSize <= 40 && (
+            {!state.feedback ? (
+                state.currentHandRange ? (
+                    <div className="flex flex-wrap justify-center gap-4">
+                    {isBBvsLimp ? (
+                        <>
+                            <Button
+                                variant="secondary"
+                                size="lg"
+                                onClick={() => handleAction('call')}
+                            >
+                                Check ✅
+                            </Button>
+                             <Button
+                                variant="default"
+                                size="lg"
+                                onClick={() => handleAction('raise')}
+                            >
+                                Bet 🚀
+                            </Button>
+                        </>
+                    ) : showOpenRaiseActions ? (
+                        <>
                             <Button
                                 variant="destructive"
-                                className="bg-red-700 hover:bg-red-800"
                                 size="lg"
-                                onClick={() => handleAction('all-in')}
+                                onClick={() => handleAction('fold')}
                             >
-                                All-in 🔥
+                                Fold 🤚
                             </Button>
-                        )}
-                    </>
-                ) : showVs3BetActions ? (
-                     <>
-                        <Button
-                            variant="destructive"
-                            size="lg"
-                            onClick={() => handleAction('fold')}
-                        >
-                            Fold 🤚
-                        </Button>
-                         <Button
-                            variant="secondary"
-                            size="lg"
-                            onClick={() => handleAction('call')}
-                        >
-                            Call 💰
-                        </Button>
-                        <Button
-                            style={{backgroundColor: '#f59e0b'}} // amber-500
-                            className="text-white hover:bg-amber-600"
-                            size="lg"
-                            onClick={() => handleAction('raise')} // This becomes a 4-bet
-                        >
-                            4-Bet 💣
-                        </Button>
-                        {state.scenario.stackSize <= 40 && (
+                            <Button
+                                variant="default"
+                                size="lg"
+                                onClick={() => handleAction('raise')}
+                            >
+                                Raise 🚀
+                            </Button>
+                        </>
+                    ) : showVsRaiseActions ? (
+                        <>
                             <Button
                                 variant="destructive"
-                                className="bg-red-700 hover:bg-red-800"
                                 size="lg"
-                                onClick={() => handleAction('all-in')}
+                                onClick={() => handleAction('fold')}
                             >
-                                All-in 🔥
+                                Fold 🤚
                             </Button>
-                        )}
-                    </>
-                ) : null }
-                </div>
-            )}
-             {!state.feedback && !state.currentHandRange && (
-                <div className="flex flex-col items-center justify-center text-center">
-                    <XCircle className="h-10 w-10 text-destructive mb-2" />
-                    <p className="font-semibold text-destructive">Sin Rango Definido</p>
-                    <p className="text-destructive/80 text-sm max-w-xs">
-                        No hay un rango GTO definido para este escenario específico. Prueba a ajustar la configuración.
-                    </p>
-                </div>
-            )}
-
-
-            {state.feedback && (
+                             <Button
+                                variant="secondary"
+                                size="lg"
+                                onClick={() => handleAction('call')}
+                            >
+                                Call 💰
+                            </Button>
+                            <Button
+                                style={{backgroundColor: '#f59e0b'}} // amber-500
+                                className="text-white hover:bg-amber-600"
+                                size="lg"
+                                onClick={() => handleAction('3-bet')}
+                            >
+                                3-Bet 💣
+                            </Button>
+                            {state.scenario.stackSize <= 40 && (
+                                <Button
+                                    variant="destructive"
+                                    className="bg-red-700 hover:bg-red-800"
+                                    size="lg"
+                                    onClick={() => handleAction('all-in')}
+                                >
+                                    All-in 🔥
+                                </Button>
+                            )}
+                        </>
+                    ) : showVs3BetActions ? (
+                         <>
+                            <Button
+                                variant="destructive"
+                                size="lg"
+                                onClick={() => handleAction('fold')}
+                            >
+                                Fold 🤚
+                            </Button>
+                             <Button
+                                variant="secondary"
+                                size="lg"
+                                onClick={() => handleAction('call')}
+                            >
+                                Call 💰
+                            </Button>
+                            <Button
+                                style={{backgroundColor: '#f59e0b'}} // amber-500
+                                className="text-white hover:bg-amber-600"
+                                size="lg"
+                                onClick={() => handleAction('raise')} // This becomes a 4-bet
+                            >
+                                4-Bet 💣
+                            </Button>
+                            {state.scenario.stackSize <= 40 && (
+                                <Button
+                                    variant="destructive"
+                                    className="bg-red-700 hover:bg-red-800"
+                                    size="lg"
+                                    onClick={() => handleAction('all-in')}
+                                >
+                                    All-in 🔥
+                                </Button>
+                            )}
+                        </>
+                    ) : null }
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center text-center">
+                        <XCircle className="h-10 w-10 text-destructive mb-2" />
+                        <p className="font-semibold text-destructive">Sin Rango Definido</p>
+                        <p className="text-destructive/80 text-sm max-w-xs">
+                            No hay un rango GTO definido para este escenario específico. Prueba a ajustar la configuración.
+                        </p>
+                    </div>
+                )
+            ) : (
                 <Button size="lg" onClick={handleNextHand}>
-                Siguiente Mano
+                    Siguiente Mano
                 </Button>
             )}
             </CardContent>
         </Card>
-        {state.currentHandRange && state.feedback ? (
-        <HandRangeGrid
-            currentHand={state.currentHand?.handNotation}
-            range={state.currentHandRange}
-        />
-        ) : !state.currentHandRange && !state.isLoading ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-destructive/50 bg-destructive/10 p-8 text-center min-h-[300px]">
-            <XCircle className="h-10 w-10 text-destructive mb-2" />
-            <p className="font-semibold text-destructive">Error de Rango</p>
-            <p className="text-destructive/80 text-sm">
-            No se pudo cargar el rango para este escenario.
-            <span className="font-mono text-xs block mt-1 p-1 bg-destructive/10 rounded-sm">({generateCacheKey(state.scenario)})</span>
-            </p>
-        </div>
-        ) : null}
+        {state.currentHandRange && state.feedback && (
+            <HandRangeGrid
+                currentHand={state.currentHand?.handNotation}
+                range={state.currentHandRange}
+            />
+        )}
     </div>
   );
 }
-
-    
