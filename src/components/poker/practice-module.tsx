@@ -56,12 +56,11 @@ type State = {
 };
 
 type ActionPayload =
-  | { type: 'SET_SCENARIO'; payload: Scenario }
+  | { type: 'SET_SCENARIO'; payload: Partial<Scenario> }
   | { type: 'HANDLE_ACTION'; payload: Action }
   | { type: 'NEXT_HAND' }
   | { type: 'TOGGLE_EXPLANATION'; payload?: GetPreflopExplanationOutput }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_RANGE_AND_HAND', payload: { range: HandRange | null, hand: { handNotation: string; cards: [string, string] }}};
+  | { type: 'SET_LOADING'; payload: boolean };
 
 function getRandomCard(deck: string[]): { card: string; remainingDeck: string[] } {
   const index = Math.floor(Math.random() * deck.length);
@@ -101,31 +100,32 @@ function generateCacheKey(scenario: Scenario): string {
     return `${scenario.position}-${scenario.stackSize}-${scenario.tableType}-${scenario.previousAction}`;
 }
 
+function loadRangeAndHand(scenario: Scenario): { range: HandRange | null, hand: { handNotation: string; cards: [string, string] }} {
+    const key = generateCacheKey(scenario);
+    const rangeData = (allRanges as Record<string, any>)[key];
+    const newHandRange = rangeData ? expandRange(rangeData) : null;
+    return { range: newHandRange, hand: getNewHand() };
+}
+
 const reducer = (state: State, action: ActionPayload): State => {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload };
 
     case 'SET_SCENARIO': {
+        const newScenario = { ...state.scenario, ...action.payload };
+        const { range, hand } = loadRangeAndHand(newScenario);
         return {
             ...state,
-            scenario: action.payload,
+            scenario: newScenario,
+            currentHandRange: range,
+            currentHand: hand,
             feedback: null,
             showExplanation: false,
+            isLoading: false,
         }
     }
     
-    case 'SET_RANGE_AND_HAND': {
-        return {
-            ...state,
-            currentHandRange: action.payload.range,
-            currentHand: action.payload.hand,
-            feedback: null,
-            showExplanation: false,
-            isLoading: false
-        }
-    }
-
     case 'HANDLE_ACTION': {
       if (!state.currentHand || !state.currentHandRange) {
         return state;
@@ -141,13 +141,9 @@ const reducer = (state: State, action: ActionPayload): State => {
     }
 
     case 'NEXT_HAND': {
-      const key = generateCacheKey(state.scenario);
-      const rangeData = (allRanges as Record<string, any>)[key];
-      const newHandRange = rangeData ? expandRange(rangeData) : null;
       return {
         ...state,
         currentHand: getNewHand(),
-        currentHandRange: newHandRange,
         feedback: null,
         showExplanation: false,
       };
@@ -187,16 +183,15 @@ export function PracticeModule() {
     isLoading: true,
   });
 
-  const scenarioMemo = useMemo(() => state.scenario, [state.scenario]);
-
   useEffect(() => {
-    dispatch({ type: 'SET_LOADING', payload: true });
-    const key = generateCacheKey(scenarioMemo);
-    const rangeData = (allRanges as Record<string, any>)[key];
-    const newHandRange = rangeData ? expandRange(rangeData) : null;
-    dispatch({ type: 'SET_RANGE_AND_HAND', payload: { range: newHandRange, hand: getNewHand() }})
-  }, [scenarioMemo]);
-  
+      dispatch({ type: 'SET_SCENARIO', payload: {
+        position: 'BTN',
+        stackSize: 100,
+        tableType: 'cash',
+        previousAction: 'none',
+      }});
+  }, []);
+
   const lastInputAction = useMemo(() => {
     if (!state.feedback || !state.currentHand) return null;
     return {
@@ -273,10 +268,8 @@ export function PracticeModule() {
     if (randomPosition === 'BB') {
         randomPreviousAction = 'raise';
     } else {
-        // Check if a -raise scenario exists for the position
         const keyForRaise = `${randomPosition}-${randomStackSize}-${randomTableType}-raise`;
-        const canFaceRaise = (allRanges as Record<string, any>)[keyForRaise];
-        if (canFaceRaise && Math.random() > 0.5) {
+        if ((allRanges as Record<string, any>)[keyForRaise] && Math.random() > 0.5) {
             randomPreviousAction = 'raise';
         }
     }
@@ -290,10 +283,10 @@ export function PracticeModule() {
   }
 
   const handleSetScenario = (payload: Partial<Scenario>) => {
-    dispatch({ type: 'SET_SCENARIO', payload: {...state.scenario, ...payload }});
+    dispatch({ type: 'SET_SCENARIO', payload });
   }
 
-  if (state.isLoading) {
+  if (state.isLoading || !state.currentHand) {
     return (
        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-3 flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[600px]">
@@ -324,7 +317,7 @@ export function PracticeModule() {
             </Button>
           <div className="space-y-2">
             <Label htmlFor="position">Posición</Label>
-            <Select value={scenarioMemo.position} onValueChange={(v) => handleSetScenario({ position: v as Position })}>
+            <Select value={state.scenario.position} onValueChange={(v) => handleSetScenario({ position: v as Position })}>
               <SelectTrigger id="position">
                 <SelectValue placeholder="Selecciona posición" />
               </SelectTrigger>
@@ -339,7 +332,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="stack-size">Stack (BBs)</Label>
-            <Select value={String(scenarioMemo.stackSize)} onValueChange={(v) => handleSetScenario({ stackSize: Number(v) })}>
+            <Select value={String(state.scenario.stackSize)} onValueChange={(v) => handleSetScenario({ stackSize: Number(v) })}>
               <SelectTrigger id="stack-size">
                 <SelectValue placeholder="Selecciona stack" />
               </SelectTrigger>
@@ -354,7 +347,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="table-type">Tipo de Mesa</Label>
-            <Select value={scenarioMemo.tableType} onValueChange={(v) => handleSetScenario({ tableType: v as TableType })}>
+            <Select value={state.scenario.tableType} onValueChange={(v) => handleSetScenario({ tableType: v as TableType })}>
               <SelectTrigger id="table-type">
                 <SelectValue placeholder="Selecciona tipo de mesa" />
               </SelectTrigger>
@@ -369,7 +362,7 @@ export function PracticeModule() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="previous-action">Acción Previa</Label>
-            <Select value={scenarioMemo.previousAction} onValueChange={(v) => handleSetScenario({ previousAction: v as 'none' | 'raise' })}>
+            <Select value={state.scenario.previousAction} onValueChange={(v) => handleSetScenario({ previousAction: v as 'none' | 'raise' })}>
               <SelectTrigger id="previous-action">
                 <SelectValue placeholder="Selecciona acción previa" />
               </SelectTrigger>
