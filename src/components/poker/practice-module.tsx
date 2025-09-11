@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { PokerCard } from './poker-card';
 import { POSITIONS, STACK_SIZES, TABLE_TYPES } from '@/lib/data';
 import type { Position, TableType, Action } from '@/lib/types';
-import { getPreflopExplanationAction, getHandRangeAction } from '@/lib/actions';
+import { getPreflopExplanationAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { CheckCircle, Info, Loader2, Shuffle, XCircle } from 'lucide-react';
@@ -30,6 +30,7 @@ import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explana
 import { HandRangeGrid } from './hand-range-grid';
 import type { HandRange } from '@/lib/types';
 import { expandRange } from '@/lib/range-expander';
+import { allRanges } from '@/lib/gto-ranges';
 
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
@@ -84,6 +85,16 @@ type Feedback = {
     explanation?: GetPreflopExplanationOutput;
 }
 
+function generateCacheKey(
+  position: Position,
+  stackSize: number,
+  tableType: TableType,
+  previousAction: 'none' | 'raise'
+): string {
+  return `${position}-${stackSize}-${tableType}-${previousAction}`;
+}
+
+
 export function PracticeModule() {
   const [position, setPosition] = useState<Position>('BTN');
   const [stackSize, setStackSize] = useState<number>(100);
@@ -102,42 +113,48 @@ export function PracticeModule() {
   const { toast } = useToast();
   const { recordHand } = useStats();
 
-  
-  const handleScenarioChange = (newPosition: Position, newStackSize: number, newTableType: TableType, newPreviousAction: 'none' | 'raise') => {
-    startRangeTransition(async () => {
-      setPosition(newPosition);
-      setStackSize(newStackSize);
-      setTableType(newTableType);
-      setPreviousAction(newPreviousAction);
-      
-      const result = await getHandRangeAction({
-        position: newPosition,
-        stackSize: newStackSize,
-        tableType: newTableType,
-        previousAction: newPreviousAction,
-      });
+  const handleScenarioChange = useCallback(
+    (
+      newPosition: Position,
+      newStackSize: number,
+      newTableType: TableType,
+      newPreviousAction: 'none' | 'raise'
+    ) => {
+      startTransition(() => {
+        setPosition(newPosition);
+        setStackSize(newStackSize);
+        setTableType(newTableType);
+        setPreviousAction(newPreviousAction);
 
-      if (result.success && result.data) {
-        const expandedRange = expandRange(result.data);
-        setCurrentHandRange(expandedRange);
-      } else {
-         setCurrentHandRange(null);
-         toast({
+        const key = generateCacheKey(
+          newPosition,
+          newStackSize,
+          newTableType,
+          newPreviousAction
+        );
+        const rangeData = (allRanges as Record<string, any>)[key];
+
+        if (rangeData) {
+          const expandedRange = expandRange(rangeData);
+          setCurrentHandRange(expandedRange);
+        } else {
+          setCurrentHandRange(null);
+          toast({
             variant: 'destructive',
             title: 'Error de Rango',
-            description: result.error || 'No se pudo cargar el rango para este escenario.',
-         });
-      }
-  
-      startTransition(() => {
+            description: 'No se pudo cargar el rango para este escenario.',
+          });
+        }
+        
         setCurrentHand(getNewHand());
         setFeedback(null);
         setShowExplanation(false);
         setLastInput(null);
       });
-    });
-  };
-
+    },
+    [toast]
+  );
+  
   // Load initial range on mount
   useEffect(() => {
     handleScenarioChange(position, stackSize, tableType, previousAction);
@@ -369,11 +386,17 @@ export function PracticeModule() {
             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               <p className="mt-4 text-muted-foreground">
-                Cargando rango de manos de la IA...
+                Cargando rango de manos...
               </p>
             </div>
         ) : feedback && currentHandRange ? (
             <HandRangeGrid currentHand={currentHand?.handNotation} range={currentHandRange} />
+        ) : !currentHandRange ? (
+             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
+                <p className="text-muted-foreground">
+                    El rango para este escenario no está disponible.
+                </p>
+            </div>
         ) : (
           <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[300px]">
             <p className="text-muted-foreground">
@@ -385,3 +408,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
