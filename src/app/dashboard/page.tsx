@@ -140,7 +140,7 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      <Card className="lg:col-span-2">
+      <Card className="lg:col-span-4">
         <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2">
                 <Lightbulb className="h-6 w-6 text-yellow-400"/>
@@ -199,7 +199,7 @@ export default function DashboardPage() {
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>
-                  ¿Estás absolutamente seguro?
+                  ¿Estás absolutely seguro?
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   Esta acción no se puede deshacer. Se borrarán
