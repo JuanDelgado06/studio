@@ -504,7 +504,7 @@ export function PracticeModule() {
         
         <Card>
             <CardHeader className="text-center">
-            <CardTitle className="font-headline">Tu Mano</CardTitle>
+            <CardTitle className="font-headline mb-2">Tu Mano</CardTitle>
             <CardDescription>
                 {descriptionText}
             </CardDescription>
@@ -631,8 +631,8 @@ export function PracticeModule() {
                                 Call 💰
                             </Button>
                             <Button
-                                style={{backgroundColor: '#f59e0b'}} // amber-500
-                                className="text-white hover:bg-amber-600"
+                                style={{backgroundColor: 'hsl(var(--accent))'}}
+                                className="text-accent-foreground hover:bg-accent/90"
                                 size="lg"
                                 onClick={() => handleAction('3-bet')}
                             >
@@ -656,8 +656,8 @@ export function PracticeModule() {
                                 Call 💰
                             </Button>
                             <Button
-                                style={{backgroundColor: '#f59e0b'}} // amber-500
-                                className="text-white hover:bg-amber-600"
+                                style={{backgroundColor: 'hsl(var(--accent))'}}
+                                className="text-accent-foreground hover:bg-accent/90"
                                 size="lg"
                                 onClick={() => handleAction('raise')} // This becomes a 4-bet
                             >
@@ -709,7 +709,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
-
-    
