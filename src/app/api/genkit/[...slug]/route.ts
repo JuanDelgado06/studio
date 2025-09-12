@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -14,3 +15,5 @@ import '@/ai/flows/get-preflop-explanation.ts';
 
 export const GET = genkitNextHandler();
 export const POST = genkitNextHandler();
+
+export const dynamic = 'force-dynamic';
