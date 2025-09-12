@@ -391,116 +391,126 @@ export function PracticeModule() {
 
   return (
     <div className="space-y-6">
-        <Sheet>
-            <SheetTrigger asChild>
-                 <Button variant="default" className="fixed bottom-4 right-4 z-50 h-14 w-14 rounded-full shadow-lg">
-                    <Settings className="h-7 w-7" />
-                 </Button>
-            </SheetTrigger>
-             <SheetContent>
-                <SheetHeader>
-                    <SheetTitle>Configurar Escenario</SheetTitle>
-                </SheetHeader>
-                <div className="space-y-4 pt-4">
-                    <Button
-                        variant="secondary"
-                        onClick={handleRandomizeScenario}
-                        className="w-full"
-                    >
-                        <Shuffle className="mr-2 h-4 w-4" />
-                        Escenario Aleatorio
-                    </Button>
-                     <div className="space-y-2">
-                        <Label htmlFor="previous-action-sheet">Acción Previa</Label>
-                        <Select
-                        value={state.scenario.previousAction}
-                        onValueChange={(v) =>
-                            handleSetScenario({ previousAction: v as PreviousAction })
-                        }
-                        >
-                        <SelectTrigger id="previous-action-sheet">
-                            <SelectValue placeholder="Selecciona acción previa" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="none">
-                                Nadie ha apostado (Open Raise)
-                            </SelectItem>
-                            <SelectItem value="raise">
-                                Enfrentando un Open-Raise
-                            </SelectItem>
-                             <SelectItem value="3-bet">
-                                Enfrentando un 3-Bet
-                            </SelectItem>
-                             <SelectItem value="4-bet">
-                                Enfrentando un 4-Bet
-                            </SelectItem>
-                        </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="position-sheet">Posición</Label>
-                        <Select
-                        value={state.scenario.position}
-                        onValueChange={(v) =>
-                            handleSetScenario({ position: v as Position })
-                        }
-                        >
-                        <SelectTrigger id="position-sheet">
-                            <SelectValue placeholder="Selecciona posición" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {POSITIONS.map((pos) => (
-                            <SelectItem key={pos} value={pos}>
-                                {pos}
-                            </SelectItem>
-                            ))}
-                        </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="stack-size-sheet">Stack (BBs)</Label>
-                        <Select
-                        value={String(state.scenario.stackSize)}
-                        onValueChange={(v) =>
-                            handleSetScenario({ stackSize: Number(v) })
-                        }
-                        >
-                        <SelectTrigger id="stack-size-sheet">
-                            <SelectValue placeholder="Selecciona stack" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {STACK_SIZES.map((size) => (
-                            <SelectItem key={size} value={String(size)}>
-                                {size} BB
-                            </SelectItem>
-                            ))}
-                        </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="table-type-sheet">Tipo de Mesa</Label>
-                        <Select
-                        value={state.scenario.tableType}
-                        onValueChange={(v) =>
-                            handleSetScenario({ tableType: v as TableType })
-                        }
-                        >
-                        <SelectTrigger id="table-type-sheet">
-                            <SelectValue placeholder="Selecciona tipo de mesa" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {TABLE_TYPES.map((type) => (
-                            <SelectItem key={type} value={type}>
-                                {type === 'cash' ? 'Cash Game' : 'Torneo'}
-                            </SelectItem>
-                            ))}
-                        </SelectContent>
-                        </Select>
-                    </div>
-                   
-                </div>
-            </SheetContent>
-        </Sheet>
+       <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-3">
+          <Button
+            variant="secondary"
+            className="h-14 w-14 rounded-full shadow-lg"
+            onClick={handleRandomizeScenario}
+            aria-label="Escenario Aleatorio"
+          >
+            <Shuffle className="h-7 w-7" />
+          </Button>
+          <Sheet>
+              <SheetTrigger asChild>
+                  <Button variant="default" className="h-14 w-14 rounded-full shadow-lg">
+                      <Settings className="h-7 w-7" />
+                  </Button>
+              </SheetTrigger>
+              <SheetContent>
+                  <SheetHeader>
+                      <SheetTitle>Configurar Escenario</SheetTitle>
+                  </SheetHeader>
+                  <div className="space-y-4 pt-4">
+                      <Button
+                          variant="secondary"
+                          onClick={handleRandomizeScenario}
+                          className="w-full"
+                      >
+                          <Shuffle className="mr-2 h-4 w-4" />
+                          Escenario Aleatorio
+                      </Button>
+                      <div className="space-y-2">
+                          <Label htmlFor="previous-action-sheet">Acción Previa</Label>
+                          <Select
+                          value={state.scenario.previousAction}
+                          onValueChange={(v) =>
+                              handleSetScenario({ previousAction: v as PreviousAction })
+                          }
+                          >
+                          <SelectTrigger id="previous-action-sheet">
+                              <SelectValue placeholder="Selecciona acción previa" />
+                          </SelectTrigger>
+                          <SelectContent>
+                              <SelectItem value="none">
+                                  Nadie ha apostado (Open Raise)
+                              </SelectItem>
+                              <SelectItem value="raise">
+                                  Enfrentando un Open-Raise
+                              </SelectItem>
+                              <SelectItem value="3-bet">
+                                  Enfrentando un 3-Bet
+                              </SelectItem>
+                              <SelectItem value="4-bet">
+                                  Enfrentando un 4-Bet
+                              </SelectItem>
+                          </SelectContent>
+                          </Select>
+                      </div>
+                      <div className="space-y-2">
+                          <Label htmlFor="position-sheet">Posición</Label>
+                          <Select
+                          value={state.scenario.position}
+                          onValueChange={(v) =>
+                              handleSetScenario({ position: v as Position })
+                          }
+                          >
+                          <SelectTrigger id="position-sheet">
+                              <SelectValue placeholder="Selecciona posición" />
+                          </SelectTrigger>
+                          <SelectContent>
+                              {POSITIONS.map((pos) => (
+                              <SelectItem key={pos} value={pos}>
+                                  {pos}
+                              </SelectItem>
+                              ))}
+                          </SelectContent>
+                          </Select>
+                      </div>
+                      <div className="space-y-2">
+                          <Label htmlFor="stack-size-sheet">Stack (BBs)</Label>
+                          <Select
+                          value={String(state.scenario.stackSize)}
+                          onValueChange={(v) =>
+                              handleSetScenario({ stackSize: Number(v) })
+                          }
+                          >
+                          <SelectTrigger id="stack-size-sheet">
+                              <SelectValue placeholder="Selecciona stack" />
+                          </SelectTrigger>
+                          <SelectContent>
+                              {STACK_SIZES.map((size) => (
+                              <SelectItem key={size} value={String(size)}>
+                                  {size} BB
+                              </SelectItem>
+                              ))}
+                          </SelectContent>
+                          </Select>
+                      </div>
+                      <div className="space-y-2">
+                          <Label htmlFor="table-type-sheet">Tipo de Mesa</Label>
+                          <Select
+                          value={state.scenario.tableType}
+                          onValueChange={(v) =>
+                              handleSetScenario({ tableType: v as TableType })
+                          }
+                          >
+                          <SelectTrigger id="table-type-sheet">
+                              <SelectValue placeholder="Selecciona tipo de mesa" />
+                          </SelectTrigger>
+                          <SelectContent>
+                              {TABLE_TYPES.map((type) => (
+                              <SelectItem key={type} value={type}>
+                                  {type === 'cash' ? 'Cash Game' : 'Torneo'}
+                              </SelectItem>
+                              ))}
+                          </SelectContent>
+                          </Select>
+                      </div>
+                    
+                  </div>
+              </SheetContent>
+          </Sheet>
+        </div>
         
         <Card>
             <CardHeader className="text-center">
