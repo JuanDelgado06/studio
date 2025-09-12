@@ -1,6 +1,4 @@
 
-'use server';
-
 /**
  * @fileoverview This file is the entrypoint for Genkit in a Next.js app.
  *
