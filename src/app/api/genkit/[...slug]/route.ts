@@ -5,17 +5,17 @@
  */
 
 import {createNextApiHandler} from '@genkit-ai/next';
-import * as adaptDifficultyFlow from '@/ai/flows/adapt-difficulty-based-on-progress';
-import * as analyzePreflopDecisionFlow from '@/ai/flows/analyze-preflop-decision';
-import * as getPreflopExplanationFlow from '@/ai/flows/get-preflop-explanation';
-import * as suggestImprovementExercisesFlow from '@/ai/flows/suggest-improvement-exercises';
+import {adaptDifficultyBasedOnProgress} from '@/ai/flows/adapt-difficulty-based-on-progress';
+import {analyzePreflopDecision} from '@/ai/flows/analyze-preflop-decision';
+import {getPreflopExplanation} from '@/ai/flows/get-preflop-explanation';
+import {suggestImprovementExercises} from '@/ai/flows/suggest-improvement-exercises';
 
 export const {GET, POST} = createNextApiHandler({
   flows: [
-    ...Object.values(adaptDifficultyFlow),
-    ...Object.values(analyzePreflopDecisionFlow),
-    ...Object.values(getPreflopExplanationFlow),
-    ...Object.values(suggestImprovementExercisesFlow),
+    adaptDifficultyBasedOnProgress,
+    analyzePreflopDecision,
+    getPreflopExplanation,
+    suggestImprovementExercises,
   ],
 });
 
