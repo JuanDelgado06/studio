@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import { BarChart3, CheckCircle, Target, TrendingUp, XCircle } from 'lucide-react';
+import { BarChart3, CheckCircle, Lightbulb, Loader2, Target, Trash2, TrendingUp, XCircle } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -30,7 +30,8 @@ import { useStats } from '@/context/stats-context';
 
 export default function DashboardPage() {
   const { toast } = useToast();
-  const { stats, resetStats, isClient } = useStats();
+  const { stats, resetStats, isClient, getAIFocusAreas } = useStats();
+  const [isLoadingFocus, setIsLoadingFocus] = React.useState(false);
 
   const handleReset = () => {
     resetStats();
@@ -39,6 +40,25 @@ export default function DashboardPage() {
       description: 'Tus estadísticas de práctica han sido borradas.',
     });
   };
+
+  const handleGenerateFocusAreas = async () => {
+    setIsLoadingFocus(true);
+    const success = await getAIFocusAreas();
+    if (!success) {
+        toast({
+            variant: 'destructive',
+            title: 'Error de la IA',
+            description: 'No se pudieron generar las áreas de enfoque. Inténtalo de nuevo.'
+        });
+    }
+    setIsLoadingFocus(false);
+  }
+
+  const handleClearFocusAreas = () => {
+    // This function will need to be added to the context to clear focus areas
+    // For now, let's assume it's there. We'll add it in the context file.
+    // clearFocusAreas(); 
+  }
 
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -117,18 +137,50 @@ export default function DashboardPage() {
                 <Progress value={stats.weeklyGoal} />
                 <p className="text-xs text-muted-foreground">Completa prácticas para progresar.</p>
             </div>
-             <div className="space-y-2">
-                <p className="font-semibold">Áreas de Enfoque Sugeridas por IA</p>
-                <div className="flex flex-wrap gap-2">
-                    {stats.focusAreas.length > 0 ? (
-                        stats.focusAreas.map((area, i) => <Badge key={i} variant="secondary">{area}</Badge>)
-                    ) : (
-                        <Badge variant="secondary">Juega para recibir sugerencias</Badge>
-                    )}
-                </div>
-            </div>
         </CardContent>
       </Card>
+
+      <Card className="lg:col-span-2">
+        <CardHeader>
+            <CardTitle className="font-headline flex items-center gap-2">
+                <Lightbulb className="h-6 w-6 text-yellow-400"/>
+                Análisis del Coach de IA
+            </CardTitle>
+            <CardDescription>Obtén consejos personalizados basados en tu rendimiento.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+             {isLoadingFocus ? (
+                <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[150px]">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    <p className="mt-4 text-muted-foreground">
+                        Analizando tu historial y generando sugerencias...
+                    </p>
+                </div>
+            ) : stats.focusAreas.length > 0 ? (
+                <div className="space-y-2">
+                    <p className="font-semibold">Áreas de Enfoque Sugeridas</p>
+                    <div className="flex flex-wrap gap-2">
+                        {stats.focusAreas.map((area, i) => <Badge key={i} variant="secondary">{area}</Badge>)}
+                    </div>
+                </div>
+            ) : (
+                 <div className="text-center text-muted-foreground p-4">
+                    <p>Juega algunas manos y luego pide un análisis a la IA para ver tus áreas de mejora.</p>
+                </div>
+            )}
+            
+            <Button onClick={handleGenerateFocusAreas} disabled={isLoadingFocus || stats.handsPlayed < 5}>
+                {isLoadingFocus ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Lightbulb className="mr-2 h-4 w-4"/>}
+                {stats.focusAreas.length > 0 ? 'Volver a generar' : 'Generar Sugerencias'}
+            </Button>
+            {stats.handsPlayed < 5 && (
+                <p className="text-xs text-center text-muted-foreground">
+                Juega al menos 5 manos para poder generar sugerencias.
+                </p>
+            )}
+        </CardContent>
+      </Card>
+
 
       <Card className="lg:col-span-4">
         <CardHeader>

@@ -36,6 +36,7 @@ type StatsContextType = {
   stats: Stats;
   recordHand: (handData: AnalyzePreflopDecisionInput, isCorrect: boolean) => void;
   resetStats: () => void;
+  getAIFocusAreas: () => Promise<boolean>;
   isClient: boolean;
 };
 
@@ -86,6 +87,8 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
         if (!parsedStats.decisionHistory) {
             parsedStats.decisionHistory = [];
         }
+        // Clear old focus areas on load
+        parsedStats.focusAreas = [];
         setStats(parsedStats);
       }
     } catch (error) {
@@ -107,38 +110,38 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
   }, [stats, isClient]);
 
 
-  // Effect to fetch focus areas when hands played is a multiple of 10
-  React.useEffect(() => {
-    if (isClient && stats.handsPlayed > 0 && stats.handsPlayed % 10 === 0) {
-      const fetchFocusAreas = async () => {
-        if (stats.overallAccuracy === 'N/A' || typeof stats.overallAccuracy !== 'number') return;
-
-        const positionalAccuracy: Record<string, number> = {};
-        stats.accuracyByPosition.forEach(p => {
-          positionalAccuracy[p.position] = p.accuracy / 100;
-        });
-
-        try {
-          const result = await getAdaptedDifficulty({
-            userStats: {
-              overallAccuracy: stats.overallAccuracy / 100,
-              positionalAccuracy,
-              handTypeAccuracy: {},
-              commonMistakes: [],
-              weeklyGoalSuccessRate: stats.weeklyGoal / 100,
-            },
-            currentDifficulty: 'beginner',
-          });
-          if (result.success && result.data) {
-            setStats(s => ({...s, focusAreas: result.data!.suggestedFocusAreas}));
-          }
-        } catch(e) {
-          console.error("Error fetching adapted difficulty:", e);
-        }
-      }
-      fetchFocusAreas();
+  const getAIFocusAreas = async (): Promise<boolean> => {
+    if (stats.overallAccuracy === 'N/A' || typeof stats.overallAccuracy !== 'number') {
+        return false;
     }
-  }, [stats.handsPlayed, isClient, stats.accuracyByPosition, stats.overallAccuracy, stats.weeklyGoal]);
+
+    const positionalAccuracy: Record<string, number> = {};
+    stats.accuracyByPosition.forEach(p => {
+        positionalAccuracy[p.position] = p.accuracy / 100;
+    });
+
+    try {
+        const result = await getAdaptedDifficulty({
+        userStats: {
+            overallAccuracy: stats.overallAccuracy / 100,
+            positionalAccuracy,
+            handTypeAccuracy: {}, // Placeholder
+            commonMistakes: [], // Placeholder
+            weeklyGoalSuccessRate: stats.weeklyGoal / 100,
+        },
+        currentDifficulty: 'beginner', // Placeholder
+        });
+        
+        if (result.success && result.data) {
+            setStats(s => ({...s, focusAreas: result.data!.suggestedFocusAreas}));
+            return true;
+        }
+        return false;
+    } catch(e) {
+        console.error("Error fetching adapted difficulty:", e);
+        return false;
+    }
+  };
 
 
   const recordHand = React.useCallback((handData: AnalyzePreflopDecisionInput, isCorrect: boolean) => {
@@ -228,7 +231,7 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <StatsContext.Provider value={{ stats, recordHand, resetStats, isClient }}>
+    <StatsContext.Provider value={{ stats, recordHand, resetStats, isClient, getAIFocusAreas }}>
       {children}
     </StatsContext.Provider>
   );
@@ -241,5 +244,3 @@ export function useStats() {
   }
   return context;
 }
-
-    
