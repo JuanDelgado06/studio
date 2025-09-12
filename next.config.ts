@@ -15,9 +15,6 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 
 const nextConfig: NextConfig = {
   /* config options here */
-  experimental: {
-    instrumentationHook: false,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -46,17 +43,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  webpack: (
-    config,
-    {isServer}
-  ) => {
-    if (!isServer) {
-      // Exclude firebase-functions from the client-side bundle
-      config.externals.push('firebase-functions');
-    }
-
-    return config;
-  },
 };
 
 export default withPWA(nextConfig);
+
+    

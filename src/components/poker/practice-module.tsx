@@ -103,7 +103,7 @@ function getNewHand() {
   return { handNotation, cards: [card1, card2] as [string, string] };
 }
 
-function generateCacheKey(scenario: Scenario): string {
+function generateCacheKey(scenario: Partial<Scenario>): string {
   const internalPreviousAction = scenario.previousAction === 'none' ? 'none' : scenario.previousAction;
   return `${scenario.position}-${scenario.stackSize}-${scenario.tableType}-${internalPreviousAction}`;
 }
@@ -709,3 +709,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
