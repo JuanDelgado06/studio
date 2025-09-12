@@ -46,6 +46,17 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (
+    config,
+    {isServer}
+  ) => {
+    if (!isServer) {
+      // Exclude firebase-functions from the client-side bundle
+      config.externals.push('firebase-functions');
+    }
+
+    return config;
+  },
 };
 
 export default withPWA(nextConfig);
