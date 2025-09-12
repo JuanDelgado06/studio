@@ -393,8 +393,8 @@ export function PracticeModule() {
     <div className="space-y-6">
         <Sheet>
             <SheetTrigger asChild>
-                 <Button variant="outline" className="fixed bottom-4 right-4 z-50 h-14 w-14 rounded-full shadow-lg">
-                    <Settings className="h-6 w-6" />
+                 <Button variant="default" className="fixed bottom-4 right-4 z-50 h-14 w-14 rounded-full shadow-lg">
+                    <Settings className="h-7 w-7" />
                  </Button>
             </SheetTrigger>
              <SheetContent>
@@ -709,5 +709,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
