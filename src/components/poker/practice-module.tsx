@@ -320,29 +320,17 @@ export function PracticeModule() {
   };
 
   const handleRandomizeScenario = () => {
-    let payload: Partial<Scenario> = {};
-    let scenarioKey = '';
+    const scenarioKeys = Object.keys(allRanges);
+    const randomKey = scenarioKeys[Math.floor(Math.random() * scenarioKeys.length)];
+    const [position, stackSize, tableType, previousAction] = randomKey.split('-');
+
+    const payload = {
+        position: position as Position,
+        stackSize: Number(stackSize),
+        tableType: tableType as TableType,
+        previousAction: previousAction as PreviousAction,
+    };
     
-    // Keep trying until we find a valid scenario from gto-ranges.json
-    while(true) {
-        const randomPreviousAction = ['none', 'raise', '3-bet', '4-bet'][Math.floor(Math.random() * 4)] as PreviousAction;
-        const randomPosition = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
-        const randomStackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
-        const randomTableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
-
-        payload = {
-            position: randomPosition,
-            stackSize: randomStackSize,
-            tableType: randomTableType,
-            previousAction: randomPreviousAction,
-        };
-        
-        scenarioKey = generateCacheKey(payload as Scenario);
-        if((allRanges as Record<string,any>)[scenarioKey]) {
-            break; // Valid scenario found
-        }
-    }
-
     dispatch({ type: 'SET_SCENARIO', payload });
   }
 
@@ -437,10 +425,10 @@ export function PracticeModule() {
                               <SelectItem value="raise">
                                   Enfrentando un Open-Raise
                               </SelectItem>
-                              <SelectItem value="3-bet">
+                              <SelectItem value="3-bet" disabled>
                                   Enfrentando un 3-Bet
                               </SelectItem>
-                              <SelectItem value="4-bet">
+                              <SelectItem value="4-bet" disabled>
                                   Enfrentando un 4-Bet
                               </SelectItem>
                           </SelectContent>
