@@ -67,11 +67,7 @@ const analyzePreflopDecisionFlow = ai.defineFlow(
     outputSchema: AnalyzePreflopDecisionOutputSchema,
   },
   async input => {
-    const mappedInput = {
-        ...input,
-        action: ['3-bet', 'all-in'].includes(input.action) ? 'raise' : input.action
-    } as any;
-    const {output} = await analyzePreflopDecisionPrompt(mappedInput);
+    const {output} = await analyzePreflopDecisionPrompt(input);
     return output!;
   }
 );

@@ -76,11 +76,7 @@ const getPreflopExplanationFlow = ai.defineFlow(
     outputSchema: GetPreflopExplanationOutputSchema,
   },
   async input => {
-    const mappedInput = {
-        ...input,
-        action: ['3-bet', 'all-in'].includes(input.action) ? 'raise' : input.action
-    } as any;
-    const {output} = await getPreflopExplanationPrompt(mappedInput);
+    const {output} = await getPreflopExplanationPrompt(input);
     return output!;
   }
 );

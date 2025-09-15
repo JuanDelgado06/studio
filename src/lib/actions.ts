@@ -23,12 +23,7 @@ const PreflopExplanationSchema = PreflopDecisionSchema.extend({
 export async function getPreflopExplanationAction(input: z.infer<typeof PreflopExplanationSchema>) {
     try {
         const validatedInput = PreflopExplanationSchema.parse(input);
-        // Map 3-bet and all-in to raise for the AI model if needed
-        const mappedInput = {
-            ...validatedInput,
-            action: ['3-bet', 'all-in'].includes(validatedInput.action) ? 'raise' : validatedInput.action,
-        } as any;
-        const result = await getPreflopExplanation(mappedInput);
+        const result = await getPreflopExplanation(validatedInput);
         return { success: true, data: result };
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -82,5 +77,3 @@ export async function suggestImprovementExercises(input: z.infer<typeof SuggestI
         return { success: false, error: 'Failed to get suggested exercises from AI.' };
     }
 }
-
-    
