@@ -7,34 +7,11 @@
  *
  * It exports:
  * - `generateGtoRange`: The main function to invoke the flow.
- * - `GenerateGtoRangeInput`: The Zod schema for the flow's input.
- * - `GenerateGtoRangeOutput`: The Zod schema for the flow's output.
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
-
-export const GenerateGtoRangeInputSchema = z.object({
-  position: z.string().describe("The player's position at the table (e.g., 'SB', 'BB', 'UTG')."),
-  stackSize: z.number().describe('The player stack size in big blinds.'),
-  tableType: z.enum(['cash', 'tournament']).describe('The type of table.'),
-  previousAction: z
-    .enum(['none', 'raise', '3-bet', '4-bet'])
-    .describe(
-      'The action that occurred before the player has to act. "none" means it folded to the player.'
-    ),
-});
-export type GenerateGtoRangeInput = z.infer<typeof GenerateGtoRangeInputSchema>;
-
-
-export const GenerateGtoRangeOutputSchema = z.object({
-    raise: z.array(z.string()).optional().describe('Hands to raise. Use range notation (e.g., "77+", "ATs+", "KJo-KTo").'),
-    call: z.array(z.string()).optional().describe('Hands to call. Use range notation.'),
-    '3-bet': z.array(z.string()).optional().describe('Hands to 3-bet. Use range notation.'),
-    'all-in': z.array(z.string()).optional().describe('Hands to go all-in. Use range notation.'),
-    fold: z.array(z.string()).optional().describe('Optional. It is assumed any hand not listed is a fold. Use range notation.'),
-}).describe('A JSON object representing the GTO hand range for the given scenario.');
-export type GenerateGtoRangeOutput = z.infer<typeof GenerateGtoRangeOutputSchema>;
+import type { GenerateGtoRangeInput, GenerateGtoRangeOutput } from '@/lib/types';
+import { GenerateGtoRangeInputSchema, GenerateGtoRangeOutputSchema } from '@/lib/types';
 
 
 export async function generateGtoRange(

@@ -5,9 +5,9 @@ import { adaptDifficultyBasedOnProgress } from "@/ai/flows/adapt-difficulty-base
 import { getPreflopExplanation } from "@/ai/flows/get-preflop-explanation";
 import { suggestImprovementExercises as suggestImprovementExercisesFlow } from "@/ai/flows/suggest-improvement-exercises";
 import { z } from "zod";
-import type { GenerateGtoRangeOutput } from "@/ai/flows/generate-gto-range";
 import { generateGtoRange } from "@/ai/flows/generate-gto-range";
 import clientPromise from "./mongodb";
+import { GenerateGtoRangeInputSchema, GenerateGtoRangeOutput, GetOrGenerateRangeSchema } from "./types";
 
 // Zod Schemas for input validation
 const PreflopDecisionSchema = z.object({
@@ -23,12 +23,6 @@ const PreflopExplanationSchema = PreflopDecisionSchema.extend({
     isOptimal: z.boolean(),
 });
 
-const GetOrGenerateRangeSchema = z.object({
-  position: z.string(),
-  stackSize: z.number(),
-  tableType: z.enum(['cash', 'tournament']),
-  previousAction: z.enum(['none', 'raise', '3-bet', '4-bet']),
-});
 
 // Server Action for fetching/generating GTO ranges
 export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenerateRangeSchema>): Promise<{ success: boolean; data?: GenerateGtoRangeOutput | null; error?: string; source?: 'db' | 'ai' }> {
