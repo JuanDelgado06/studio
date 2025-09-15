@@ -360,7 +360,10 @@ export function PracticeModule() {
     case 'none':
       if (isBBvsLimp) {
         descriptionText = `La mano llega limpia hasta ti en la Ciega Grande (BB). Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-      } else {
+      } else if (isSBOpen) {
+        descriptionText = `Todos se retiran y la acción te llega en la Ciega Pequeña (SB). Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      }
+      else {
         descriptionText = `Nadie ha apostado todavía. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
       }
       break;
