@@ -1,9 +1,8 @@
 
-import type { GetHandRangeOutput } from '@/ai/flows/get-hand-range';
-import type { Action, HandRange } from './types';
+import type { Action, HandRange, GenerateGtoRangeOutput } from './types';
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
-const RANK_MAP = RANKS.reduce((acc, rank, index) => {
+const RANK_MAP: Record<string, number> = RANKS.reduce((acc, rank, index) => {
     acc[rank] = index;
     return acc;
 }, {} as Record<string, number>);
@@ -14,7 +13,7 @@ function parseRange(rangeStr: string): string[] {
     const sanitizedStr = rangeStr.trim();
 
     // Case 1: Handle pairs (e.g., "77", "TT+", "JJ-88")
-    if (sanitizedStr.length >= 2 && sanitizedStr[0] === sanitizedStr[1] && !sanitizedStr.includes('s') && !sanitizedStr.includes('o')) {
+    if (/^[2-9AKQJT]{2}(\+|-)?([2-9AKQJT]{2})?$/.test(sanitizedStr) && sanitizedStr[0] === sanitizedStr[1]) {
         const rank = sanitizedStr[0];
         if (sanitizedStr.endsWith('+')) {
             const startIndex = RANK_MAP[rank];
@@ -37,7 +36,7 @@ function parseRange(rangeStr: string): string[] {
     }
 
     // Case 2: Suited/Offsuit hands (e.g., "AKs", "QJo", "ATs+", "KJo+", "T8s-T6s")
-    if (sanitizedStr.length >= 3) {
+    if (/^[AKQJT98765432]{2}[so](\+|-)?([AKQJT98765432]{2}[so])?$/.test(sanitizedStr)) {
         const type = sanitizedStr.includes('s') ? 's' : 'o';
         const r1 = sanitizedStr[0];
         const r2 = sanitizedStr[1];
@@ -52,7 +51,7 @@ function parseRange(rangeStr: string): string[] {
                 hands.push(`${highRank}${RANKS[i]}${type}`);
             }
         } else if (sanitizedStr.includes('-')) {
-             const [start, end] = sanitizedStr.split('-'); // e.g. "T9s", "T6s"
+             const [start, end] = sanitizedStr.split('-');
              const startRank = start[0];
              const startKickerIndex = RANK_MAP[start[1]];
              const endKickerIndex = RANK_MAP[end[1]];
@@ -80,7 +79,7 @@ function parseRange(rangeStr: string): string[] {
 }
 
 
-export function expandRange(summary: any): HandRange {
+export function expandRange(summary: GenerateGtoRangeOutput): HandRange {
   const handRange: HandRange = {};
 
   const allHands: {hand: string, type: 'pair' | 'suited' | 'offsuit'}[] = [];
@@ -105,15 +104,23 @@ export function expandRange(summary: any): HandRange {
     hands.forEach(rangeStr => {
       const parsed = parseRange(rangeStr);
       parsed.forEach(h => {
-        handRange[h] = action;
+        // Ensure we don't overwrite a stronger action with a weaker one (e.g. all-in > raise)
+        const existingAction = handRange[h];
+        const actionStrength: Record<Action, number> = { 'fold': 0, 'call': 1, 'raise': 2, '3-bet': 3, 'all-in': 4 };
+        if (!existingAction || actionStrength[action] > actionStrength[existingAction]) {
+            handRange[h] = action;
+        }
       });
     });
   }
 
-  processAction(summary.raise, 'raise');
+  // Process actions in a specific order to handle overlaps, weaker to stronger
+  processAction(summary.fold, 'fold');
   processAction(summary.call, 'call');
+  processAction(summary.raise, 'raise');
   processAction(summary['3-bet'], '3-bet');
   processAction(summary['all-in'], 'all-in');
   
   return handRange;
 }
+
