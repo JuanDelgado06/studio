@@ -425,10 +425,10 @@ export function PracticeModule() {
                               <SelectItem value="raise">
                                   Enfrentando un Open-Raise
                               </SelectItem>
-                              <SelectItem value="3-bet" disabled>
+                              <SelectItem value="3-bet">
                                   Enfrentando un 3-Bet
                               </SelectItem>
-                              <SelectItem value="4-bet" disabled>
+                              <SelectItem value="4-bet">
                                   Enfrentando un 4-Bet
                               </SelectItem>
                           </SelectContent>
