@@ -368,13 +368,13 @@ export function PracticeModule() {
       }
       break;
     case 'raise':
-      descriptionText = `Un oponente ha subido. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      descriptionText = `Un oponente ha subido a 2.5 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
       break;
     case '3-bet':
-      descriptionText = `Te enfrentas a un 3-bet. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      descriptionText = `Te enfrentas a un 3-bet de 9 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
       break;
     case '4-bet':
-        descriptionText = `Te enfrentas a un 4-bet. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+        descriptionText = `Te enfrentas a un 4-bet de 22 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
         break;
     default:
       descriptionText = `Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
@@ -740,3 +740,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    
