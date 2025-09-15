@@ -238,12 +238,6 @@ export function PracticeModule() {
     if (result.success && result.data) {
         const expandedRange = expandRange(result.data);
         dispatch({ type: 'SET_RANGE', payload: { range: expandedRange, source: result.source || null } });
-        if (result.source === 'ai') {
-            toast({
-                title: 'Rango Generado por IA',
-                description: 'Este rango fue creado por IA y guardado para el futuro.',
-            });
-        }
     } else {
         toast({
             variant: 'destructive',
@@ -304,12 +298,25 @@ export function PracticeModule() {
       dispatch({ type: 'START_LOADING', payload: { explanation: true } });
       dispatch({ type: 'TOGGLE_EXPLANATION' }); 
 
+      let betSize = 0;
+      switch (state.scenario.previousAction) {
+        case 'raise':
+          betSize = 2.5;
+          break;
+        case '3-bet':
+          betSize = 9;
+          break;
+        case '4-bet':
+          betSize = 22;
+          break;
+      }
+
       const result = await getPreflopExplanationAction({
         ...state.scenario,
         hand: state.currentHand.handNotation,
         action: state.feedback.action,
         isOptimal: state.feedback.isOptimal,
-        betSize: state.scenario.stackSize,
+        betSize: betSize,
       });
 
       if (result.success && result.data) {
