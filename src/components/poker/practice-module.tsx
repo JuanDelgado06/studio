@@ -248,7 +248,7 @@ export function PracticeModule() {
         toast({
             variant: 'destructive',
             title: 'Error de Rango',
-            description: result.error || 'No se pudo cargar o generar el rango para este escenario.',
+            description: result.error || 'No se pudo cargar o generar el rango.',
         });
         dispatch({ type: 'SET_RANGE', payload: { range: null, source: null } });
     }
@@ -338,8 +338,7 @@ export function PracticeModule() {
   };
 
   const handleNextHand = () => {
-    const newScenario = getRandomScenario();
-    setAndFetchScenario(newScenario);
+    handleRandomizeScenario();
   };
 
   const handleRandomizeScenario = () => {
@@ -351,18 +350,7 @@ export function PracticeModule() {
     const newScenario = { ...state.scenario, ...payload };
     setAndFetchScenario(newScenario);
   };
-
-  if (state.isLoading || !state.currentHand) {
-    return (
-      <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[600px]">
-        <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
-        <p className="mt-4 text-muted-foreground">
-          Cargando escenario y buscando rango en la base de datos...
-        </p>
-      </div>
-    );
-  }
-
+  
   const isBBvsLimp =
     state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
   
@@ -389,6 +377,19 @@ export function PracticeModule() {
       descriptionText = `Te enfrentas a un 4-bet a 22 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
       break;
   }
+
+  if (state.isLoading || !state.currentHand) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[600px]">
+        <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
+        <p className="mt-4 text-muted-foreground">
+          Cargando escenario y buscando rango...
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground/50">({descriptionText})</p>
+      </div>
+    );
+  }
+
 
   const showOpenRaiseActions = state.scenario.previousAction === 'none' && !isBBvsLimp && !isSBOpen;
   const showVsRaiseActions = state.scenario.previousAction === 'raise';
@@ -476,7 +477,7 @@ export function PracticeModule() {
                           <Label htmlFor="stack-size-sheet">Stack (BBs)</Label>
                           <Select
                           value={String(state.scenario.stackSize)}
-                          onValuechange={(v) =>
+                          onValueChange={(v) =>
                               handleSetScenario({ stackSize: Number(v) })
                           }
                           >
@@ -729,7 +730,7 @@ export function PracticeModule() {
                         <XCircle className="h-10 w-10 text-destructive mb-2" />
                         <p className="font-semibold text-destructive">Sin Rango Definido</p>
                         <p className="text-destructive/80 text-sm max-w-xs">
-                            No hay un rango GTO en la base de datos para este escenario. La IA está generando uno ahora...
+                            No hay un rango GTO en la base de datos para este escenario. La IA puede estar generando uno ahora...
                         </p>
                     </div>
                 )
