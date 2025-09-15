@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useReducer, useEffect, useCallback } from 'react';
+import { useReducer, useEffect, useCallback, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -21,17 +21,16 @@ import { Button } from '@/components/ui/button';
 import { PokerCard } from './poker-card';
 import { POSITIONS, STACK_SIZES, TABLE_TYPES, PREVIOUS_ACTIONS } from '@/lib/data';
 import type { Position, TableType, Action, PreviousAction } from '@/lib/types';
-import { getPreflopExplanationAction, getOrGenerateRangeAction } from '@/lib/actions';
+import { getPreflopExplanationAction, getOrGenerateRangeAction, getDbRangesKeys } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { CheckCircle, Info, Loader2, Settings, Shuffle, Sparkles, XCircle } from 'lucide-react';
+import { CheckCircle, Info, Loader2, Database, Sparkles, Settings, Shuffle, XCircle } from 'lucide-react';
 import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
 import { expandRange } from '@/lib/range-expander';
 import type { HandRange } from '@/lib/types';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
-import { Badge } from '../ui/badge';
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const SUITS = ['s', 'h', 'd', 'c'];
@@ -57,12 +56,13 @@ type State = {
   showExplanation: boolean;
   isLoading: boolean;
   explanationIsLoading: boolean;
+  error: string | null;
 };
 
 type ActionPayload =
   | { type: 'START_LOADING'; payload?: { main?: boolean; explanation?: boolean } }
   | { type: 'SET_SCENARIO'; payload: { scenario: Scenario, hand: State['currentHand'] } }
-  | { type: 'SET_RANGE'; payload: { range: HandRange | null; source: State['rangeSource'] } }
+  | { type: 'SET_RANGE'; payload: { range: HandRange | null; source: State['rangeSource'], error?: string | null } }
   | { type: 'HANDLE_ACTION'; payload: Action }
   | { type: 'NEXT_HAND' }
   | { type: 'SET_EXPLANATION'; payload: GetPreflopExplanationOutput | null }
@@ -151,6 +151,7 @@ const reducer = (state: State, action: ActionPayload): State => {
             showExplanation: false,
             currentHandRange: null,
             rangeSource: null,
+            error: null,
         }
     }
 
@@ -160,6 +161,7 @@ const reducer = (state: State, action: ActionPayload): State => {
             currentHandRange: action.payload.range,
             rangeSource: action.payload.source,
             isLoading: false,
+            error: action.payload.error || null,
         }
     }
 
@@ -188,6 +190,7 @@ const reducer = (state: State, action: ActionPayload): State => {
         currentHand: getNewHand(),
         feedback: null,
         showExplanation: false,
+        error: null,
       };
     }
 
@@ -215,6 +218,8 @@ const reducer = (state: State, action: ActionPayload): State => {
 export function PracticeModule() {
   const { toast } = useToast();
   const { recordHand } = useStats();
+  const [dbKeys, setDbKeys] = useState<string[]>([]);
+  const [isSheetOpen, setSheetOpen] = useState(false);
 
   const [state, dispatch] = useReducer(reducer, {
     scenario: {
@@ -230,6 +235,7 @@ export function PracticeModule() {
     showExplanation: false,
     isLoading: true,
     explanationIsLoading: false,
+    error: null,
   });
 
   const fetchRangeForScenario = useCallback(async (scenario: Scenario) => {
@@ -239,14 +245,9 @@ export function PracticeModule() {
         const expandedRange = expandRange(result.data);
         dispatch({ type: 'SET_RANGE', payload: { range: expandedRange, source: result.source || null } });
     } else {
-        toast({
-            variant: 'destructive',
-            title: 'Error de Rango',
-            description: result.error || 'No se pudo cargar o generar el rango.',
-        });
-        dispatch({ type: 'SET_RANGE', payload: { range: null, source: null } });
+        dispatch({ type: 'SET_RANGE', payload: { range: null, source: null, error: result.error } });
     }
-  }, [toast]);
+  }, []);
   
   const setAndFetchScenario = useCallback((scenario: Scenario) => {
       dispatch({ type: 'SET_SCENARIO', payload: { scenario, hand: getNewHand() } });
@@ -254,7 +255,7 @@ export function PracticeModule() {
   }, [fetchRangeForScenario]);
 
 
-  // Initial load
+  // Initial load and fetch DB keys
   useEffect(() => {
     const initialScenario: Scenario = {
         position: 'BTN',
@@ -263,6 +264,14 @@ export function PracticeModule() {
         previousAction: 'none',
     };
     setAndFetchScenario(initialScenario);
+
+    const fetchKeys = async () => {
+        const result = await getDbRangesKeys();
+        if (result.success && result.data) {
+            setDbKeys(result.data);
+        }
+    }
+    fetchKeys();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -351,13 +360,46 @@ export function PracticeModule() {
   const handleRandomizeScenario = () => {
     const newScenario = getRandomScenario();
     setAndFetchScenario(newScenario);
+    setSheetOpen(false);
   }
 
   const handleSetScenario = (payload: Partial<Scenario>) => {
     const newScenario = { ...state.scenario, ...payload };
     setAndFetchScenario(newScenario);
+    setSheetOpen(false);
   };
   
+  const handleFindDbScenario = () => {
+      if (dbKeys.length === 0) {
+          toast({ variant: 'destructive', title: 'Error', description: 'No se encontraron claves en la BD.'});
+          return;
+      }
+      const randomKey = dbKeys[Math.floor(Math.random() * dbKeys.length)];
+      const [position, stackSize, tableType, previousAction] = randomKey.split('-');
+      const newScenario: Scenario = {
+          position: position as Position,
+          stackSize: parseInt(stackSize, 10),
+          tableType: tableType as TableType,
+          previousAction: previousAction as PreviousAction,
+      };
+      setAndFetchScenario(newScenario);
+      setSheetOpen(false);
+  };
+
+  const handleForceAiScenario = () => {
+      let newScenario: Scenario;
+      let scenarioKey: string;
+      let attempts = 0;
+      do {
+        newScenario = getRandomScenario();
+        scenarioKey = `${newScenario.position}-${newScenario.stackSize}-${newScenario.tableType}-${newScenario.previousAction}`;
+        attempts++;
+      } while (dbKeys.includes(scenarioKey) && attempts < 50); // Avoid infinite loops
+
+      setAndFetchScenario(newScenario);
+      setSheetOpen(false);
+  };
+
   const isBBvsLimp =
     state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
   
@@ -414,7 +456,7 @@ export function PracticeModule() {
           >
             <Shuffle className="h-7 w-7" />
           </Button>
-          <Sheet>
+          <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
               <SheetTrigger asChild>
                   <Button variant="default" className="h-14 w-14 rounded-full shadow-lg">
                       <Settings className="h-7 w-7" />
@@ -431,7 +473,24 @@ export function PracticeModule() {
                           className="w-full"
                       >
                           <Shuffle className="mr-2 h-4 w-4" />
-                          Escenario Aleatorio
+                          Aleatorio
+                      </Button>
+                      <Button
+                          variant="outline"
+                          onClick={handleFindDbScenario}
+                          className="w-full"
+                          disabled={dbKeys.length === 0}
+                      >
+                          <Database className="mr-2 h-4 w-4" />
+                          Buscar Escenario en BD
+                      </Button>
+                      <Button
+                          variant="outline"
+                          onClick={handleForceAiScenario}
+                          className="w-full"
+                      >
+                          <Sparkles className="mr-2 h-4 w-4" />
+                          Forzar Generación IA
                       </Button>
                       <div className="space-y-2">
                           <Label htmlFor="previous-action-sheet">Acción Previa</Label>
@@ -602,7 +661,15 @@ export function PracticeModule() {
             )}
 
             {!state.feedback ? (
-                state.currentHandRange ? (
+                 state.error ? (
+                    <div className="flex flex-col items-center justify-center text-center">
+                        <XCircle className="h-10 w-10 text-destructive mb-2" />
+                        <p className="font-semibold text-destructive">Error al Cargar Rango</p>
+                        <p className="text-destructive/80 text-sm max-w-xs">
+                            {state.error}
+                        </p>
+                    </div>
+                ) : state.currentHandRange ? (
                     <div className="flex flex-wrap justify-center gap-4">
                     {isBBvsLimp ? (
                         <>
@@ -748,7 +815,7 @@ export function PracticeModule() {
             )}
             </CardContent>
         </Card>
-        {state.currentHandRange && state.feedback && (
+        {state.currentHandRange && (
             <div>
                 <HandRangeGrid
                     currentHand={state.currentHand?.handNotation}
@@ -759,3 +826,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
+    

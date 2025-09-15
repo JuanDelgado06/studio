@@ -7,7 +7,7 @@ import { suggestImprovementExercises as suggestImprovementExercisesFlow } from "
 import { z } from "zod";
 import { generateGtoRange } from "@/ai/flows/generate-gto-range";
 import clientPromise from "./mongodb";
-import { GenerateGtoRangeInputSchema, GenerateGtoRangeOutput, GetOrGenerateRangeSchema } from "./types";
+import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema } from "./types";
 
 // Zod Schemas for input validation
 const PreflopDecisionSchema = z.object({
@@ -60,6 +60,20 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     console.error("Error in getOrGenerateRangeAction:", error);
     return { success: false, error: "Failed to get or generate range." };
   }
+}
+
+export async function getDbRangesKeys(): Promise<{ success: boolean; data?: string[], error?: string; }> {
+    try {
+        const client = await clientPromise;
+        const db = client.db("poker-pro");
+        const rangesCollection = db.collection("gto-ranges");
+        const ranges = await rangesCollection.find({}, { projection: { key: 1, _id: 0 } }).toArray();
+        const keys = ranges.map(r => r.key);
+        return { success: true, data: keys };
+    } catch (error) {
+        console.error("Error fetching range keys:", error);
+        return { success: false, error: "Failed to fetch range keys from database." };
+    }
 }
 
 
@@ -121,3 +135,5 @@ export async function suggestImprovementExercises(input: z.infer<typeof SuggestI
         return { success: false, error: 'Failed to get suggested exercises from AI.' };
     }
 }
+
+    
