@@ -742,12 +742,7 @@ export function PracticeModule() {
             </CardContent>
         </Card>
         {state.currentHandRange && state.feedback && (
-            <div className='relative'>
-                 {state.rangeSource && (
-                    <Badge variant={state.rangeSource === 'ai' ? 'default' : 'secondary'} className="absolute -top-3 right-4 z-10">
-                        {state.rangeSource === 'ai' ? <><Sparkles className="mr-1.5 h-3 w-3" /> Generado por IA</> : 'Desde DB'}
-                    </Badge>
-                )}
+            <div>
                 <HandRangeGrid
                     currentHand={state.currentHand?.handNotation}
                     range={state.currentHandRange}
