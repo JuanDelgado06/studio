@@ -363,7 +363,6 @@ export function PracticeModule() {
     );
   }
 
-  // --- Start of Logic to be moved ---
   const isBBvsLimp =
     state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
   
@@ -395,7 +394,6 @@ export function PracticeModule() {
   const showVsRaiseActions = state.scenario.previousAction === 'raise';
   const showVs3BetActions = state.scenario.previousAction === '3-bet';
   const showVs4BetActions = state.scenario.previousAction === '4-bet';
-  // --- End of Logic to be moved ---
 
   return (
     <div className="space-y-6">
@@ -478,7 +476,7 @@ export function PracticeModule() {
                           <Label htmlFor="stack-size-sheet">Stack (BBs)</Label>
                           <Select
                           value={String(state.scenario.stackSize)}
-                          onValueChange={(v) =>
+                          onValuechange={(v) =>
                               handleSetScenario({ stackSize: Number(v) })
                           }
                           >
