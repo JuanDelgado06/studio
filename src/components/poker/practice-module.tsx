@@ -355,30 +355,29 @@ export function PracticeModule() {
     );
   }
 
-  let descriptionText = '';
-  switch (state.scenario.previousAction) {
-    case 'none':
-      if (isBBvsLimp) {
-        descriptionText = `La mano llega limpia hasta ti en la Ciega Grande (BB). Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-      } else if (isSBOpen) {
-        descriptionText = `Todos se retiran y la acción te llega en la Ciega Pequeña (SB). Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-      }
-      else {
-        descriptionText = `Nadie ha apostado todavía. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-      }
-      break;
-    case 'raise':
-      descriptionText = `Un oponente ha subido a 2.5 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-      break;
-    case '3-bet':
-      descriptionText = `Te enfrentas a un 3-bet de 9 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-      break;
-    case '4-bet':
+    let descriptionText = '';
+    switch (state.scenario.previousAction) {
+        case 'none':
+        if (isBBvsLimp) {
+            descriptionText = `La mano llega limpia hasta ti en la Ciega Grande (BB). Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+        } else if (isSBOpen) {
+            descriptionText = `Todos se retiran y la acción te llega en la Ciega Pequeña (SB). Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+        } else {
+            descriptionText = `Nadie ha apostado todavía. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+        }
+        break;
+        case 'raise':
+        descriptionText = `Un oponente ha subido a 2.5 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+        break;
+        case '3-bet':
+        descriptionText = `Te enfrentas a un 3-bet de 9 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+        break;
+        case '4-bet':
         descriptionText = `Te enfrentas a un 4-bet de 22 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
         break;
-    default:
-      descriptionText = `Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-  }
+        default:
+        descriptionText = `Estás en tu turno de jugar ahora.`;
+    }
   
   const showOpenRaiseActions = state.scenario.previousAction === 'none' && !isBBvsLimp && !isSBOpen;
   const showVsRaiseActions = state.scenario.previousAction === 'raise';
