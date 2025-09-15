@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useReducer, useEffect } from 'react';
+import { useReducer, useEffect, useCallback } from 'react';
 import {
   Card,
   CardContent,
@@ -19,19 +19,19 @@ import {
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { PokerCard } from './poker-card';
-import { POSITIONS, STACK_SIZES, TABLE_TYPES } from '@/lib/data';
+import { POSITIONS, STACK_SIZES, TABLE_TYPES, PREVIOUS_ACTIONS } from '@/lib/data';
 import type { Position, TableType, Action, PreviousAction } from '@/lib/types';
-import { getPreflopExplanationAction } from '@/lib/actions';
+import { getPreflopExplanationAction, getOrGenerateRangeAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { CheckCircle, Info, Loader2, Settings, Shuffle, XCircle } from 'lucide-react';
+import { CheckCircle, Info, Loader2, Settings, Shuffle, Sparkles, XCircle } from 'lucide-react';
 import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
 import { expandRange } from '@/lib/range-expander';
-import allRanges from '@/lib/gto-ranges.json';
 import type { HandRange } from '@/lib/types';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
+import { Badge } from '../ui/badge';
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const SUITS = ['s', 'h', 'd', 'c'];
@@ -47,6 +47,7 @@ type State = {
   scenario: Scenario;
   currentHand: { handNotation: string; cards: [string, string] } | null;
   currentHandRange: HandRange | null;
+  rangeSource: 'db' | 'ai' | null;
   feedback: {
     isOptimal: boolean;
     action: Action;
@@ -59,12 +60,14 @@ type State = {
 };
 
 type ActionPayload =
-  | { type: 'SET_SCENARIO'; payload: Partial<Scenario> }
+  | { type: 'START_LOADING'; payload?: { main?: boolean; explanation?: boolean } }
+  | { type: 'SET_SCENARIO'; payload: { scenario: Scenario, hand: State['currentHand'] } }
+  | { type: 'SET_RANGE'; payload: { range: HandRange | null; source: State['rangeSource'] } }
   | { type: 'HANDLE_ACTION'; payload: Action }
   | { type: 'NEXT_HAND' }
   | { type: 'SET_EXPLANATION'; payload: GetPreflopExplanationOutput | null }
   | { type: 'TOGGLE_EXPLANATION' }
-  | { type: 'SET_LOADING'; payload: { main?: boolean; explanation?: boolean } };
+  | { type: 'STOP_LOADING'; payload?: { main?: boolean; explanation?: boolean } };
 
 function getRandomCard(deck: string[]): {
   card: string;
@@ -103,48 +106,61 @@ function getNewHand() {
   return { handNotation, cards: [card1, card2] as [string, string] };
 }
 
-function generateCacheKey(scenario: Partial<Scenario>): string {
-  const internalPreviousAction = scenario.previousAction === 'none' ? 'none' : scenario.previousAction;
-  return `${scenario.position}-${scenario.stackSize}-${scenario.tableType}-${internalPreviousAction}`;
-}
-
-function loadRangeAndHand(scenario: Scenario): {
-  range: HandRange | null;
-  hand: { handNotation: string; cards: [string, string] };
-} {
-  const key = generateCacheKey(scenario);
-  const rangeData = (allRanges as Record<string, any>)[key];
-  const newHandRange = rangeData ? expandRange(rangeData) : null;
-  return { range: newHandRange, hand: getNewHand() };
+function getRandomScenario(): Scenario {
+    const position = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
+    const stackSize = STACK_SIZES[Math.floor(Math.random() * STACK_SIZES.length)];
+    const tableType = TABLE_TYPES[Math.floor(Math.random() * TABLE_TYPES.length)];
+    const previousAction = PREVIOUS_ACTIONS[Math.floor(Math.random() * PREVIOUS_ACTIONS.length)];
+    return { position, stackSize, tableType, previousAction };
 }
 
 const reducer = (state: State, action: ActionPayload): State => {
   switch (action.type) {
-    case 'SET_LOADING':
+    case 'START_LOADING':
       return {
         ...state,
         isLoading:
-          action.payload.main !== undefined
+          action.payload?.main !== undefined
             ? action.payload.main
             : state.isLoading,
         explanationIsLoading:
-          action.payload.explanation !== undefined
+          action.payload?.explanation !== undefined
             ? action.payload.explanation
             : state.explanationIsLoading,
       };
 
-    case 'SET_SCENARIO': {
-      const newScenario = { ...state.scenario, ...action.payload };
-      const { range, hand } = loadRangeAndHand(newScenario);
+    case 'STOP_LOADING':
       return {
         ...state,
-        scenario: newScenario,
-        currentHandRange: range,
-        currentHand: hand,
-        feedback: null,
-        showExplanation: false,
-        isLoading: false,
+        isLoading:
+          action.payload?.main !== undefined
+            ? !action.payload.main
+            : state.isLoading,
+        explanationIsLoading:
+          action.payload?.explanation !== undefined
+            ? !action.payload.explanation
+            : state.explanationIsLoading,
       };
+
+    case 'SET_SCENARIO': {
+        return {
+            ...state,
+            scenario: action.payload.scenario,
+            currentHand: action.payload.hand,
+            feedback: null,
+            showExplanation: false,
+            currentHandRange: null,
+            rangeSource: null,
+        }
+    }
+
+    case 'SET_RANGE': {
+        return {
+            ...state,
+            currentHandRange: action.payload.range,
+            rangeSource: action.payload.source,
+            isLoading: false,
+        }
     }
 
     case 'HANDLE_ACTION': {
@@ -155,9 +171,7 @@ const reducer = (state: State, action: ActionPayload): State => {
       const correctAction =
         state.currentHandRange[state.currentHand.handNotation] || 'fold';
 
-      // If the correct action is '3-bet' or 'all-in', a 'raise' is also acceptable
       const isAggressiveActionCorrect = ['3-bet', 'all-in'].includes(correctAction) && actionTaken === 'raise';
-      // If the correct action is 'raise', a '3-bet' is also acceptable in a vs-raise scenario
       const isRaiseSynonymCorrect = correctAction === 'raise' && actionTaken === '3-bet' && state.scenario.previousAction !== 'none';
 
       const isOptimal = actionTaken === correctAction || isAggressiveActionCorrect || isRaiseSynonymCorrect;
@@ -169,22 +183,9 @@ const reducer = (state: State, action: ActionPayload): State => {
     }
 
     case 'NEXT_HAND': {
-       const scenarioKeys = Object.keys(allRanges);
-       const randomKey = scenarioKeys[Math.floor(Math.random() * scenarioKeys.length)];
-       const [position, stackSize, tableType, previousAction] = randomKey.split('-');
-
-       const newScenario = {
-           position: position as Position,
-           stackSize: Number(stackSize),
-           tableType: tableType as TableType,
-           previousAction: previousAction as PreviousAction,
-       };
-      const { range, hand } = loadRangeAndHand(newScenario);
       return {
         ...state,
-        scenario: newScenario,
-        currentHand: hand,
-        currentHandRange: range,
+        currentHand: getNewHand(),
         feedback: null,
         showExplanation: false,
       };
@@ -224,23 +225,50 @@ export function PracticeModule() {
     },
     currentHand: null,
     currentHandRange: null,
+    rangeSource: null,
     feedback: null,
     showExplanation: false,
     isLoading: true,
     explanationIsLoading: false,
   });
 
+  const fetchRangeForScenario = useCallback(async (scenario: Scenario) => {
+    dispatch({ type: 'START_LOADING', payload: { main: true } });
+    const result = await getOrGenerateRangeAction(scenario);
+    if (result.success && result.data) {
+        const expandedRange = expandRange(result.data);
+        dispatch({ type: 'SET_RANGE', payload: { range: expandedRange, source: result.source || null } });
+        if (result.source === 'ai') {
+            toast({
+                title: 'Rango Generado por IA',
+                description: 'Este rango fue creado por IA y guardado para el futuro.',
+            });
+        }
+    } else {
+        toast({
+            variant: 'destructive',
+            title: 'Error de Rango',
+            description: result.error || 'No se pudo cargar o generar el rango para este escenario.',
+        });
+        dispatch({ type: 'SET_RANGE', payload: { range: null, source: null } });
+    }
+  }, [toast]);
+  
+  const setAndFetchScenario = useCallback((scenario: Scenario) => {
+      dispatch({ type: 'SET_SCENARIO', payload: { scenario, hand: getNewHand() } });
+      fetchRangeForScenario(scenario);
+  }, [fetchRangeForScenario]);
+
+
   // Initial load
   useEffect(() => {
-    dispatch({
-      type: 'SET_SCENARIO',
-      payload: {
+    const initialScenario: Scenario = {
         position: 'BTN',
         stackSize: 100,
         tableType: 'cash',
         previousAction: 'none',
-      },
-    });
+    };
+    setAndFetchScenario(initialScenario);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -252,7 +280,7 @@ export function PracticeModule() {
           ...state.scenario,
           hand: state.currentHand.handNotation,
           action: state.feedback.action,
-          betSize: state.scenario.stackSize, // Pass stack size as a proxy for bet size
+          betSize: state.scenario.stackSize, 
         },
         state.feedback.isOptimal
       );
@@ -261,45 +289,27 @@ export function PracticeModule() {
   }, [state.feedback]);
 
 
-  useEffect(() => {
-    if (!state.currentHandRange && !state.isLoading) {
-      const scenarioKey = generateCacheKey(state.scenario);
-      // Only show toast if a range for this scenario is supposed to exist
-      if (Object.keys(allRanges).includes(scenarioKey)) {
-        toast({
-            variant: 'destructive',
-            title: 'Error de Rango',
-            description: `No se pudo cargar el rango para este escenario. (${scenarioKey})`,
-        });
-      }
-    }
-  }, [state.currentHandRange, state.isLoading, state.scenario, toast]);
-
-
   const handleShowExplanation = async () => {
-    // If explanation is already showing, just hide it.
     if (state.showExplanation) {
       dispatch({ type: 'TOGGLE_EXPLANATION' });
       return;
     }
 
-    // If explanation is loaded but hidden, just show it.
     if (state.feedback?.explanation) {
       dispatch({ type: 'TOGGLE_EXPLANATION' });
       return;
     }
 
-    // If explanation is not loaded, fetch it.
     if (state.feedback && state.currentHand) {
-      dispatch({ type: 'SET_LOADING', payload: { explanation: true } });
-      dispatch({ type: 'TOGGLE_EXPLANATION' }); // Show loading state
+      dispatch({ type: 'START_LOADING', payload: { explanation: true } });
+      dispatch({ type: 'TOGGLE_EXPLANATION' }); 
 
       const result = await getPreflopExplanationAction({
         ...state.scenario,
         hand: state.currentHand.handNotation,
         action: state.feedback.action,
         isOptimal: state.feedback.isOptimal,
-        betSize: state.scenario.stackSize, // Pass stack size as a proxy for bet size
+        betSize: state.scenario.stackSize,
       });
 
       if (result.success && result.data) {
@@ -311,9 +321,9 @@ export function PracticeModule() {
           description:
             result.error || 'No se pudo obtener la explicación de la IA.',
         });
-        dispatch({ type: 'TOGGLE_EXPLANATION' }); // Hide explanation panel on error
+        dispatch({ type: 'TOGGLE_EXPLANATION' }); 
       }
-      dispatch({ type: 'SET_LOADING', payload: { explanation: false } });
+      dispatch({ type: 'STOP_LOADING', payload: { explanation: true } });
     }
   };
 
@@ -328,27 +338,18 @@ export function PracticeModule() {
   };
 
   const handleNextHand = () => {
-    dispatch({ type: 'NEXT_HAND' });
+    const newScenario = getRandomScenario();
+    setAndFetchScenario(newScenario);
   };
 
   const handleRandomizeScenario = () => {
-    const scenarioKeys = Object.keys(allRanges);
-    const randomKey = scenarioKeys[Math.floor(Math.random() * scenarioKeys.length)];
-    const [position, stackSize, tableType, previousAction] = randomKey.split('-');
-
-    const payload = {
-        position: position as Position,
-        stackSize: Number(stackSize),
-        tableType: tableType as TableType,
-        previousAction: previousAction as PreviousAction,
-    };
-    
-    dispatch({ type: 'SET_SCENARIO', payload });
+    const newScenario = getRandomScenario();
+    setAndFetchScenario(newScenario);
   }
 
-
   const handleSetScenario = (payload: Partial<Scenario>) => {
-    dispatch({ type: 'SET_SCENARIO', payload: payload });
+    const newScenario = { ...state.scenario, ...payload };
+    setAndFetchScenario(newScenario);
   };
 
   if (state.isLoading || !state.currentHand) {
@@ -356,7 +357,7 @@ export function PracticeModule() {
       <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[600px]">
         <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
         <p className="mt-4 text-muted-foreground">
-          Cargando módulo de práctica...
+          Cargando escenario y buscando rango en la base de datos...
         </p>
       </div>
     );
@@ -368,7 +369,7 @@ export function PracticeModule() {
   
   const isSBOpen = state.scenario.position === 'SB' && state.scenario.previousAction === 'none';
   
-  let descriptionText = `Estás en tu turno de jugar ahora.`;
+  let descriptionText = '';
   switch (state.scenario.previousAction) {
     case 'none':
       if (isBBvsLimp) {
@@ -383,10 +384,10 @@ export function PracticeModule() {
       descriptionText = `Un oponente ha subido a 2.5 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
       break;
     case '3-bet':
-      descriptionText = `Te enfrentas a un 3-bet de 9 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      descriptionText = `Te enfrentas a un 3-bet a 9 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
       break;
     case '4-bet':
-      descriptionText = `Te enfrentas a un 4-bet de 22 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      descriptionText = `Te enfrentas a un 4-bet a 22 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
       break;
   }
 
@@ -438,18 +439,18 @@ export function PracticeModule() {
                               <SelectValue placeholder="Selecciona acción previa" />
                           </SelectTrigger>
                           <SelectContent>
-                              <SelectItem value="none">
-                                  Nadie ha apostado (Open Raise)
-                              </SelectItem>
-                              <SelectItem value="raise">
-                                  Enfrentando un Open-Raise
-                              </SelectItem>
-                              <SelectItem value="3-bet">
-                                  Enfrentando un 3-Bet
-                              </SelectItem>
-                              <SelectItem value="4-bet">
-                                  Enfrentando un 4-Bet
-                              </SelectItem>
+                              {PREVIOUS_ACTIONS.map((pa) => (
+                                <SelectItem key={pa} value={pa}>
+                                  {
+                                    {
+                                      'none': 'Nadie ha apostado',
+                                      'raise': 'Enfrentando un Open-Raise',
+                                      '3-bet': 'Enfrentando un 3-Bet',
+                                      '4-bet': 'Enfrentando un 4-Bet',
+                                    }[pa]
+                                  }
+                                </SelectItem>
+                              ))}
                           </SelectContent>
                           </Select>
                       </div>
@@ -728,24 +729,31 @@ export function PracticeModule() {
                 ) : (
                     <div className="flex flex-col items-center justify-center text-center">
                         <XCircle className="h-10 w-10 text-destructive mb-2" />
-                        <p className="font-semibold text-destructive">Sin Rango</p>
+                        <p className="font-semibold text-destructive">Sin Rango Definido</p>
                         <p className="text-destructive/80 text-sm max-w-xs">
-                            No hay un rango GTO definido para este escenario específico. Prueba a ajustar la configuración.
+                            No hay un rango GTO en la base de datos para este escenario. La IA está generando uno ahora...
                         </p>
                     </div>
                 )
             ) : (
                 <Button size="lg" onClick={handleNextHand}>
-                    Siguiente Mano
+                    Siguiente Mano Aleatoria
                 </Button>
             )}
             </CardContent>
         </Card>
         {state.currentHandRange && state.feedback && (
-            <HandRangeGrid
-                currentHand={state.currentHand?.handNotation}
-                range={state.currentHandRange}
-            />
+            <div className='relative'>
+                 {state.rangeSource && (
+                    <Badge variant={state.rangeSource === 'ai' ? 'default' : 'secondary'} className="absolute -top-3 right-4 z-10">
+                        {state.rangeSource === 'ai' ? <><Sparkles className="mr-1.5 h-3 w-3" /> Generado por IA</> : 'Desde DB'}
+                    </Badge>
+                )}
+                <HandRangeGrid
+                    currentHand={state.currentHand?.handNotation}
+                    range={state.currentHandRange}
+                />
+            </div>
         )}
     </div>
   );
