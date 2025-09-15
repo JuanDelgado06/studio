@@ -20,7 +20,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { PokerCard } from './poker-card';
 import { POSITIONS, STACK_SIZES, TABLE_TYPES, PREVIOUS_ACTIONS } from '@/lib/data';
-import type { Position, TableType, Action, PreviousAction } from '@/lib/types';
+import type { Position, TableType, Action, PreviousAction, GtoRangeScenario } from '@/lib/types';
 import { getPreflopExplanationAction, getOrGenerateRangeAction, getDbRangesKeys } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
@@ -218,7 +218,7 @@ const reducer = (state: State, action: ActionPayload): State => {
 export function PracticeModule() {
   const { toast } = useToast();
   const { recordHand } = useStats();
-  const [dbKeys, setDbKeys] = useState<string[]>([]);
+  const [dbScenarios, setDbScenarios] = useState<GtoRangeScenario[]>([]);
   const [isSheetOpen, setSheetOpen] = useState(false);
 
   const [state, dispatch] = useReducer(reducer, {
@@ -268,7 +268,7 @@ export function PracticeModule() {
     const fetchKeys = async () => {
         const result = await getDbRangesKeys();
         if (result.success && result.data) {
-            setDbKeys(result.data);
+            setDbScenarios(result.data);
         }
     }
     fetchKeys();
@@ -370,31 +370,31 @@ export function PracticeModule() {
   };
   
   const handleFindDbScenario = () => {
-      if (dbKeys.length === 0) {
-          toast({ variant: 'destructive', title: 'Error', description: 'No se encontraron claves en la BD.'});
+      if (dbScenarios.length === 0) {
+          toast({ variant: 'destructive', title: 'Error', description: 'No se encontraron escenarios en la BD.'});
           return;
       }
-      const randomKey = dbKeys[Math.floor(Math.random() * dbKeys.length)];
-      const [position, stackSize, tableType, previousAction] = randomKey.split('-');
-      const newScenario: Scenario = {
-          position: position as Position,
-          stackSize: parseInt(stackSize, 10),
-          tableType: tableType as TableType,
-          previousAction: previousAction as PreviousAction,
-      };
-      setAndFetchScenario(newScenario);
+      const randomScenario = dbScenarios[Math.floor(Math.random() * dbScenarios.length)];
+      setAndFetchScenario(randomScenario);
       setSheetOpen(false);
+  };
+
+  const isScenarioInDb = (scenario: Scenario) => {
+    return dbScenarios.some(dbScenario => 
+      dbScenario.position === scenario.position &&
+      dbScenario.stackSize === scenario.stackSize &&
+      dbScenario.tableType === scenario.tableType &&
+      dbScenario.previousAction === scenario.previousAction
+    );
   };
 
   const handleForceAiScenario = () => {
       let newScenario: Scenario;
-      let scenarioKey: string;
       let attempts = 0;
       do {
         newScenario = getRandomScenario();
-        scenarioKey = `${newScenario.position}-${newScenario.stackSize}-${newScenario.tableType}-${newScenario.previousAction}`;
         attempts++;
-      } while (dbKeys.includes(scenarioKey) && attempts < 50); // Avoid infinite loops
+      } while (isScenarioInDb(newScenario) && attempts < 50); // Avoid infinite loops
 
       setAndFetchScenario(newScenario);
       setSheetOpen(false);
@@ -479,7 +479,7 @@ export function PracticeModule() {
                           variant="outline"
                           onClick={handleFindDbScenario}
                           className="w-full"
-                          disabled={dbKeys.length === 0}
+                          disabled={dbScenarios.length === 0}
                       >
                           <Database className="mr-2 h-4 w-4" />
                           Buscar Escenario en BD

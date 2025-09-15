@@ -7,7 +7,7 @@ import { suggestImprovementExercises as suggestImprovementExercisesFlow } from "
 import { z } from "zod";
 import { generateGtoRange } from "@/ai/flows/generate-gto-range";
 import clientPromise from "./mongodb";
-import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema } from "./types";
+import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema, GtoRangeScenario } from "./types";
 
 // Zod Schemas for input validation
 const PreflopDecisionSchema = z.object({
@@ -32,13 +32,18 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     const db = client.db("poker-pro");
     const rangesCollection = db.collection("gto-ranges");
 
-    const scenarioKey = `${validatedInput.position}-${validatedInput.stackSize}-${validatedInput.tableType}-${validatedInput.previousAction}`;
+    const query = {
+        position: validatedInput.position,
+        stackSize: validatedInput.stackSize,
+        tableType: validatedInput.tableType,
+        previousAction: validatedInput.previousAction,
+    };
     
     // 1. Try to find the range in the database
-    const existingRange = await rangesCollection.findOne({ key: scenarioKey });
+    const existingRangeDoc = await rangesCollection.findOne(query);
 
-    if (existingRange) {
-      return { success: true, data: existingRange.range, source: 'db' };
+    if (existingRangeDoc) {
+      return { success: true, data: existingRangeDoc.range, source: 'db' };
     }
 
     // 2. If not found, generate it with AI
@@ -49,7 +54,8 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     }
 
     // 3. Save the newly generated range to the database
-    await rangesCollection.insertOne({ key: scenarioKey, range: generatedRange, createdAt: new Date() });
+    const newDocument = { ...query, range: generatedRange, createdAt: new Date() };
+    await rangesCollection.insertOne(newDocument);
 
     return { success: true, data: generatedRange, source: 'ai' };
 
@@ -62,14 +68,16 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
   }
 }
 
-export async function getDbRangesKeys(): Promise<{ success: boolean; data?: string[], error?: string; }> {
+export async function getDbRangesKeys(): Promise<{ success: boolean; data?: GtoRangeScenario[], error?: string; }> {
     try {
         const client = await clientPromise;
         const db = client.db("poker-pro");
         const rangesCollection = db.collection("gto-ranges");
-        const ranges = await rangesCollection.find({}, { projection: { key: 1, _id: 0 } }).toArray();
-        const keys = ranges.map(r => r.key);
-        return { success: true, data: keys };
+        const ranges = await rangesCollection.find({}, { projection: { range: 0, createdAt: 0, _id: 0 } }).toArray();
+        
+        const scenarios = ranges.map(r => GtoRangeScenario.parse(r));
+
+        return { success: true, data: scenarios };
     } catch (error) {
         console.error("Error fetching range keys:", error);
         return { success: false, error: "Failed to fetch range keys from database." };

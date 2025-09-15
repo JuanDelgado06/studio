@@ -33,9 +33,12 @@ export const GenerateGtoRangeOutputSchema = z.object({
 export type GenerateGtoRangeOutput = z.infer<typeof GenerateGtoRangeOutputSchema>;
 
 export const GetOrGenerateRangeSchema = z.object({
-  position: z.string(),
+  position: z.nativeEnum({SB: 'SB', BB: 'BB', UTG: 'UTG', MP: 'MP', CO: 'CO', BTN: 'BTN'}),
   stackSize: z.number(),
   tableType: z.enum(['cash', 'tournament']),
   previousAction: z.enum(['none', 'raise', '3-bet', '4-bet']),
 });
+
+export const GtoRangeScenario = GetOrGenerateRangeSchema;
+export type GtoRangeScenario = z.infer<typeof GtoRangeScenario>;
     
