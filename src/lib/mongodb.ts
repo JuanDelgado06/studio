@@ -1,6 +1,5 @@
 // This approach is taken from the official Next.js example for MongoDB.
 // https://github.com/vercel/next.js/blob/canary/examples/with-mongodb/lib/mongodb.ts
-import 'dotenv/config';
 import { MongoClient } from 'mongodb'
 
 if (!process.env.MONGODB_URI) {
