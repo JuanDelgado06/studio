@@ -98,10 +98,6 @@
   "BTN-100-cash-4-bet": { "all-in": ["JJ+", "AKs", "AKo"], "call": ["AQs", "TT"] },
   "SB-100-cash-4-bet": { "all-in": ["QQ+", "AKs", "AKo"], "call": ["AQs", "JJ-TT"]},
 
-  "MP-100-tournament-4-bet": { "all-in": ["KK+", "AKs"], "call": [] },
-  "CO-100-tournament-4-bet": { "all-in": ["QQ+", "AKs", "AKo"], "call": [] },
-  "BTN-100-tournament-4-bet": { "all-in": ["JJ+", "AKs", "AKo"], "call": ["AQs", "TT"] },
-
   "SB-100-tournament-none": { "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"], "call": [] },
   "SB-80-tournament-none": { "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"], "call": [] },
   "SB-60-tournament-none": { "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"], "call": [] },
@@ -176,7 +172,26 @@
   
   "UTG-100-tournament-raise": { "3-bet": ["QQ+", "AKs", "AKo"], "call": ["JJ-TT", "AQs", "AQo"] },
   "UTG-40-tournament-raise": { "3-bet": ["JJ+", "AKs", "AKo"], "call": ["TT", "AQs"] },
-  "UTG-20-tournament-raise": { "all-in": ["TT+", "AQs+", "AKo"], "call": ["99", "AJs"] }
-}
+  "UTG-20-tournament-raise": { "all-in": ["TT+", "AQs+", "AKo"], "call": ["99", "AJs"] },
+  
+  "BTN-100-tournament-3-bet": { "raise": ["QQ+", "AKs", "AKo"], "call": ["JJ-TT", "AQs", "AQo"] },
+  "CO-100-tournament-3-bet": { "raise": ["QQ+", "AKs", "AKo"], "call": ["JJ", "AQs"] },
+  "MP-100-tournament-3-bet": { "raise": ["KK+", "AKs", "AKo"], "call": ["QQ-JJ"] },
+  "UTG-100-tournament-3-bet": { "raise": ["KK+", "AKo"], "call": [] },
+  "SB-100-tournament-3-bet": { "raise": ["QQ+", "AKs", "AKo"], "call": ["JJ", "AQs"] },
+  "BB-100-tournament-3-bet": { "raise": ["QQ+", "AKs", "AKo"], "call": ["JJ", "AQs", "KQs", "AQo"] },
+  "BB-100-tournament-4-bet": { "all-in": ["QQ+", "AKs", "AKo"], "call": ["JJ-TT", "AQs", "AQo"] },
 
-    
+  "BTN-40-tournament-3-bet": { "all-in": ["TT+", "AKs", "AQo+"], "call": ["99", "AQs"] },
+  "CO-40-tournament-3-bet": { "all-in": ["JJ+", "AKs", "AQo+"], "call": ["TT"] },
+  "MP-40-tournament-3-bet": { "all-in": ["QQ+", "AKs", "AKo"], "call": ["JJ"] },
+  "UTG-40-tournament-3-bet": { "all-in": ["QQ+", "AKs", "AKo"], "call": [] },
+  "SB-40-tournament-3-bet": { "all-in": ["TT+", "AKs", "AQo+"], "call": ["99"] },
+  "BB-40-tournament-3-bet": { "all-in": ["JJ+", "AKs", "AQo+"], "call": ["TT", "AQs"] },
+  "BB-40-tournament-4-bet": { "all-in": ["99+", "AQs+", "AKo", "AQo"], "call": [] },
+
+  "MP-100-tournament-4-bet": { "all-in": ["KK+", "AKs"], "call": [] },
+  "CO-100-tournament-4-bet": { "all-in": ["QQ+", "AKs", "AKo"], "call": [] },
+  "BTN-100-tournament-4-bet": { "all-in": ["JJ+", "AKs", "AKo"], "call": ["AQs", "TT"] },
+  "SB-100-tournament-4-bet": { "all-in": ["QQ+", "AKs", "AKo"], "call": ["AQs", "JJ-TT"]}
+}
