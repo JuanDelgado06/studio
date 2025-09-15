@@ -815,7 +815,7 @@ export function PracticeModule() {
             )}
             </CardContent>
         </Card>
-        {state.currentHandRange && (
+        {state.feedback && state.currentHandRange && (
             <div>
                 <HandRangeGrid
                     currentHand={state.currentHand?.handNotation}
@@ -827,4 +827,3 @@ export function PracticeModule() {
   );
 }
 
-    
