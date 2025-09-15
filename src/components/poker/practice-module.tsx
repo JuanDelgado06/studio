@@ -169,10 +169,22 @@ const reducer = (state: State, action: ActionPayload): State => {
     }
 
     case 'NEXT_HAND': {
-      const { hand } = loadRangeAndHand(state.scenario);
+       const scenarioKeys = Object.keys(allRanges);
+       const randomKey = scenarioKeys[Math.floor(Math.random() * scenarioKeys.length)];
+       const [position, stackSize, tableType, previousAction] = randomKey.split('-');
+
+       const newScenario = {
+           position: position as Position,
+           stackSize: Number(stackSize),
+           tableType: tableType as TableType,
+           previousAction: previousAction as PreviousAction,
+       };
+      const { range, hand } = loadRangeAndHand(newScenario);
       return {
         ...state,
+        scenario: newScenario,
         currentHand: hand,
+        currentHandRange: range,
         feedback: null,
         showExplanation: false,
       };
@@ -433,10 +445,10 @@ export function PracticeModule() {
                               <SelectItem value="raise">
                                   Enfrentando un Open-Raise
                               </SelectItem>
-                              <SelectItem value="3-bet" >
+                              <SelectItem value="3-bet">
                                   Enfrentando un 3-Bet
                               </SelectItem>
-                              <SelectItem value="4-bet" >
+                              <SelectItem value="4-bet">
                                   Enfrentando un 4-Bet
                               </SelectItem>
                           </SelectContent>
