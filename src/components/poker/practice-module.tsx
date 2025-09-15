@@ -325,7 +325,7 @@ export function PracticeModule() {
         hand: state.currentHand.handNotation,
         action: state.feedback.action,
         isOptimal: state.feedback.isOptimal,
-        betSize: betSize,
+        betSize,
       });
 
       if (result.success && result.data) {
@@ -374,17 +374,26 @@ export function PracticeModule() {
           toast({ variant: 'destructive', title: 'Error', description: 'No se encontraron escenarios en la BD.'});
           return;
       }
-      const randomScenario = dbScenarios[Math.floor(Math.random() * dbScenarios.length)];
-      setAndFetchScenario(randomScenario);
+      const randomDbScenario = dbScenarios[Math.floor(Math.random() * dbScenarios.length)];
+      // Create a scenario from the DB range document
+      const newScenario: Scenario = {
+        position: randomDbScenario.position,
+        tableType: randomDbScenario.tableType,
+        previousAction: randomDbScenario.previousAction,
+        // Pick a random stack size within the range for variety
+        stackSize: Math.floor(Math.random() * (randomDbScenario.stackRange.max - randomDbScenario.stackRange.min + 1)) + randomDbScenario.stackRange.min,
+      };
+      setAndFetchScenario(newScenario);
       setSheetOpen(false);
   };
 
   const isScenarioInDb = (scenario: Scenario) => {
     return dbScenarios.some(dbScenario => 
       dbScenario.position === scenario.position &&
-      dbScenario.stackSize === scenario.stackSize &&
       dbScenario.tableType === scenario.tableType &&
-      dbScenario.previousAction === scenario.previousAction
+      dbScenario.previousAction === scenario.previousAction &&
+      scenario.stackSize >= dbScenario.stackRange.min &&
+      scenario.stackSize <= dbScenario.stackRange.max
     );
   };
 
@@ -826,4 +835,5 @@ export function PracticeModule() {
     </div>
   );
 }
+
 

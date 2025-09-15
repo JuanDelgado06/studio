@@ -7,7 +7,7 @@ import { suggestImprovementExercises as suggestImprovementExercisesFlow } from "
 import { z } from "zod";
 import { generateGtoRange } from "@/ai/flows/generate-gto-range";
 import clientPromise from "./mongodb";
-import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema, GtoRangeScenario } from "./types";
+import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema, GtoRangeDocumentSchema, GtoRangeScenario } from "./types";
 
 // Zod Schemas for input validation
 const PreflopDecisionSchema = z.object({
@@ -34,9 +34,10 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
 
     const query = {
         position: validatedInput.position,
-        stackSize: validatedInput.stackSize,
         tableType: validatedInput.tableType,
         previousAction: validatedInput.previousAction,
+        'stackRange.min': { $lte: validatedInput.stackSize },
+        'stackRange.max': { $gte: validatedInput.stackSize },
     };
     
     // 1. Try to find the range in the database
@@ -47,15 +48,17 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     }
 
     // 2. If not found, generate it with AI
+    // For generation and storage, we can define a default range or a specific logic.
+    // For now, let's just generate for the specific stack size.
+    // A more advanced implementation might determine the best range to generate.
     const generatedRange = await generateGtoRange(validatedInput);
 
     if (!generatedRange) {
       throw new Error("AI failed to generate a range.");
     }
-
-    // 3. Save the newly generated range to the database
-    const newDocument = { ...query, range: generatedRange, createdAt: new Date() };
-    await rangesCollection.insertOne(newDocument);
+    
+    // For now, we are not saving AI generated ranges back to the DB to avoid polluting the ranged structure.
+    // This can be a future improvement.
 
     return { success: true, data: generatedRange, source: 'ai' };
 
@@ -75,7 +78,7 @@ export async function getDbRangesKeys(): Promise<{ success: boolean; data?: GtoR
         const rangesCollection = db.collection("gto-ranges");
         const ranges = await rangesCollection.find({}, { projection: { range: 0, createdAt: 0, _id: 0 } }).toArray();
         
-        const scenarios = ranges.map(r => GtoRangeScenario.parse(r));
+        const scenarios = ranges.map(r => GtoRangeDocumentSchema.parse(r));
 
         return { success: true, data: scenarios };
     } catch (error) {

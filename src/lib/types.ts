@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 export type Position = 'SB' | 'BB' | 'UTG' | 'MP' | 'CO' | 'BTN';
@@ -39,6 +40,11 @@ export const GetOrGenerateRangeSchema = z.object({
   previousAction: z.enum(['none', 'raise', '3-bet', '4-bet']),
 });
 
-export const GtoRangeScenario = GetOrGenerateRangeSchema;
-export type GtoRangeScenario = z.infer<typeof GtoRangeScenario>;
+export const GtoRangeDocumentSchema = z.object({
+    position: z.nativeEnum({SB: 'SB', BB: 'BB', UTG: 'UTG', MP: 'MP', CO: 'CO', BTN: 'BTN'}),
+    stackRange: z.object({ min: z.number(), max: z.number() }),
+    tableType: z.enum(['cash', 'tournament']),
+    previousAction: z.enum(['none', 'raise', '3-bet', '4-bet']),
+});
+export type GtoRangeScenario = z.infer<typeof GtoRangeDocumentSchema>;
     

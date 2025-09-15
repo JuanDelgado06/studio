@@ -3,569 +3,416 @@
   "ranges": [
     {
       "position": "BTN",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "none",
-      "range": {
-        "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J2s+", "T5s+", "95s+", "85s+", "74s+", "64s+", "53s+", "43s", "A2o+", "K5o+", "Q8o+", "J8o+", "T8o+", "98o"]
-      }
+      "range": { "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J2s+", "T5s+", "95s+", "85s+", "74s+", "64s+", "53s+", "43s", "A2o+", "K5o+", "Q8o+", "J8o+", "T8o+", "98o"] }
     },
     {
       "position": "BTN",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "raise",
-      "range": {
-        "3-bet": ["TT+", "AQs+", "AKo", "A5s-A4s", "KQs"],
-        "call": ["99-22", "AJs-A2s", "KJs-KTs", "QJs-QTs", "JTs", "T9s", "98s", "87s", "76s", "65s", "AQo-ATo", "KQo-KJo", "QJo-QTo", "JTo"]
-      }
+      "range": { "3-bet": ["TT+", "AQs+", "AKo", "A5s-A4s", "KQs"], "call": ["99-22", "AJs-A2s", "KJs-KTs", "QJs-QTs", "JTs", "T9s", "98s", "87s", "76s", "65s", "AQo-ATo", "KQo-KJo", "QJo-QTo", "JTo"] }
     },
     {
       "position": "BTN",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "3-bet",
-      "range": {
-        "4-bet": ["QQ+", "AKs", "AKo"],
-        "call": ["JJ-99", "AQs-AJs", "KQs", "AQo"]
-      }
+      "range": { "4-bet": ["QQ+", "AKs", "AKo"], "call": ["JJ-99", "AQs-AJs", "KQs", "AQo"] }
     },
     {
       "position": "BTN",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["KK+", "AKs", "AKo"]
-      }
+      "range": { "all-in": ["KK+", "AKs", "AKo"] }
     },
     {
       "position": "BTN",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "none",
-      "range": {
-        "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "96s+", "86s+", "75s+", "65s", "A2o+", "K7o+", "Q9o+", "J9o+", "T9o"]
-      }
+      "range": { "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "96s+", "86s+", "75s+", "65s", "A2o+", "K7o+", "Q9o+", "J9o+", "T9o"] }
     },
     {
       "position": "BTN",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "raise",
-      "range": {
-        "3-bet": ["99+", "AJs+", "KQs", "AKo", "A5s-A4s", "T9s", "98s", "87s"],
-        "call": ["88-22", "ATs-A6s", "A3s-A2s", "KJs-KTs", "QJs-QTs", "JTs", "76s", "AQo-ATo", "KQo", "QJo", "JTo"]
-      }
+      "range": { "3-bet": ["99+", "AJs+", "KQs", "AKo", "A5s-A4s", "T9s", "98s", "87s"], "call": ["88-22", "ATs-A6s", "A3s-A2s", "KJs-KTs", "QJs-QTs", "JTs", "76s", "AQo-ATo", "KQo", "QJo", "JTo"] }
     },
     {
       "position": "BTN",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "3-bet",
-      "range": {
-        "4-bet": ["TT+", "AKs", "AKo", "AQs"],
-        "call": ["99", "AJs", "KQs"]
-      }
+      "range": { "4-bet": ["TT+", "AKs", "AKo", "AQs"], "call": ["99", "AJs", "KQs"] }
     },
     {
       "position": "BTN",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["TT+", "AKs", "AKo", "AQs"]
-      }
+      "range": { "all-in": ["TT+", "AKs", "AKo", "AQs"] }
     },
     {
       "position": "CO",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "none",
-      "range": {
-        "raise": ["22+", "A2s+", "K4s+", "Q6s+", "J7s+", "T7s+", "97s+", "87s", "76s", "A8o+", "A5o-A4o", "KTo+", "QTo+", "JTo"]
-      }
+      "range": { "raise": ["22+", "A2s+", "K4s+", "Q6s+", "J7s+", "T7s+", "97s+", "87s", "76s", "A8o+", "A5o-A4o", "KTo+", "QTo+", "JTo"] }
     },
     {
       "position": "CO",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "raise",
-      "range": {
-        "3-bet": ["TT+", "AQs+", "KQs", "AKo"],
-        "call": ["99-22", "AJs-ATs", "KTs+", "QTs+", "JTs", "T9s", "98s", "87s", "AQo", "KQo"]
-      }
+      "range": { "3-bet": ["TT+", "AQs+", "KQs", "AKo"], "call": ["99-22", "AJs-ATs", "KTs+", "QTs+", "JTs", "T9s", "98s", "87s", "AQo", "KQo"] }
     },
     {
       "position": "CO",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "3-bet",
-      "range": {
-        "4-bet": ["QQ+", "AKs", "AKo"],
-        "call": ["JJ-TT", "AQs", "AQo"]
-      }
+      "range": { "4-bet": ["QQ+", "AKs", "AKo"], "call": ["JJ-TT", "AQs", "AQo"] }
     },
     {
       "position": "CO",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["KK+", "AKs", "AKo"]
-      }
+      "range": { "all-in": ["KK+", "AKs", "AKo"] }
     },
     {
       "position": "CO",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "none",
-      "range": {
-        "raise": ["22+", "A2s+", "K5s+", "Q8s+", "J8s+", "T8s+", "98s", "A9o+", "KTo+", "QTo+", "JTo"]
-      }
+      "range": { "raise": ["22+", "A2s+", "K5s+", "Q8s+", "J8s+", "T8s+", "98s", "A9o+", "KTo+", "QTo+", "JTo"] }
     },
     {
       "position": "CO",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "raise",
-      "range": {
-        "3-bet": ["99+", "AJs+", "KQs", "AKo", "A5s-A4s", "T9s", "98s"],
-        "call": ["88-22", "ATs-A6s", "A3s-A2s", "KTs-KJs", "QTs", "JTs", "AQo-ATo", "KQo", "QJo"]
-      }
+      "range": { "3-bet": ["99+", "AJs+", "KQs", "AKo", "A5s-A4s", "T9s", "98s"], "call": ["88-22", "ATs-A6s", "A3s-A2s", "KTs-KJs", "QTs", "JTs", "AQo-ATo", "KQo", "QJo"] }
     },
     {
       "position": "CO",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "3-bet",
-      "range": {
-        "all-in": ["TT+", "AQs+", "AKo"]
-      }
+      "range": { "all-in": ["TT+", "AQs+", "AKo"] }
     },
     {
       "position": "CO",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["TT+", "AQs+", "AKo"]
-      }
+      "range": { "all-in": ["TT+", "AQs+", "AKo"] }
     },
     {
       "position": "MP",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "none",
-      "range": {
-        "raise": ["22+", "A2s+", "K8s+", "Q9s+", "J9s+", "T9s", "98s", "87s", "ATo+", "KQo"]
-      }
+      "range": { "raise": ["22+", "A2s+", "K8s+", "Q9s+", "J9s+", "T9s", "98s", "87s", "ATo+", "KQo"] }
     },
     {
       "position": "MP",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "raise",
-      "range": {
-        "3-bet": ["JJ+", "AKs", "AKo"],
-        "call": ["TT-22", "AQs-ATs", "KJs+", "QJs", "JTs", "AQo"]
-      }
+      "range": { "3-bet": ["JJ+", "AKs", "AKo"], "call": ["TT-22", "AQs-ATs", "KJs+", "QJs", "JTs", "AQo"] }
     },
     {
       "position": "MP",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "3-bet",
-      "range": {
-        "4-bet": ["QQ+", "AKs", "AKo"],
-        "call": ["JJ"]
-      }
+      "range": { "4-bet": ["QQ+", "AKs", "AKo"], "call": ["JJ"] }
     },
     {
       "position": "MP",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["KK+", "AKs", "AKo"]
-      }
+      "range": { "all-in": ["KK+", "AKs", "AKo"] }
     },
     {
       "position": "MP",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "none",
-      "range": {
-        "raise": ["22+", "A4s+", "K9s+", "QJs", "JTs", "T9s", "98s", "AJo+", "KQo"]
-      }
+      "range": { "raise": ["22+", "A4s+", "K9s+", "QJs", "JTs", "T9s", "98s", "AJo+", "KQo"] }
     },
     {
       "position": "MP",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "raise",
-      "range": {
-        "3-bet": ["TT+", "AQs+", "AKo", "A5s"],
-        "call": ["99-22", "AJs-ATs", "KTs+", "QJs", "JTs", "T9s", "AQo"]
-      }
+      "range": { "3-bet": ["TT+", "AQs+", "AKo", "A5s"], "call": ["99-22", "AJs-ATs", "KTs+", "QJs", "JTs", "T9s", "AQo"] }
     },
     {
       "position": "MP",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "3-bet",
-      "range": {
-        "all-in": ["TT+", "AKs", "AKo", "AQs"]
-      }
+      "range": { "all-in": ["TT+", "AKs", "AKo", "AQs"] }
     },
     {
       "position": "MP",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["QQ+", "AKs", "AKo"]
-      }
+      "range": { "all-in": ["QQ+", "AKs", "AKo"] }
     },
     {
       "position": "UTG",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "none",
-      "range": {
-        "raise": ["66+", "A9s+", "KTs+", "QJs", "JTs", "T9s", "98s", "AJo+", "KQo"]
-      }
+      "range": { "raise": ["66+", "A9s+", "KTs+", "QJs", "JTs", "T9s", "98s", "AJo+", "KQo"] }
     },
     {
       "position": "UTG",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "raise",
-      "range": {
-        "3-bet": ["QQ+", "AKs", "AKo"],
-        "call": ["JJ-77", "AQs-AJs", "KQs"]
-      }
+      "range": { "3-bet": ["QQ+", "AKs", "AKo"], "call": ["JJ-77", "AQs-AJs", "KQs"] }
     },
     {
       "position": "UTG",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "3-bet",
-      "range": {
-        "4-bet": ["KK+", "AKs", "AKo"],
-        "call": ["QQ"]
-      }
+      "range": { "4-bet": ["KK+", "AKs", "AKo"], "call": ["QQ"] }
     },
     {
       "position": "UTG",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["KK+", "AKs", "AKo"]
-      }
+      "range": { "all-in": ["KK+", "AKs", "AKo"] }
     },
     {
       "position": "UTG",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "none",
-      "range": {
-        "raise": ["66+", "A9s+", "KTs+", "QJs", "JTs", "T9s", "ATo+", "KQo"]
-      }
+      "range": { "raise": ["66+", "A9s+", "KTs+", "QJs", "JTs", "T9s", "ATo+", "KQo"] }
     },
     {
       "position": "UTG",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "raise",
-      "range": {
-        "3-bet": ["JJ+", "AKs", "AKo"],
-        "call": ["TT-66", "AQs-AJs", "KQs"]
-      }
+      "range": { "3-bet": ["JJ+", "AKs", "AKo"], "call": ["TT-66", "AQs-AJs", "KQs"] }
     },
     {
       "position": "UTG",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "3-bet",
-      "range": {
-        "all-in": ["JJ+", "AKs", "AKo"]
-      }
+      "range": { "all-in": ["JJ+", "AKs", "AKo"] }
     },
     {
       "position": "UTG",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["QQ+", "AKs", "AKo"]
-      }
+      "range": { "all-in": ["QQ+", "AKs", "AKo"] }
     },
     {
       "position": "SB",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "none",
-      "range": {
-        "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"],
-        "call": []
-      }
+      "range": { "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"], "call": [] }
     },
     {
       "position": "SB",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "raise",
-      "range": {
-        "3-bet": ["TT+", "AQs+", "KQs", "A5s-A4s", "AKo", "AQo"],
-        "call": ["99-22", "AJs-A6s", "A3s-A2s", "KJs-KTs", "QJs-QTs", "JTs", "T9s", "98s", "87s", "76s", "65s", "ATo-A9o", "KQo", "KJo", "QJo", "JTo"]
-      }
+      "range": { "3-bet": ["TT+", "AQs+", "KQs", "A5s-A4s", "AKo", "AQo"], "call": ["99-22", "AJs-A6s", "A3s-A2s", "KJs-KTs", "QJs-QTs", "JTs", "T9s", "98s", "87s", "76s", "65s", "ATo-A9o", "KQo", "KJo", "QJo", "JTo"] }
     },
     {
       "position": "SB",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "3-bet",
-      "range": {
-        "4-bet": ["QQ+", "AKs", "AKo"],
-        "call": ["JJ-TT", "AQs", "AQo"]
-      }
+      "range": { "4-bet": ["QQ+", "AKs", "AKo"], "call": ["JJ-TT", "AQs", "AQo"] }
     },
     {
       "position": "SB",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["KK+", "AKs", "AKo"]
-      }
+      "range": { "all-in": ["KK+", "AKs", "AKo"] }
     },
     {
       "position": "SB",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "none",
-      "range": {
-        "raise": ["22+", "A2s+", "K2s+", "Q5s+", "J7s+", "T7s+", "97s+", "87s", "A2o+", "K9o+", "QTo+", "JTo"],
-        "call": ["K3s-K2s", "Q4s-Q2s", "J6s-J2s", "T6s-T5s", "96s-95s", "86s", "76s", "65s", "54s", "K8o-K2o", "Q9o-Q2o", "J9o-J7o", "T9o-T8o", "98o", "87o", "76o", "65o"]
-      }
+      "range": { "raise": ["22+", "A2s+", "K2s+", "Q5s+", "J7s+", "T7s+", "97s+", "87s", "A2o+", "K9o+", "QTo+", "JTo"], "call": ["K3s-K2s", "Q4s-Q2s", "J6s-J2s", "T6s-T5s", "96s-95s", "86s", "76s", "65s", "54s", "K8o-K2o", "Q9o-Q2o", "J9o-J7o", "T9o-T8o", "98o", "87o", "76o", "65o"] }
     },
     {
       "position": "SB",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "raise",
-      "range": {
-        "3-bet": ["99+", "AJs+", "KQs", "A5s-A4s", "AKo"],
-        "call": ["88-22", "ATs-A6s", "A3s-A2s", "KJs-KTs", "QJs-QTs", "JTs", "T9s", "98s", "87s", "AQo-ATo", "KQo", "QJo", "JTo"]
-      }
+      "range": { "3-bet": ["99+", "AJs+", "KQs", "A5s-A4s", "AKo"], "call": ["88-22", "ATs-A6s", "A3s-A2s", "KJs-KTs", "QJs-QTs", "JTs", "T9s", "98s", "87s", "AQo-ATo", "KQo", "QJo", "JTo"] }
     },
     {
       "position": "SB",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "3-bet",
-      "range": {
-        "all-in": ["TT+", "AQs+", "AKo"]
-      }
+      "range": { "all-in": ["TT+", "AQs+", "AKo"] }
     },
     {
       "position": "SB",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["TT+", "AQs+", "AKo"]
-      }
+      "range": { "all-in": ["TT+", "AQs+", "AKo"] }
     },
     {
       "position": "BB",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "none",
-      "range": {
-        "raise": ["A2s+", "K2s+", "Q2s+", "J2s+", "T2s+", "95s+", "84s+", "74s+", "63s+", "53s+", "43s", "A2o+", "K2o+", "Q2o+", "J5o+", "T7o+", "97o+", "87o"],
-        "call": []
-      }
+      "range": { "raise": ["A2s+", "K2s+", "Q2s+", "J2s+", "T2s+", "95s+", "84s+", "74s+", "63s+", "53s+", "43s", "A2o+", "K2o+", "Q2o+", "J5o+", "T7o+", "97o+", "87o"], "call": [] }
     },
     {
       "position": "BB",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "raise",
-      "range": {
-        "3-bet": ["TT+", "AQs+", "KQs", "A5s-A4s", "AKo", "AQo"],
-        "call": ["99-22", "AJs-A2s", "KJs-K2s", "QJs-Q2s", "JTs-J2s", "T9s-T2s", "98s-92s", "87s-82s", "76s-72s", "65s-62s", "54s-52s", "43s-42s", "32s", "AJo-A2o", "KQo-K2o", "QJo-Q2o", "JTo-J7o", "T9o-T8o", "98o"]
-      }
+      "range": { "3-bet": ["TT+", "AQs+", "KQs", "A5s-A4s", "AKo", "AQo"], "call": ["99-22", "AJs-A2s", "KJs-K2s", "QJs-Q2s", "JTs-J2s", "T9s-T2s", "98s-92s", "87s-82s", "76s-72s", "65s-62s", "54s-52s", "43s-42s", "32s", "AJo-A2o", "KQo-K2o", "QJo-Q2o", "JTo-J7o", "T9o-T8o", "98o"] }
     },
     {
       "position": "BB",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "3-bet",
-      "range": {
-        "4-bet": ["QQ+", "AKs", "AKo"],
-        "call": ["JJ-TT", "AQs-AJs", "KQs", "AQo-AJo", "KQo"]
-      }
+      "range": { "4-bet": ["QQ+", "AKs", "AKo"], "call": ["JJ-TT", "AQs-AJs", "KQs", "AQo-AJo", "KQo"] }
     },
     {
       "position": "BB",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["KK+", "AKs", "AKo"]
-      }
+      "range": { "all-in": ["KK+", "AKs", "AKo"] }
     },
     {
       "position": "BB",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "none",
-      "range": {
-        "raise": ["A2s+", "K2s+", "Q2s+", "J2s+", "T4s+", "95s+", "85s+", "75s+", "64s+", "54s", "A2o+", "K2o+", "Q5o+", "J7o+", "T8o+", "98o"],
-        "call": []
-      }
+      "range": { "raise": ["A2s+", "K2s+", "Q2s+", "J2s+", "T4s+", "95s+", "85s+", "75s+", "64s+", "54s", "A2o+", "K2o+", "Q5o+", "J7o+", "T8o+", "98o"], "call": [] }
     },
     {
       "position": "BB",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "raise",
-      "range": {
-        "3-bet": ["99+", "AJs+", "KQs", "AKo"],
-        "call": ["88-22", "ATs-A2s", "KJs-K2s", "QJs-Q2s", "JTs-J2s", "T9s-T2s", "98s-92s", "87s-82s", "76s-72s", "65s-62s", "54s-52s", "43s-42s", "32s", "AQo-A2o", "KQo-K2o", "QJo-Q5o", "JTo-J7o", "T9o-T8o", "98o"]
-      }
+      "range": { "3-bet": ["99+", "AJs+", "KQs", "AKo"], "call": ["88-22", "ATs-A2s", "KJs-K2s", "QJs-Q2s", "JTs-J2s", "T9s-T2s", "98s-92s", "87s-82s", "76s-72s", "65s-62s", "54s-52s", "43s-42s", "32s", "AQo-A2o", "KQo-K2o", "QJo-Q5o", "JTo-J7o", "T9o-T8o", "98o"] }
     },
     {
       "position": "BB",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "3-bet",
-      "range": {
-        "all-in": ["99+", "AJs+", "KQs", "AKo"],
-        "call": ["88-22", "ATs-A2s", "KJs-K2s", "QJs-Q2s", "JTs-J2s", "T9s-T2s", "98s-92s", "87s-82s", "76s-72s", "65s-62s", "54s-52s", "43s-42s", "32s", "AQo-A2o", "KQo-K2o", "QJo-Q5o", "JTo-J7o", "T9o-T8o", "98o"]
-      }
+      "range": { "all-in": ["99+", "AJs+", "KQs", "AKo"], "call": ["88-22", "ATs-A2s", "KJs-K2s", "QJs-Q2s", "JTs-J2s", "T9s-T2s", "98s-92s", "87s-82s", "76s-72s", "65s-62s", "54s-52s", "43s-42s", "32s", "AQo-A2o", "KQo-K2o", "QJo-Q5o", "JTo-J7o", "T9o-T8o", "98o"] }
     },
     {
       "position": "BB",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "cash",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["99+", "AQs+", "AKo"]
-      }
+      "range": { "all-in": ["99+", "AQs+", "AKo"] }
     },
     {
       "position": "BTN",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "tournament",
       "previousAction": "3-bet",
-      "range": {
-        "4-bet": ["TT+", "AKs", "AQs", "AKo", "A5s"],
-        "call": ["99-77", "AJs-ATs", "KQs-KJs", "QJs", "JTs", "T9s", "AQo"]
-      }
+      "range": { "4-bet": ["TT+", "AKs", "AQs", "AKo", "A5s"], "call": ["99-77", "AJs-ATs", "KQs-KJs", "QJs", "JTs", "T9s", "AQo"] }
     },
     {
       "position": "BTN",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "tournament",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["QQ+", "AKs", "AKo"],
-        "call": ["JJ-TT", "AQs"]
-      }
+      "range": { "all-in": ["QQ+", "AKs", "AKo"], "call": ["JJ-TT", "AQs"] }
     },
     {
       "position": "CO",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "tournament",
       "previousAction": "3-bet",
-      "range": {
-        "4-bet": ["JJ+", "AKs", "AKo"],
-        "call": ["TT-99", "AQs", "AQo"]
-      }
+      "range": { "4-bet": ["JJ+", "AKs", "AKo"], "call": ["TT-99", "AQs", "AQo"] }
     },
     {
       "position": "CO",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "tournament",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["QQ+", "AKs", "AKo"],
-        "call": ["JJ", "AQs"]
-      }
+      "range": { "all-in": ["QQ+", "AKs", "AKo"], "call": ["JJ", "AQs"] }
     },
     {
       "position": "MP",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "tournament",
       "previousAction": "3-bet",
-      "range": {
-        "4-bet": ["QQ+", "AKs", "AKo"],
-        "call": ["JJ-TT", "AQs", "AQo"]
-      }
+      "range": { "4-bet": ["QQ+", "AKs", "AKo"], "call": ["JJ-TT", "AQs", "AQo"] }
     },
     {
       "position": "MP",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "tournament",
       "previousAction": "4-bet",
-      "range": {
-        "all-in": ["QQ+", "AKs", "AKo"],
-        "call": ["JJ"]
-      }
+      "range": { "all-in": ["QQ+", "AKs", "AKo"], "call": ["JJ"] }
     },
     {
       "position": "UTG",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "tournament",
       "previousAction": "3-bet",
-      "range": {
-        "4-bet": ["KK+", "AKs", "AKo"],
-        "call": ["QQ-JJ", "AQs"]
-      }
+      "range": { "4-bet": ["KK+", "AKs", "AKo"], "call": ["QQ-JJ", "AQs"] }
     },
     {
       "position": "BTN",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "tournament",
       "previousAction": "3-bet",
-      "range": {
-        "all-in": ["99+", "AQs+", "AKo", "A5s"],
-        "call": ["88-77", "AJs-ATs", "KQs-KJs", "QJs", "JTs", "AQo"]
-      }
+      "range": { "all-in": ["99+", "AQs+", "AKo", "A5s"], "call": ["88-77", "AJs-ATs", "KQs-KJs", "QJs", "JTs", "AQo"] }
     },
     {
       "position": "CO",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "tournament",
       "previousAction": "3-bet",
-      "range": {
-        "all-in": ["TT+", "AQs+", "AKo", "A5s"],
-        "call": ["99-88", "AJs", "KQs", "AQo"]
-      }
+      "range": { "all-in": ["TT+", "AQs+", "AKo", "A5s"], "call": ["99-88", "AJs", "KQs", "AQo"] }
     },
     {
       "position": "MP",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "tournament",
       "previousAction": "3-bet",
-      "range": {
-        "all-in": ["TT+", "AKs", "AQs", "AKo"],
-        "call": ["99", "AJs"]
-      }
+      "range": { "all-in": ["TT+", "AKs", "AQs", "AKo"], "call": ["99", "AJs"] }
     },
     {
       "position": "UTG",
-      "stackSize": 40,
+      "stackRange": { "min": 21, "max": 70 },
       "tableType": "tournament",
       "previousAction": "3-bet",
-      "range": {
-        "all-in": ["JJ+", "AKs", "AKo"],
-        "call": ["TT"]
-      }
+      "range": { "all-in": ["JJ+", "AKs", "AKo"], "call": ["TT"] }
     }
   ]
 }
