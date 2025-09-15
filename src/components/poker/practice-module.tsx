@@ -341,6 +341,8 @@ export function PracticeModule() {
 
   const isBBvsLimp =
     state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
+  
+  const isSBOpen = state.scenario.position === 'SB' && state.scenario.previousAction === 'none';
 
   if (state.isLoading || !state.currentHand) {
     return (
@@ -356,7 +358,11 @@ export function PracticeModule() {
   let descriptionText = '';
   switch (state.scenario.previousAction) {
     case 'none':
-      descriptionText = `Nadie ha apostado todavía. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      if (isBBvsLimp) {
+        descriptionText = `La mano llega limpia hasta ti en la Ciega Grande (BB). Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      } else {
+        descriptionText = `Nadie ha apostado todavía. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      }
       break;
     case 'raise':
       descriptionText = `Un oponente ha subido. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
@@ -371,7 +377,7 @@ export function PracticeModule() {
       descriptionText = `Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
   }
   
-  const showOpenRaiseActions = state.scenario.previousAction === 'none' && !isBBvsLimp;
+  const showOpenRaiseActions = state.scenario.previousAction === 'none' && !isBBvsLimp && !isSBOpen;
   const showVsRaiseActions = state.scenario.previousAction === 'raise';
   const showVs3BetActions = state.scenario.previousAction === '3-bet';
   const showVs4BetActions = state.scenario.previousAction === '4-bet';
@@ -425,10 +431,10 @@ export function PracticeModule() {
                               <SelectItem value="raise">
                                   Enfrentando un Open-Raise
                               </SelectItem>
-                              <SelectItem value="3-bet">
+                              <SelectItem value="3-bet" >
                                   Enfrentando un 3-Bet
                               </SelectItem>
-                              <SelectItem value="4-bet">
+                              <SelectItem value="4-bet" >
                                   Enfrentando un 4-Bet
                               </SelectItem>
                           </SelectContent>
@@ -593,6 +599,30 @@ export function PracticeModule() {
                                 onClick={() => handleAction('raise')}
                             >
                                 Bet 🚀
+                            </Button>
+                        </>
+                    ) : isSBOpen ? (
+                        <>
+                            <Button
+                                variant="destructive"
+                                size="lg"
+                                onClick={() => handleAction('fold')}
+                            >
+                                Fold 🤚
+                            </Button>
+                             <Button
+                                variant="secondary"
+                                size="lg"
+                                onClick={() => handleAction('call')}
+                            >
+                                Call 💰
+                            </Button>
+                            <Button
+                                variant="default"
+                                size="lg"
+                                onClick={() => handleAction('raise')}
+                            >
+                                Raise 🚀
                             </Button>
                         </>
                     ) : showOpenRaiseActions ? (
