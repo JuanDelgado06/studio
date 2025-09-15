@@ -351,11 +351,6 @@ export function PracticeModule() {
     dispatch({ type: 'SET_SCENARIO', payload: payload });
   };
 
-  const isBBvsLimp =
-    state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
-  
-  const isSBOpen = state.scenario.position === 'SB' && state.scenario.previousAction === 'none';
-
   if (state.isLoading || !state.currentHand) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[600px]">
@@ -367,35 +362,39 @@ export function PracticeModule() {
     );
   }
 
-    let descriptionText = '';
-    switch (state.scenario.previousAction) {
-        case 'none':
-        if (isBBvsLimp) {
-            descriptionText = `La mano llega limpia hasta ti en la Ciega Grande (BB). Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-        } else if (isSBOpen) {
-            descriptionText = `Todos los jugadores antes de ti se han retirado. La acción te llega en la Ciega Pequeña (SB) y te enfrentas solo a la Ciega Grande. Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-        } else {
-            descriptionText = `Nadie ha apostado todavía. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-        }
-        break;
-        case 'raise':
-        descriptionText = `Un oponente ha subido a 2.5 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-        break;
-        case '3-bet':
-        descriptionText = `Te enfrentas a un 3-bet de 9 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-        break;
-        case '4-bet':
-        descriptionText = `Te enfrentas a un 4-bet de 22 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-        break;
-        default:
-        descriptionText = `Estás en tu turno de jugar ahora.`;
-    }
+  // --- Start of Logic to be moved ---
+  const isBBvsLimp =
+    state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
   
+  const isSBOpen = state.scenario.position === 'SB' && state.scenario.previousAction === 'none';
+  
+  let descriptionText = `Estás en tu turno de jugar ahora.`;
+  switch (state.scenario.previousAction) {
+    case 'none':
+      if (isBBvsLimp) {
+        descriptionText = `La mano llega limpia hasta ti en la Ciega Grande (BB). Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      } else if (isSBOpen) {
+        descriptionText = `Todos los jugadores antes de ti se han retirado. La acción te llega en la Ciega Pequeña (SB) contra la Ciega Grande. Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      } else {
+        descriptionText = `Nadie ha apostado todavía. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      }
+      break;
+    case 'raise':
+      descriptionText = `Un oponente ha subido a 2.5 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      break;
+    case '3-bet':
+      descriptionText = `Te enfrentas a un 3-bet de 9 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      break;
+    case '4-bet':
+      descriptionText = `Te enfrentas a un 4-bet de 22 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
+      break;
+  }
+
   const showOpenRaiseActions = state.scenario.previousAction === 'none' && !isBBvsLimp && !isSBOpen;
   const showVsRaiseActions = state.scenario.previousAction === 'raise';
   const showVs3BetActions = state.scenario.previousAction === '3-bet';
   const showVs4BetActions = state.scenario.previousAction === '4-bet';
-
+  // --- End of Logic to be moved ---
 
   return (
     <div className="space-y-6">
@@ -751,6 +750,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-    
-    
