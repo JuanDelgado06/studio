@@ -1,0 +1,36 @@
+
+{
+  "explanations": [
+    {
+      "position": "BTN",
+      "stackSize": 100,
+      "tableType": "cash",
+      "hand": "A5s",
+      "action": "3-bet",
+      "isOptimal": true,
+      "feedback": "Correcto. 3-betear con A5s desde el botón contra un open-raise es una jugada estándar y rentable. Polariza tu rango de 3-bet, equilibra tus manos de valor y puede hacer que el rival foldee manos mejores.",
+      "evExplanation": "El EV de 3-betear aquí es superior al de solo hacer call o fold. Capitaliza la fold equity y mantiene la iniciativa con una mano que tiene buena jugabilidad post-flop."
+    },
+    {
+      "position": "UTG",
+      "stackSize": 100,
+      "tableType": "cash",
+      "hand": "87s",
+      "action": "raise",
+      "isOptimal": false,
+      "feedback": "Incorrecto. Abrir con 87s desde UTG en una mesa de cash de 100bb es demasiado loose. Estas manos son difíciles de jugar fuera de posición y a menudo estarás dominado.",
+      "evExplanation": "El EV de hacer open-raise con esta mano desde UTG es negativo. Es un fold claro para proteger tu stack de situaciones marginales y con EV negativo a largo plazo."
+    },
+    {
+        "position": "BB",
+        "stackSize": 100,
+        "tableType": "cash",
+        "hand": "KJo",
+        "action": "call",
+        "isOptimal": true,
+        "isOptimalVsBtn": true,
+        "feedback": "Correcto. Defender tu ciega grande con KJo pagando contra un open-raise del botón es una jugada estándar. Tienes una mano fuerte que domina a muchas de las manos del rango de apertura del botón.",
+        "evExplanation": "El EV de hacer call es significativamente mayor que el de foldear, ya que estás cerrando la acción y tienes una buena probabilidad de ganar el pozo post-flop. Un 3-bet también podría ser una opción, pero el call es la jugada más común y sólida."
+    }
+  ]
+}
