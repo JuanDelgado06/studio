@@ -21,16 +21,18 @@ import { Button } from '@/components/ui/button';
 import { PokerCard } from './poker-card';
 import { POSITIONS, STACK_SIZES, TABLE_TYPES, PREVIOUS_ACTIONS, POSITION_NAMES } from '@/lib/data';
 import type { Position, TableType, Action, PreviousAction, GtoRangeScenario } from '@/lib/types';
-import { getPreflopExplanationAction, getOrGenerateRangeAction, getDbRangesKeys } from '@/lib/actions';
+import { getPreflopExplanationAction, getOrGenerateRangeAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { CheckCircle, Info, Loader2, Database, Sparkles, Settings, Shuffle, XCircle } from 'lucide-react';
+import { CheckCircle, Info, Loader2, Database, Sparkles, Settings, Shuffle, XCircle, Hand } from 'lucide-react';
 import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
 import { expandRange } from '@/lib/range-expander';
 import type { HandRange } from '@/lib/types';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
+import { Input } from '../ui/input';
+import { Separator } from '../ui/separator';
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const SUITS = ['s', 'h', 'd', 'c'];
@@ -79,31 +81,80 @@ function getRandomCard(deck: string[]): {
   return { card, remainingDeck };
 }
 
-function getNewHand() {
-  let deck: string[] = [];
-  for (const suit of SUITS) {
-    for (const rank of RANKS) {
-      deck.push(`${rank}${suit}`);
-    }
-  }
+function getNewHand(handNotationStr?: string): { handNotation: string; cards: [string, string] } | null {
+  if (handNotationStr) {
+      // User provided a hand, let's parse and create it
+      const hand = handNotationStr.trim().replace(/ /g, '');
+      if (hand.length < 2 || hand.length > 3) return null;
 
-  const { card: card1, remainingDeck: deckAfterCard1 } = getRandomCard(deck);
-  const { card: card2 } = getRandomCard(deckAfterCard1);
+      const r1 = hand[0].toUpperCase();
+      const r2 = hand[1].toUpperCase();
+      if (!RANKS.includes(r1) || !RANKS.includes(r2)) return null;
 
-  const rank1Index = RANKS.indexOf(card1[0]);
-  const rank2Index = RANKS.indexOf(card2[0]);
+      const isPair = r1 === r2;
+      let isSuited = false;
 
-  let handNotation;
-  if (rank1Index === rank2Index) {
-    handNotation = `${card1[0]}${card2[0]}`;
+      if (hand.length === 3) {
+          const suffix = hand[2].toLowerCase();
+          if (suffix !== 's' && suffix !== 'o') return null;
+          isSuited = suffix === 's';
+      }
+
+      if (isPair && hand.length === 3) return null; // e.g. AAo is invalid
+
+      const rank1Index = RANKS.indexOf(r1);
+      const rank2Index = RANKS.indexOf(r2);
+      
+      const highRank = RANKS[Math.min(rank1Index, rank2Index)];
+      const lowRank = RANKS[Math.max(rank1Index, rank2Index)];
+
+      const finalNotation = isPair ? `${r1}${r1}` : `${highRank}${lowRank}${isSuited ? 's' : 'o'}`;
+      
+      // Generate random suits for the visual cards
+      const availableSuits = [...SUITS];
+      const suit1Index = Math.floor(Math.random() * availableSuits.length);
+      const suit1 = availableSuits.splice(suit1Index, 1)[0];
+
+      let suit2;
+      if (isSuited) {
+          suit2 = suit1;
+      } else {
+          const suit2Index = Math.floor(Math.random() * availableSuits.length);
+          suit2 = availableSuits[suit2Index];
+      }
+
+      const card1Str = `${r1}${suit1}`;
+      const card2Str = `${r2}${suit2}`;
+      
+      return { handNotation: finalNotation, cards: [card1Str, card2Str] };
+
   } else {
-    const highRank = RANKS[Math.min(rank1Index, rank2Index)];
-    const lowRank = RANKS[Math.max(rank1Index, rank2Index)];
-    const suited = card1[1] === card2[1] ? 's' : 'o';
-    handNotation = `${highRank}${lowRank}${suited}`;
-  }
+      // Generate a completely random hand
+      let deck: string[] = [];
+      for (const suit of SUITS) {
+        for (const rank of RANKS) {
+          deck.push(`${rank}${suit}`);
+        }
+      }
 
-  return { handNotation, cards: [card1, card2] as [string, string] };
+      const { card: card1, remainingDeck: deckAfterCard1 } = getRandomCard(deck);
+      const { card: card2 } = getRandomCard(deckAfterCard1);
+
+      const rank1Index = RANKS.indexOf(card1[0]);
+      const rank2Index = RANKS.indexOf(card2[0]);
+
+      let handNotation;
+      if (rank1Index === rank2Index) {
+        handNotation = `${card1[0]}${card2[0]}`;
+      } else {
+        const highRank = RANKS[Math.min(rank1Index, rank2Index)];
+        const lowRank = RANKS[Math.max(rank1Index, rank2Index)];
+        const suited = card1[1] === card2[1] ? 's' : 'o';
+        handNotation = `${highRank}${lowRank}${suited}`;
+      }
+
+      return { handNotation, cards: [card1, card2] as [string, string] };
+  }
 }
 
 function getRandomScenario(): Scenario {
@@ -218,8 +269,8 @@ const reducer = (state: State, action: ActionPayload): State => {
 export function PracticeModule() {
   const { toast } = useToast();
   const { recordHand } = useStats();
-  const [dbScenarios, setDbScenarios] = useState<GtoRangeScenario[]>([]);
   const [isSheetOpen, setSheetOpen] = useState(false);
+  const [customHand, setCustomHand] = useState('');
 
   const [state, dispatch] = useReducer(reducer, {
     scenario: {
@@ -249,13 +300,18 @@ export function PracticeModule() {
     }
   }, []);
   
-  const setAndFetchScenario = useCallback((scenario: Scenario) => {
-      dispatch({ type: 'SET_SCENARIO', payload: { scenario, hand: getNewHand() } });
+  const setAndFetchScenario = useCallback((scenario: Scenario, handNotation?: string) => {
+      const hand = getNewHand(handNotation);
+      if (!hand) {
+          toast({ variant: 'destructive', title: 'Mano Inválida', description: 'El formato de la mano no es correcto. Usa AAs, AKs, AQo, etc.'});
+          return;
+      }
+      dispatch({ type: 'SET_SCENARIO', payload: { scenario, hand } });
       findRangeForScenario(scenario);
-  }, [findRangeForScenario]);
+  }, [findRangeForScenario, toast]);
 
 
-  // Initial load and fetch DB keys
+  // Initial load
   useEffect(() => {
     const initialScenario: Scenario = {
         position: 'BTN',
@@ -264,14 +320,6 @@ export function PracticeModule() {
         previousAction: 'none',
     };
     setAndFetchScenario(initialScenario);
-
-    const fetchKeys = async () => {
-        const result = await getDbRangesKeys();
-        if (result.success && result.data) {
-            setDbScenarios(result.data);
-        }
-    }
-    fetchKeys();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -355,6 +403,7 @@ export function PracticeModule() {
   const handleRandomizeScenario = useCallback(() => {
     const newScenario = getRandomScenario();
     setAndFetchScenario(newScenario);
+    setCustomHand('');
     setSheetOpen(false);
   }, [setAndFetchScenario]);
 
@@ -364,49 +413,13 @@ export function PracticeModule() {
 
   const handleSetScenario = (payload: Partial<Scenario>) => {
     const newScenario = { ...state.scenario, ...payload };
-    setAndFetchScenario(newScenario);
+    setAndFetchScenario(newScenario, customHand);
     setSheetOpen(false);
   };
   
-  const handleFindDbScenario = () => {
-      if (dbScenarios.length === 0) {
-          toast({ variant: 'destructive', title: 'Error', description: 'No se encontraron escenarios en la BD.'});
-          return;
-      }
-      const randomDbScenario = dbScenarios[Math.floor(Math.random() * dbScenarios.length)];
-      // Create a scenario from the DB range document
-      const newScenario: Scenario = {
-        position: randomDbScenario.position,
-        tableType: randomDbScenario.tableType,
-        previousAction: randomDbScenario.previousAction,
-        // Pick a random stack size within the range for variety
-        stackSize: Math.floor(Math.random() * (randomDbScenario.stackRange.max - randomDbScenario.stackRange.min + 1)) + randomDbScenario.stackRange.min,
-      };
-      setAndFetchScenario(newScenario);
-      setSheetOpen(false);
-  };
-
-  const isScenarioInDb = (scenario: Scenario) => {
-    return dbScenarios.some(dbScenario => 
-      dbScenario.position === scenario.position &&
-      dbScenario.tableType === scenario.tableType &&
-      dbScenario.previousAction === scenario.previousAction &&
-      scenario.stackSize >= dbScenario.stackRange.min &&
-      scenario.stackSize <= dbScenario.stackRange.max
-    );
-  };
-
-  const handleForceAiScenario = () => {
-      let newScenario: Scenario;
-      let attempts = 0;
-      do {
-        newScenario = getRandomScenario();
-        attempts++;
-      } while (isScenarioInDb(newScenario) && attempts < 50); // Avoid infinite loops
-
-      setAndFetchScenario(newScenario);
-      setSheetOpen(false);
-  };
+  const handleSetCustomHandAndScenario = () => {
+      handleSetScenario({});
+  }
 
   const generateDescription = () => {
     const { position, tableType, stackSize, previousAction } = state.scenario;
@@ -494,25 +507,27 @@ export function PracticeModule() {
                           className="w-full"
                       >
                           <Shuffle className="mr-2 h-4 w-4" />
-                          Aleatorio
+                          Escenario Aleatorio
                       </Button>
-                      <Button
-                          variant="outline"
-                          onClick={handleFindDbScenario}
-                          className="w-full"
-                          disabled={dbScenarios.length === 0}
-                      >
-                          <Database className="mr-2 h-4 w-4" />
-                          Buscar Escenario en BD
-                      </Button>
-                      <Button
-                          variant="outline"
-                          onClick={handleForceAiScenario}
-                          className="w-full"
-                      >
-                          <Sparkles className="mr-2 h-4 w-4" />
-                          Forzar Generación IA
-                      </Button>
+                      
+                      <Separator />
+
+                      <div className="space-y-2">
+                        <Label>Mano Específica (Opcional)</Label>
+                        <div className="flex gap-2">
+                            <Input 
+                                placeholder="Ej: AKs, 77, T9o"
+                                value={customHand}
+                                onChange={(e) => setCustomHand(e.target.value)}
+                            />
+                            <Button onClick={handleSetCustomHandAndScenario}><Hand className="h-4 w-4"/></Button>
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      <h3 className="font-semibold">Escenario de Práctica</h3>
+
                       <div className="space-y-2">
                           <Label htmlFor="previous-action-sheet">Acción Previa</Label>
                           <Select
