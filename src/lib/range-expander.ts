@@ -106,7 +106,7 @@ export function expandRange(summary: GenerateGtoRangeOutput): HandRange {
       parsed.forEach(h => {
         // Ensure we don't overwrite a stronger action with a weaker one (e.g. all-in > raise)
         const existingAction = handRange[h];
-        const actionStrength: Record<Action, number> = { 'fold': 0, 'call': 1, 'raise': 2, '3-bet': 3, 'all-in': 4 };
+        const actionStrength: Record<Action, number> = { 'fold': 0, 'call': 1, 'raise': 2, '3-bet': 3, '4-bet': 4, 'all-in': 5 };
         if (!existingAction || actionStrength[action] > actionStrength[existingAction]) {
             handRange[h] = action;
         }
@@ -119,8 +119,8 @@ export function expandRange(summary: GenerateGtoRangeOutput): HandRange {
   processAction(summary.call, 'call');
   processAction(summary.raise, 'raise');
   processAction(summary['3-bet'], '3-bet');
+  processAction(summary['4-bet'], '4-bet');
   processAction(summary['all-in'], 'all-in');
   
   return handRange;
 }
-

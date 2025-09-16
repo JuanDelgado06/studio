@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export type Position = 'SB' | 'BB' | 'UTG' | 'MP' | 'CO' | 'BTN';
 export type TableType = 'cash' | 'tournament';
-export type Action = 'fold' | 'call' | 'raise' | '3-bet' | 'all-in';
+export type Action = 'fold' | 'call' | 'raise' | '3-bet' | '4-bet' | 'all-in';
 export type PreviousAction = 'none' | 'raise' | '3-bet' | '4-bet';
 export type Hand = {
     card1: string;
@@ -27,6 +27,7 @@ export const GenerateGtoRangeOutputSchema = z.object({
     raise: z.array(z.string()).optional().describe('Hands to raise. Use range notation (e.g., "77+", "ATs+", "KJo-KTo").'),
     call: z.array(z.string()).optional().describe('Hands to call. Use range notation.'),
     '3-bet': z.array(z.string()).optional().describe('Hands to 3-bet. Use range notation.'),
+    '4-bet': z.array(z.string()).optional().describe('Hands to 4-bet. Use range notation.'),
     'all-in': z.array(z.string()).optional().describe('Hands to go all-in. Use range notation.'),
     fold: z.array(z.string()).optional().describe('Optional. It is assumed any hand not listed is a fold. Use range notation.'),
 }).describe('A JSON object representing the GTO hand range for the given scenario.');
@@ -50,4 +51,3 @@ export const GtoRangeDocumentSchema = z.object({
     range: GenerateGtoRangeOutputSchema,
 }).passthrough();
 export type GtoRangeScenario = z.infer<typeof GtoRangeDocumentSchema>;
-    

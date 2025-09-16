@@ -226,8 +226,9 @@ const reducer = (state: State, action: ActionPayload): State => {
 
       const isAggressiveActionCorrect = ['3-bet', 'all-in'].includes(correctAction) && actionTaken === 'raise';
       const isRaiseSynonymCorrect = correctAction === 'raise' && actionTaken === '3-bet' && state.scenario.previousAction !== 'none';
+      const is4BetCorrect = correctAction === '4-bet' && (actionTaken === 'raise' || actionTaken === '4-bet');
 
-      const isOptimal = actionTaken === correctAction || isAggressiveActionCorrect || isRaiseSynonymCorrect;
+      const isOptimal = actionTaken === correctAction || isAggressiveActionCorrect || isRaiseSynonymCorrect || is4BetCorrect;
 
       return {
         ...state,
@@ -810,7 +811,7 @@ export function PracticeModule() {
                                 style={{backgroundColor: 'hsl(var(--accent))'}}
                                 className="text-accent-foreground hover:bg-accent/90"
                                 size="lg"
-                                onClick={() => handleAction('raise')} // This becomes a 4-bet
+                                onClick={() => handleAction('4-bet')}
                             >
                                 4-Bet 💣
                             </Button>
