@@ -7,7 +7,7 @@ import { suggestImprovementExercises as suggestImprovementExercisesFlow } from "
 import { z } from "zod";
 import { generateGtoRange } from "@/ai/flows/generate-gto-range";
 import clientPromise from "./mongodb";
-import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema, GtoRangeDocumentSchema, GtoRangeScenario } from "./types";
+import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema, GtoRangeDocumentSchema } from "./types";
 import type { GetPreflopExplanationOutput } from "@/ai/flows/get-preflop-explanation";
 
 // Zod Schemas for input validation
@@ -43,12 +43,10 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     const existingRangeDoc = await rangesCollection.findOne(query);
 
     if (existingRangeDoc) {
-      const parsedRange = GtoRangeDocumentSchema.extend({
-        range: GenerateGtoRangeOutputSchema
-      }).safeParse(existingRangeDoc);
-
-      if (parsedRange.success) {
-        return { success: true, data: parsedRange.data.range, source: 'db' };
+       // The range data is nested under the 'range' property.
+      const rangeData = existingRangeDoc.range;
+      if (rangeData) {
+        return { success: true, data: rangeData, source: 'db' };
       }
     }
 
@@ -58,13 +56,26 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
       throw new Error("AI failed to generate a range.");
     }
     
+    // Define a loose range for new entries
+    let minStack, maxStack;
+    if (validatedInput.stackSize <= 25) {
+      minStack = Math.max(10, validatedInput.stackSize - 5);
+      maxStack = validatedInput.stackSize + 5;
+    } else if (validatedInput.stackSize <= 50) {
+      minStack = validatedInput.stackSize - 10;
+      maxStack = validatedInput.stackSize + 10;
+    } else {
+      minStack = validatedInput.stackSize - 15;
+      maxStack = validatedInput.stackSize + 15;
+    }
+
     const newRangeDoc = {
       position: validatedInput.position,
       tableType: validatedInput.tableType,
       previousAction: validatedInput.previousAction,
       stackRange: {
-        min: validatedInput.stackSize - 5,
-        max: validatedInput.stackSize + 5
+        min: minStack,
+        max: maxStack
       },
       range: generatedRange,
       createdAt: new Date(),
@@ -76,6 +87,7 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
 
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error("Zod Error in getOrGenerateRangeAction:", error.flatten());
       return { success: false, error: "Invalid input for range generation." };
     }
     console.error("Error in getOrGenerateRangeAction:", error);
@@ -83,7 +95,7 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
   }
 }
 
-export async function getDbRangesKeys(): Promise<{ success: boolean; data?: GtoRangeScenario[], error?: string; }> {
+export async function getDbRangesKeys(): Promise<{ success: boolean; data?: z.infer<typeof GtoRangeDocumentSchema>[], error?: string; }> {
     try {
         const client = await clientPromise;
         const db = client.db("poker-pro");
