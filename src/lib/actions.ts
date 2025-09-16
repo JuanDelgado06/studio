@@ -8,6 +8,7 @@ import { z } from "zod";
 import { generateGtoRange } from "@/ai/flows/generate-gto-range";
 import clientPromise from "./mongodb";
 import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema, GtoRangeDocumentSchema, GtoRangeScenario } from "./types";
+import type { GetPreflopExplanationOutput } from "@/ai/flows/get-preflop-explanation";
 
 // Zod Schemas for input validation
 const PreflopDecisionSchema = z.object({
@@ -21,6 +22,12 @@ const PreflopDecisionSchema = z.object({
 
 const PreflopExplanationSchema = PreflopDecisionSchema.extend({
     isOptimal: z.boolean(),
+});
+
+// Schema for the document to be stored in the 'explanations' collection
+const ExplanationDocumentSchema = PreflopExplanationSchema.extend({
+  feedback: z.string(),
+  evExplanation: z.string(),
 });
 
 
@@ -40,17 +47,12 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
         'stackRange.max': { $gte: validatedInput.stackSize },
     };
     
-    // 1. Try to find the range in the database
     const existingRangeDoc = await rangesCollection.findOne(query);
 
     if (existingRangeDoc) {
-      return { success: true, data: existingRangeDoc.range, source: 'db' };
+      return { success: true, data: existingRangeDoc.range as GenerateGtoRangeOutput, source: 'db' };
     }
 
-    // 2. If not found, generate it with AI
-    // For generation and storage, we can define a default range or a specific logic.
-    // For now, let's just generate for the specific stack size.
-    // A more advanced implementation might determine the best range to generate.
     const generatedRange = await generateGtoRange(validatedInput);
 
     if (!generatedRange) {
@@ -58,7 +60,6 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     }
     
     // For now, we are not saving AI generated ranges back to the DB to avoid polluting the ranged structure.
-    // This can be a future improvement.
 
     return { success: true, data: generatedRange, source: 'ai' };
 
@@ -88,18 +89,51 @@ export async function getDbRangesKeys(): Promise<{ success: boolean; data?: GtoR
 }
 
 
-// Existing Server Actions
-export async function getPreflopExplanationAction(input: z.infer<typeof PreflopExplanationSchema>) {
+// Updated action to cache explanations
+export async function getPreflopExplanationAction(input: z.infer<typeof PreflopExplanationSchema>): Promise<{ success: boolean; data?: GetPreflopExplanationOutput | null; error?: string; source?: 'db' | 'ai' }> {
     try {
         const validatedInput = PreflopExplanationSchema.parse(input);
-        const result = await getPreflopExplanation(validatedInput);
-        return { success: true, data: result };
+        const client = await clientPromise;
+        const db = client.db("poker-pro");
+        const explanationsCollection = db.collection("explanations");
+        
+        // 1. Try to find the explanation in the database
+        const existingExplanation = await explanationsCollection.findOne(validatedInput);
+        
+        if (existingExplanation) {
+            return {
+                success: true,
+                data: {
+                    feedback: existingExplanation.feedback,
+                    evExplanation: existingExplanation.evExplanation,
+                },
+                source: 'db'
+            };
+        }
+
+        // 2. If not found, generate it with AI
+        const generatedExplanation = await getPreflopExplanation(validatedInput);
+        
+        if (!generatedExplanation) {
+            throw new Error("AI failed to generate an explanation.");
+        }
+
+        // 3. Save the new explanation to the database
+        const documentToInsert = {
+            ...validatedInput,
+            ...generatedExplanation,
+            createdAt: new Date(),
+        };
+        await explanationsCollection.insertOne(documentToInsert);
+
+        return { success: true, data: generatedExplanation, source: 'ai' };
+
     } catch (error) {
         if (error instanceof z.ZodError) {
             return { success: false, error: "Invalid input for explanation." };
         }
-        console.error(error);
-        return { success: false, error: "Failed to get explanation from AI." };
+        console.error("Error in getPreflopExplanationAction:", error);
+        return { success: false, error: "Failed to get or generate explanation." };
     }
 }
 
@@ -146,5 +180,3 @@ export async function suggestImprovementExercises(input: z.infer<typeof SuggestI
         return { success: false, error: 'Failed to get suggested exercises from AI.' };
     }
 }
-
-    
