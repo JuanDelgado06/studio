@@ -61,7 +61,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Manos Jugadas</CardTitle>
@@ -103,7 +103,7 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      <Card className="lg:col-span-2">
+      <Card className="sm:col-span-2 lg:col-span-2">
         <CardHeader>
           <CardTitle className="font-headline">Precisión por Posición</CardTitle>
           <CardDescription>
@@ -115,7 +115,7 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
       
-      <Card className="lg:col-span-2">
+      <Card className="sm:col-span-2 lg:col-span-2">
         <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2">
                 <Target className="h-6 w-6"/>
@@ -140,7 +140,7 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      <Card className="lg:col-span-4">
+      <Card className="sm:col-span-2 lg:col-span-4">
         <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2">
                 <Lightbulb className="h-6 w-6 text-yellow-400"/>
@@ -182,7 +182,7 @@ export default function DashboardPage() {
       </Card>
 
 
-      <Card className="lg:col-span-4">
+      <Card className="sm:col-span-2 lg:col-span-4">
         <CardHeader>
           <CardTitle className="font-headline text-destructive">
             Zona de Peligro

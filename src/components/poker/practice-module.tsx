@@ -624,14 +624,14 @@ export function PracticeModule() {
         
         <Card>
             <CardHeader className="text-center">
-            <CardTitle className="font-headline mb-2">Tu Mano</CardTitle>
-            <CardDescription className="leading-relaxed">
+            <CardTitle className="font-headline mb-2 text-2xl sm:text-3xl">Tu Mano</CardTitle>
+            <CardDescription className="leading-relaxed px-2">
                 {descriptionText}
             </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center gap-8 min-h-[350px]">
+            <CardContent className="flex flex-col items-center justify-center gap-6 sm:gap-8 min-h-[350px]">
             {state.currentHand ? (
-                <div className="flex gap-4">
+                <div className="flex gap-2 sm:gap-4">
                 {renderCard(state.currentHand.cards[0])}
                 {renderCard(state.currentHand.cards[1])}
                 </div>
@@ -644,7 +644,7 @@ export function PracticeModule() {
                 <Alert
                     variant={state.feedback.isOptimal ? 'default' : 'destructive'}
                 >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                     <div className="flex flex-col">
                         <div className="flex items-center">
                             {state.feedback.isOptimal ? (
@@ -669,6 +669,7 @@ export function PracticeModule() {
                         size="sm"
                         onClick={handleShowExplanation}
                         disabled={state.explanationIsLoading}
+                        className="shrink-0"
                     >
                         {state.explanationIsLoading ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -707,17 +708,17 @@ export function PracticeModule() {
                         </p>
                     </div>
                 ) : state.currentHandRange ? (
-                    <div className="flex flex-wrap justify-center gap-4">
+                    <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-3 sm:gap-4 w-full px-4">
                     {isBBvsLimp ? (
                         <>
-                            <Button
+                            <Button className="w-full sm:w-auto"
                                 variant="secondary"
                                 size="lg"
                                 onClick={() => handleAction('call')}
                             >
                                 Check ✅
                             </Button>
-                             <Button
+                             <Button className="w-full sm:w-auto"
                                 variant="default"
                                 size="lg"
                                 onClick={() => handleAction('raise')}
@@ -727,21 +728,21 @@ export function PracticeModule() {
                         </>
                     ) : isSBOpen ? (
                         <>
-                            <Button
+                            <Button className="w-full sm:w-auto"
                                 variant="destructive"
                                 size="lg"
                                 onClick={() => handleAction('fold')}
                             >
                                 Fold 🤚
                             </Button>
-                             <Button
+                             <Button className="w-full sm:w-auto"
                                 variant="secondary"
                                 size="lg"
                                 onClick={() => handleAction('call')}
                             >
                                 Call 💰
                             </Button>
-                            <Button
+                            <Button className="w-full sm:w-auto"
                                 variant="default"
                                 size="lg"
                                 onClick={() => handleAction('raise')}
@@ -751,14 +752,14 @@ export function PracticeModule() {
                         </>
                     ) : showOpenRaiseActions ? (
                         <>
-                            <Button
+                            <Button className="w-full sm:w-auto"
                                 variant="destructive"
                                 size="lg"
                                 onClick={() => handleAction('fold')}
                             >
                                 Fold 🤚
                             </Button>
-                            <Button
+                            <Button className="w-full sm:w-auto"
                                 variant="default"
                                 size="lg"
                                 onClick={() => handleAction('raise')}
@@ -768,14 +769,14 @@ export function PracticeModule() {
                         </>
                     ) : showVsRaiseActions ? (
                         <>
-                            <Button
+                            <Button className="w-full sm:w-auto"
                                 variant="destructive"
                                 size="lg"
                                 onClick={() => handleAction('fold')}
                             >
                                 Fold 🤚
                             </Button>
-                             <Button
+                             <Button className="w-full sm:w-auto"
                                 variant="secondary"
                                 size="lg"
                                 onClick={() => handleAction('call')}
@@ -783,8 +784,8 @@ export function PracticeModule() {
                                 Call 💰
                             </Button>
                             <Button
+                                className="w-full sm:w-auto text-accent-foreground hover:bg-accent/90"
                                 style={{backgroundColor: 'hsl(var(--accent))'}}
-                                className="text-accent-foreground hover:bg-accent/90"
                                 size="lg"
                                 onClick={() => handleAction('3-bet')}
                             >
@@ -793,14 +794,14 @@ export function PracticeModule() {
                         </>
                     ) : showVs3BetActions ? (
                          <>
-                            <Button
+                            <Button className="w-full sm:w-auto"
                                 variant="destructive"
                                 size="lg"
                                 onClick={() => handleAction('fold')}
                             >
                                 Fold 🤚
                             </Button>
-                             <Button
+                             <Button className="w-full sm:w-auto"
                                 variant="secondary"
                                 size="lg"
                                 onClick={() => handleAction('call')}
@@ -808,8 +809,8 @@ export function PracticeModule() {
                                 Call 💰
                             </Button>
                             <Button
+                                className="w-full sm:w-auto text-accent-foreground hover:bg-accent/90"
                                 style={{backgroundColor: 'hsl(var(--accent))'}}
-                                className="text-accent-foreground hover:bg-accent/90"
                                 size="lg"
                                 onClick={() => handleAction('4-bet')}
                             >
@@ -818,16 +819,17 @@ export function PracticeModule() {
                         </>
                     ) : showVs4BetActions ? (
                         <>
-                           <Button
+                           <Button className="w-full sm:w-auto"
                                variant="destructive"
                                size="lg"
                                onClick={() => handleAction('fold')}
                            >
                                Fold 🤚
                            </Button>
-                            <Button
+                            <Button className="w-full sm:w-auto"
                                variant="destructive"
-                               className="bg-red-700 hover:bg-red-800"
+                               
+                               style={{backgroundColor: 'hsl(var(--destructive))'}}
                                size="lg"
                                onClick={() => handleAction('all-in')}
                            >
@@ -853,7 +855,7 @@ export function PracticeModule() {
             </CardContent>
         </Card>
         {state.feedback && state.currentHandRange && (
-            <div>
+            <div className="p-1">
                 <HandRangeGrid
                     currentHand={state.currentHand?.handNotation}
                     range={state.currentHandRange}

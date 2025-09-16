@@ -15,24 +15,16 @@ interface HandRangeGridProps {
 }
 
 const actionStyles: Record<Action, { className: string; label: string }> = {
-  raise: { className: 'bg-green-500/30 border-green-500/60', label: 'Raise' },
-  '3-bet': { className: 'bg-amber-500/30 border-amber-500/60', label: '3-Bet' },
-  '4-bet': { className: 'bg-purple-500/30 border-purple-500/60', label: '4-Bet' },
-  'all-in': { className: 'bg-destructive/30 border-destructive/60', label: 'All-in' },
-  call: { className: 'bg-sky-500/30 border-sky-500/60', label: 'Call' },
-  fold: { className: 'bg-neutral-500/20 border-neutral-500/40', label: 'Fold' },
+    'all-in': { className: 'bg-red-500/80 border-red-400 text-white', label: 'All-in' },
+    '4-bet': { className: 'bg-purple-500/80 border-purple-400 text-white', label: '4-Bet' },
+    '3-bet': { className: 'bg-amber-500/80 border-amber-400 text-amber-950', label: '3-Bet' },
+    raise: { className: 'bg-primary/80 border-primary/90', label: 'Raise' },
+    call: { className: 'bg-sky-500/80 border-sky-400', label: 'Call' },
+    fold: { className: 'bg-zinc-500/20 border-zinc-500/30 text-zinc-400', label: 'Fold' },
 };
 
-const pairActionStyles: Record<Action, string> = {
-  raise: 'bg-green-600 border-green-500 text-white font-bold',
-  '3-bet': 'bg-amber-600 border-amber-500 text-white font-bold',
-  '4-bet': 'bg-purple-600 border-purple-500 text-white font-bold',
-  'all-in': 'bg-destructive border-red-700 text-white font-bold',
-  call: 'bg-sky-600 border-sky-500 text-white font-bold',
-  fold: 'bg-neutral-600/50 border-neutral-500 text-neutral-200',
-};
 
-const actionOrder: Action[] = ['all-in', '4-bet', '3-bet', 'raise', 'call', 'fold'];
+const actionOrder: Action[] = ['all-in', '4-bet', '3-bet', 'raise', 'call'];
 
 
 export const HandRangeGrid: React.FC<HandRangeGridProps> = ({
@@ -43,17 +35,17 @@ export const HandRangeGrid: React.FC<HandRangeGridProps> = ({
     <Card className="overflow-hidden">
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-              <BarChartHorizontal className="h-6 w-6 text-primary" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 sm:h-12 sm:w-12">
+              <BarChartHorizontal className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
           </div>
           <div>
-            <CardTitle className="font-headline">Rango de Manos GTO</CardTitle>
+            <CardTitle className="font-headline text-xl sm:text-2xl">Rango de Manos GTO</CardTitle>
             <CardDescription>Visualización de la estrategia óptima.</CardDescription>
           </div>
         </div>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
-        <div className="grid grid-cols-13 gap-1 font-mono text-xs">
+        <div className="grid grid-cols-13 gap-0.5 sm:gap-1 font-mono text-xs">
           {RANKS.map((rowRank, i) =>
             RANKS.map((colRank, j) => {
               let hand: string;
@@ -73,29 +65,18 @@ export const HandRangeGrid: React.FC<HandRangeGridProps> = ({
               const isCurrentHand = hand === currentHand;
               const action = range ? range[hand] || 'fold' : 'fold';
 
-              let cellClass = '';
-              if (range) {
-                 if (handType === 'pair') {
-                    cellClass = pairActionStyles[action] || pairActionStyles.fold;
-                 } else {
-                    cellClass = actionStyles[action].className || actionStyles.fold.className;
-                 }
-              } else {
-                // Default styling if no range is provided
-                if (handType === 'suited') cellClass = 'bg-primary/10';
-                else if (handType === 'offsuit') cellClass = 'bg-secondary/20';
-                else if (handType === 'pair') cellClass = 'bg-destructive/20 text-destructive-foreground';
-              }
+              let cellClass = actionStyles[action]?.className || actionStyles.fold.className;
               
               return (
                 <div
                   key={hand}
                   className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-md border text-center text-xs font-semibold transition-colors duration-300',
+                    'flex h-6 w-6 items-center justify-center rounded-sm border text-center text-[10px] font-bold transition-transform duration-300',
+                    'sm:h-8 sm:w-8 sm:rounded-md sm:text-xs',
                     'lg:h-9 lg:w-9',
                     cellClass,
                     isCurrentHand &&
-                      'ring-4 ring-offset-2 ring-primary ring-offset-background scale-110'
+                      'ring-2 ring-offset-1 ring-accent ring-offset-background scale-125 z-10 sm:ring-4'
                   )}
                   title={`${hand}: ${action}`}
                 >
@@ -107,15 +88,14 @@ export const HandRangeGrid: React.FC<HandRangeGridProps> = ({
         </div>
       </CardContent>
        <div className="border-t bg-card-foreground/5 p-4">
-          <div className="flex flex-wrap justify-center gap-x-3 gap-y-2 text-xs">
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
               {actionOrder.map((action) => {
                   const style = actionStyles[action];
                   if (!style) return null;
                   return (
-                      <div key={action} className="flex items-center gap-2">
-                          <div className={cn("h-3 w-3 rounded-full border", style.className)} />
-                          <span className="font-semibold capitalize">{style.label}</span>
-                      </div>
+                      <Badge key={action} className={cn('text-xs', style.className)}>
+                        {style.label}
+                      </Badge>
                   );
               })}
           </div>
