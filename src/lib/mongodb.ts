@@ -52,26 +52,10 @@ async function setupDatabase(client: MongoClient) {
     const explanationsCount = await explanationsCollection.countDocuments();
     if (explanationsCount === 0 && explanationsData?.explanations?.length) {
       console.log("Seeding 'explanations' collection with initial data...");
-      // We need to transform the data to use stack brackets
-      const bracketedExplanations = explanationsData.explanations.map(exp => {
-          const { stackSize, ...rest } = exp;
-          return {
-              ...rest,
-              stackRange: getStackBracket(stackSize)
-          };
-      });
-      await explanationsCollection.insertMany(bracketedExplanations);
-      console.log(`${bracketedExplanations.length} explanation documents inserted.`);
+      await explanationsCollection.insertMany(explanationsData.explanations);
+      console.log(`${explanationsData.explanations.length} explanation documents inserted.`);
     }
 }
-
-// Helper function to determine stack bracket - must be available here
-function getStackBracket(stackSize: number): { min: number; max: number } {
-  if (stackSize <= 20) return { min: 1, max: 20 };
-  if (stackSize <= 70) return { min: 21, max: 70 };
-  return { min: 71, max: 100 };
-}
-
 
 if (process.env.NODE_ENV === 'development') {
   // In development mode, use a global variable so that the value

@@ -3,7 +3,7 @@
   "explanations": [
     {
       "position": "BTN",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "hand": "A5s",
       "action": "3-bet",
@@ -13,7 +13,7 @@
     },
     {
       "position": "UTG",
-      "stackSize": 100,
+      "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
       "hand": "87s",
       "action": "raise",
@@ -23,7 +23,7 @@
     },
     {
         "position": "BB",
-        "stackSize": 100,
+        "stackRange": { "min": 71, "max": 100 },
         "tableType": "cash",
         "hand": "KJo",
         "action": "call",
