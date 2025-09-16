@@ -19,7 +19,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { PokerCard } from './poker-card';
-import { POSITIONS, STACK_SIZES, TABLE_TYPES, PREVIOUS_ACTIONS } from '@/lib/data';
+import { POSITIONS, STACK_SIZES, TABLE_TYPES, PREVIOUS_ACTIONS, POSITION_NAMES } from '@/lib/data';
 import type { Position, TableType, Action, PreviousAction, GtoRangeScenario } from '@/lib/types';
 import { getPreflopExplanationAction, getOrGenerateRangeAction, getDbRangesKeys } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -238,7 +238,7 @@ export function PracticeModule() {
     error: null,
   });
 
-  const fetchRangeForScenario = useCallback(async (scenario: Scenario) => {
+  const findRangeForScenario = useCallback(async (scenario: Scenario) => {
     dispatch({ type: 'START_LOADING', payload: { main: true } });
     const result = await getOrGenerateRangeAction(scenario);
     if (result.success && result.data) {
@@ -251,8 +251,8 @@ export function PracticeModule() {
   
   const setAndFetchScenario = useCallback((scenario: Scenario) => {
       dispatch({ type: 'SET_SCENARIO', payload: { scenario, hand: getNewHand() } });
-      fetchRangeForScenario(scenario);
-  }, [fetchRangeForScenario]);
+      findRangeForScenario(scenario);
+  }, [findRangeForScenario]);
 
 
   // Initial load and fetch DB keys
@@ -288,8 +288,7 @@ export function PracticeModule() {
         state.feedback.isOptimal
       );
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.feedback]);
+  }, [state.feedback, state.currentHand, state.scenario, recordHand]);
 
 
   const handleShowExplanation = async () => {
@@ -352,16 +351,16 @@ export function PracticeModule() {
   const handleAction = (action: Action) => {
     dispatch({ type: 'HANDLE_ACTION', payload: action });
   };
+  
+  const handleRandomizeScenario = useCallback(() => {
+    const newScenario = getRandomScenario();
+    setAndFetchScenario(newScenario);
+    setSheetOpen(false);
+  }, [setAndFetchScenario]);
 
   const handleNextHand = () => {
     handleRandomizeScenario();
   };
-
-  const handleRandomizeScenario = () => {
-    const newScenario = getRandomScenario();
-    setAndFetchScenario(newScenario);
-    setSheetOpen(false);
-  }
 
   const handleSetScenario = (payload: Partial<Scenario>) => {
     const newScenario = { ...state.scenario, ...payload };
@@ -409,32 +408,42 @@ export function PracticeModule() {
       setSheetOpen(false);
   };
 
-  const isBBvsLimp =
-    state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
-  
-  const isSBOpen = state.scenario.position === 'SB' && state.scenario.previousAction === 'none';
-  
-  let descriptionText = '';
-  switch (state.scenario.previousAction) {
-    case 'none':
-      if (isBBvsLimp) {
-        descriptionText = `La mano llega limpia hasta ti en la Ciega Grande (BB). Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-      } else if (isSBOpen) {
-        descriptionText = `Todos los jugadores antes de ti se han retirado. La acción te llega en la Ciega Pequeña (SB) contra la Ciega Grande. Estás con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-      } else {
-        descriptionText = `Nadie ha apostado todavía. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-      }
-      break;
-    case 'raise':
-      descriptionText = `Un oponente ha subido a 2.5 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-      break;
-    case '3-bet':
-      descriptionText = `Te enfrentas a un 3-bet a 9 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-      break;
-    case '4-bet':
-      descriptionText = `Te enfrentas a un 4-bet a 22 BB. Estás en ${state.scenario.position} con ${state.scenario.stackSize} BB. ¿Qué haces?`;
-      break;
-  }
+  const generateDescription = () => {
+    const { position, tableType, stackSize, previousAction } = state.scenario;
+    const positionName = POSITION_NAMES[position];
+    const tableTypeName = tableType === 'cash' ? 'un Cash Game' : 'un Torneo';
+    const firstLine = `Estás en ${positionName} (${position}) en ${tableTypeName} con ${stackSize} BB.`;
+
+    let secondLine = '';
+    switch (previousAction) {
+        case 'none':
+            secondLine = 'La mano te llega limpia (fold).';
+            if (position === 'BB') secondLine = 'La acción llega limpia hasta la SB, que completa. Estás en la ciega grande.';
+            if (position === 'SB') secondLine = 'Todos foldean hasta ti. Estás en la ciega pequeña contra la ciega grande.';
+            break;
+        case 'raise':
+            secondLine = 'Un rival ha abierto la mano con una subida (open-raise) a 2.5 BB.';
+            break;
+        case '3-bet':
+            secondLine = 'Te enfrentas a una resubida (3-bet) a 9 BB.';
+            break;
+        case '4-bet':
+            secondLine = 'Un rival te ha hecho una resubida muy grande (4-bet) a 22 BB.';
+            break;
+    }
+    
+    return (
+        <>
+            {firstLine}
+            <br />
+            {secondLine}
+            <br />
+            ¿Qué haces?
+        </>
+    );
+  };
+
+  const descriptionText = generateDescription();
 
   if (state.isLoading || !state.currentHand) {
     return (
@@ -443,12 +452,15 @@ export function PracticeModule() {
         <p className="mt-4 text-muted-foreground">
           Cargando escenario y buscando rango...
         </p>
-        <p className="mt-2 text-xs text-muted-foreground/50">({descriptionText})</p>
+        <p className="mt-2 text-xs text-muted-foreground/50">({state.scenario.position}, {state.scenario.stackSize}BB, {state.scenario.tableType}, vs {state.scenario.previousAction})</p>
       </div>
     );
   }
 
-
+  const isBBvsLimp =
+    state.scenario.position === 'BB' && state.scenario.previousAction === 'none';
+  
+  const isSBOpen = state.scenario.position === 'SB' && state.scenario.previousAction === 'none';
   const showOpenRaiseActions = state.scenario.previousAction === 'none' && !isBBvsLimp && !isSBOpen;
   const showVsRaiseActions = state.scenario.previousAction === 'raise';
   const showVs3BetActions = state.scenario.previousAction === '3-bet';
@@ -460,7 +472,7 @@ export function PracticeModule() {
           <Button
             variant="secondary"
             className="h-14 w-14 rounded-full shadow-lg"
-            onClick={handleRandomizeScenario}
+            onClick={handleNextHand}
             aria-label="Escenario Aleatorio"
           >
             <Shuffle className="h-7 w-7" />
@@ -597,7 +609,7 @@ export function PracticeModule() {
         <Card>
             <CardHeader className="text-center">
             <CardTitle className="font-headline mb-2">Tu Mano</CardTitle>
-            <CardDescription>
+            <CardDescription className="leading-relaxed">
                 {descriptionText}
             </CardDescription>
             </CardHeader>
@@ -835,5 +847,3 @@ export function PracticeModule() {
     </div>
   );
 }
-
-
