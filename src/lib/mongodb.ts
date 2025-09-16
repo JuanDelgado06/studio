@@ -1,7 +1,7 @@
-
 // This approach is taken from the official Next.js example for MongoDB.
 // https://github.com/vercel/next.js/blob/canary/examples/with-mongodb/lib/mongodb.ts
 import { MongoClient } from 'mongodb'
+import jsonData from './gto-ranges.json';
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
@@ -13,8 +13,8 @@ const options = {}
 let client
 let clientPromise: Promise<MongoClient>
 
-// Function to ensure indexes are created
-async function ensureIndexes(client: MongoClient) {
+// Function to ensure indexes and initial data are set up
+async function setupDatabase(client: MongoClient) {
     const db = client.db("poker-pro");
     
     // Index for gto-ranges collection
@@ -26,6 +26,19 @@ async function ensureIndexes(client: MongoClient) {
         'stackRange.min': 1,
         'stackRange.max': 1,
     }, { name: 'gto_range_scenario_idx' });
+
+    // Check if the collection is empty before inserting data
+    const count = await rangesCollection.countDocuments();
+    if (count === 0) {
+        console.log("Seeding 'gto-ranges' collection with initial data...");
+        // The data is nested under a "ranges" key in the JSON file
+        if (jsonData && jsonData.ranges && Array.isArray(jsonData.ranges)) {
+            await rangesCollection.insertMany(jsonData.ranges);
+            console.log(`${jsonData.ranges.length} documents inserted.`);
+        } else {
+            console.error("Could not find ranges data in gto-ranges.json");
+        }
+    }
 
     // Index for explanations collection
     const explanationsCollection = db.collection('explanations');
@@ -50,7 +63,7 @@ if (process.env.NODE_ENV === 'development') {
   if (!globalWithMongo._mongoClientPromise) {
     client = new MongoClient(uri, options)
     globalWithMongo._mongoClientPromise = client.connect().then(async (client) => {
-        await ensureIndexes(client);
+        await setupDatabase(client);
         return client;
     });
   }
@@ -59,7 +72,7 @@ if (process.env.NODE_ENV === 'development') {
   // In production mode, it's best to not use a global variable.
   client = new MongoClient(uri, options)
   clientPromise = client.connect().then(async (client) => {
-      await ensureIndexes(client);
+      await setupDatabase(client);
       return client;
   });
 }
@@ -67,5 +80,3 @@ if (process.env.NODE_ENV === 'development') {
 // Export a module-scoped MongoClient promise. By doing this in a
 // separate module, the client can be shared across functions.
 export default clientPromise
-
-    
