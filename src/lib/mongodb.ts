@@ -1,8 +1,6 @@
 // This approach is taken from the official Next.js example for MongoDB.
 // https://github.com/vercel/next.js/blob/canary/examples/with-mongodb/lib/mongodb.ts
 import { MongoClient } from 'mongodb'
-import gtoRangesData from './gto-ranges.json';
-import explanationsData from './explanations.json';
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
@@ -14,7 +12,7 @@ const options = {}
 let client
 let clientPromise: Promise<MongoClient>
 
-// Function to ensure indexes and initial data are set up
+// Function to ensure indexes are set up
 async function setupDatabase(client: MongoClient) {
     const db = client.db("poker-pro");
     
@@ -28,14 +26,6 @@ async function setupDatabase(client: MongoClient) {
         'stackRange.max': 1,
     }, { name: 'gto_range_scenario_idx' });
 
-    // Check if the collection is empty before inserting data
-    const rangesCount = await rangesCollection.countDocuments();
-    if (rangesCount === 0 && gtoRangesData?.ranges?.length) {
-        console.log("Seeding 'gto-ranges' collection with initial data...");
-        await rangesCollection.insertMany(gtoRangesData.ranges);
-        console.log(`${gtoRangesData.ranges.length} range documents inserted.`);
-    }
-
     // Index for explanations collection
     const explanationsCollection = db.collection('explanations');
     await explanationsCollection.createIndex({
@@ -47,14 +37,6 @@ async function setupDatabase(client: MongoClient) {
         'stackRange.max': 1,
         tableType: 1,
     }, { name: 'explanation_scenario_idx' });
-
-    // Check if the explanations collection is empty before inserting data
-    const explanationsCount = await explanationsCollection.countDocuments();
-    if (explanationsCount === 0 && explanationsData?.explanations?.length) {
-      console.log("Seeding 'explanations' collection with initial data...");
-      await explanationsCollection.insertMany(explanationsData.explanations);
-      console.log(`${explanationsData.explanations.length} explanation documents inserted.`);
-    }
 }
 
 if (process.env.NODE_ENV === 'development') {

@@ -24,7 +24,6 @@ const PreflopExplanationSchema = PreflopDecisionSchema.extend({
     isOptimal: z.boolean(),
 });
 
-// Helper function to determine stack bracket
 function getStackBracket(stackSize: number): { min: number; max: number } {
   if (stackSize <= 20) return { min: 1, max: 20 };
   if (stackSize <= 70) return { min: 21, max: 70 };
@@ -40,13 +39,12 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     const db = client.db("poker-pro");
     const rangesCollection = db.collection("gto-ranges");
 
-    const stackBracket = getStackBracket(validatedInput.stackSize);
-
     const query = {
         position: validatedInput.position,
         tableType: validatedInput.tableType,
         previousAction: validatedInput.previousAction,
-        stackRange: stackBracket,
+        'stackRange.min': { $lte: validatedInput.stackSize },
+        'stackRange.max': { $gte: validatedInput.stackSize },
     };
     
     const existingRangeDoc = await rangesCollection.findOne(query);
@@ -65,7 +63,10 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     }
     
     const newRangeDoc = {
-      ...query,
+      position: validatedInput.position,
+      tableType: validatedInput.tableType,
+      previousAction: validatedInput.previousAction,
+      stackRange: getStackBracket(validatedInput.stackSize),
       range: generatedRange,
       createdAt: new Date(),
     };
@@ -109,13 +110,12 @@ export async function getPreflopExplanationAction(input: z.infer<typeof PreflopE
         const db = client.db("poker-pro");
         const explanationsCollection = db.collection("explanations");
         
-        const stackBracket = getStackBracket(validatedInput.stackSize);
-        
         const { stackSize, betSize, ...queryWithoutStack } = validatedInput;
 
         const query = {
             ...queryWithoutStack,
-            stackRange: stackBracket,
+            'stackRange.min': { $lte: stackSize },
+            'stackRange.max': { $gte: stackSize },
         };
         
         // 1. Try to find the explanation in the database using the stack bracket
@@ -141,7 +141,8 @@ export async function getPreflopExplanationAction(input: z.infer<typeof PreflopE
 
         // 3. Save the new explanation to the database with the stack bracket
         const documentToInsert = {
-            ...query,
+            ...queryWithoutStack,
+            stackRange: getStackBracket(stackSize),
             ...generatedExplanation,
             createdAt: new Date(),
         };
