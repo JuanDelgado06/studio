@@ -7,7 +7,7 @@ import { suggestImprovementExercises as suggestImprovementExercisesFlow } from "
 import { z } from "zod";
 import { generateGtoRange } from "@/ai/flows/generate-gto-range";
 import clientPromise from "./mongodb";
-import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema, GtoRangeDocumentSchema, GtoRangeScenario } from "./types";
+import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema, GtoRangeDocumentSchema, GtoRangeScenario, GtoRangeFromDbSchema } from "./types";
 import type { GetPreflopExplanationOutput } from "@/ai/flows/get-preflop-explanation";
 import { GenerateGtoRangeOutputSchema } from "./types";
 
@@ -51,7 +51,8 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     const existingRangeDoc = await rangesCollection.findOne(query);
     
     if (existingRangeDoc) {
-      const parsedRange = GenerateGtoRangeOutputSchema.safeParse(existingRangeDoc.range);
+      // Use a passthrough schema to validate the range from the DB, allowing extra fields like _id
+      const parsedRange = GtoRangeFromDbSchema.safeParse(existingRangeDoc.range);
       if (parsedRange.success) {
         return { success: true, data: parsedRange.data, source: 'db' };
       }
@@ -83,7 +84,8 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
       return { success: false, error: "Invalid input for range generation." };
     }
     console.error("Error in getOrGenerateRangeAction:", error);
-    return { success: false, error: "Failed to get or generate range." };
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+    return { success: false, error: `Failed to get or generate range. ${errorMessage}` };
   }
 }
 

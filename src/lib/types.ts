@@ -32,6 +32,9 @@ export const GenerateGtoRangeOutputSchema = z.object({
 }).describe('A JSON object representing the GTO hand range for the given scenario.');
 export type GenerateGtoRangeOutput = z.infer<typeof GenerateGtoRangeOutputSchema>;
 
+// Schema specifically for validating data coming from the DB, allowing other fields.
+export const GtoRangeFromDbSchema = GenerateGtoRangeOutputSchema.passthrough();
+
 export const GetOrGenerateRangeSchema = z.object({
   position: z.nativeEnum({SB: 'SB', BB: 'BB', UTG: 'UTG', MP: 'MP', CO: 'CO', BTN: 'BTN'}),
   stackSize: z.number(),
@@ -44,6 +47,7 @@ export const GtoRangeDocumentSchema = z.object({
     stackRange: z.object({ min: z.number(), max: z.number() }),
     tableType: z.enum(['cash', 'tournament']),
     previousAction: z.enum(['none', 'raise', '3-bet', '4-bet']),
+    range: GenerateGtoRangeOutputSchema,
 }).passthrough();
 export type GtoRangeScenario = z.infer<typeof GtoRangeDocumentSchema>;
     
