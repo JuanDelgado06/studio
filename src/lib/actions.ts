@@ -50,8 +50,7 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
         position: validatedInput.position,
         tableType: validatedInput.tableType,
         previousAction: validatedInput.previousAction,
-        'stackRange.min': stackBracket.min,
-        'stackRange.max': stackBracket.max,
+        stackRange: stackBracket,
     };
     
     const existingRangeDoc = await rangesCollection.findOne(query);
