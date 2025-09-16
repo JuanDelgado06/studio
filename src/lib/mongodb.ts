@@ -1,7 +1,8 @@
 // This approach is taken from the official Next.js example for MongoDB.
 // https://github.com/vercel/next.js/blob/canary/examples/with-mongodb/lib/mongodb.ts
 import { MongoClient } from 'mongodb'
-import jsonData from './gto-ranges.json';
+import gtoRangesData from './gto-ranges.json';
+import explanationsData from './explanations.json';
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
@@ -28,16 +29,11 @@ async function setupDatabase(client: MongoClient) {
     }, { name: 'gto_range_scenario_idx' });
 
     // Check if the collection is empty before inserting data
-    const count = await rangesCollection.countDocuments();
-    if (count === 0) {
+    const rangesCount = await rangesCollection.countDocuments();
+    if (rangesCount === 0 && gtoRangesData?.ranges?.length) {
         console.log("Seeding 'gto-ranges' collection with initial data...");
-        // The data is nested under a "ranges" key in the JSON file
-        if (jsonData && jsonData.ranges && Array.isArray(jsonData.ranges)) {
-            await rangesCollection.insertMany(jsonData.ranges);
-            console.log(`${jsonData.ranges.length} documents inserted.`);
-        } else {
-            console.error("Could not find ranges data in gto-ranges.json");
-        }
+        await rangesCollection.insertMany(gtoRangesData.ranges);
+        console.log(`${gtoRangesData.ranges.length} range documents inserted.`);
     }
 
     // Index for explanations collection
@@ -45,11 +41,35 @@ async function setupDatabase(client: MongoClient) {
     await explanationsCollection.createIndex({
         position: 1,
         hand: 1,
-        stackSize: 1,
-        tableType: 1,
         action: 1,
         isOptimal: 1,
+        'stackRange.min': 1,
+        'stackRange.max': 1,
+        tableType: 1,
     }, { name: 'explanation_scenario_idx' });
+
+    // Check if the explanations collection is empty before inserting data
+    const explanationsCount = await explanationsCollection.countDocuments();
+    if (explanationsCount === 0 && explanationsData?.explanations?.length) {
+      console.log("Seeding 'explanations' collection with initial data...");
+      // We need to transform the data to use stack brackets
+      const bracketedExplanations = explanationsData.explanations.map(exp => {
+          const { stackSize, ...rest } = exp;
+          return {
+              ...rest,
+              stackRange: getStackBracket(stackSize)
+          };
+      });
+      await explanationsCollection.insertMany(bracketedExplanations);
+      console.log(`${bracketedExplanations.length} explanation documents inserted.`);
+    }
+}
+
+// Helper function to determine stack bracket - must be available here
+function getStackBracket(stackSize: number): { min: number; max: number } {
+  if (stackSize <= 20) return { min: 1, max: 20 };
+  if (stackSize <= 70) return { min: 21, max: 70 };
+  return { min: 71, max: 100 };
 }
 
 

@@ -26,12 +26,8 @@ const PreflopExplanationSchema = PreflopDecisionSchema.extend({
 
 // Helper function to determine stack bracket
 function getStackBracket(stackSize: number): { min: number; max: number } {
-  if (stackSize <= 20) {
-    return { min: 1, max: 20 };
-  }
-  if (stackSize <= 70) {
-    return { min: 21, max: 70 };
-  }
+  if (stackSize <= 20) return { min: 1, max: 20 };
+  if (stackSize <= 70) return { min: 21, max: 70 };
   return { min: 71, max: 100 };
 }
 
@@ -54,7 +50,7 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     };
     
     const existingRangeDoc = await rangesCollection.findOne(query);
-
+    
     if (existingRangeDoc) {
       const parsedDoc = GtoRangeDocumentSchema.extend({ range: GenerateGtoRangeOutputSchema }).safeParse(existingRangeDoc);
       if (parsedDoc.success) {
@@ -69,10 +65,7 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     }
     
     const newRangeDoc = {
-      position: validatedInput.position,
-      tableType: validatedInput.tableType,
-      previousAction: validatedInput.previousAction,
-      stackRange: stackBracket,
+      ...query,
       range: generatedRange,
       createdAt: new Date(),
     };
@@ -108,7 +101,7 @@ export async function getDbRangesKeys(): Promise<{ success: boolean; data?: z.in
 }
 
 
-// Updated action to cache explanations
+// Updated action to cache explanations using stack brackets
 export async function getPreflopExplanationAction(input: z.infer<typeof PreflopExplanationSchema>): Promise<{ success: boolean; data?: GetPreflopExplanationOutput | null; error?: string; source?: 'db' | 'ai' }> {
     try {
         const validatedInput = PreflopExplanationSchema.parse(input);
@@ -116,8 +109,17 @@ export async function getPreflopExplanationAction(input: z.infer<typeof PreflopE
         const db = client.db("poker-pro");
         const explanationsCollection = db.collection("explanations");
         
-        // 1. Try to find the explanation in the database
-        const existingExplanation = await explanationsCollection.findOne(validatedInput);
+        const stackBracket = getStackBracket(validatedInput.stackSize);
+        
+        const { stackSize, ...queryWithoutStack } = validatedInput;
+
+        const query = {
+            ...queryWithoutStack,
+            stackRange: stackBracket,
+        };
+        
+        // 1. Try to find the explanation in the database using the stack bracket
+        const existingExplanation = await explanationsCollection.findOne(query);
         
         if (existingExplanation) {
             return {
@@ -137,9 +139,9 @@ export async function getPreflopExplanationAction(input: z.infer<typeof PreflopE
             throw new Error("AI failed to generate an explanation.");
         }
 
-        // 3. Save the new explanation to the database
+        // 3. Save the new explanation to the database with the stack bracket
         const documentToInsert = {
-            ...validatedInput,
+            ...query,
             ...generatedExplanation,
             createdAt: new Date(),
         };
