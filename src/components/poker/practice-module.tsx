@@ -45,7 +45,25 @@ const pokerTips = [
     "Controlar el tamaño del pozo es clave para maximizar ganancias y minimizar pérdidas.",
     "La agresividad selectiva suele ser la estrategia más rentable en No-Limit Hold'em.",
     "Entender las 'pot odds' es fundamental para decidir si un call es rentable a largo plazo.",
-    "Presta atención a los stacks. El tamaño de tu stack y el de tus rivales define la estrategia a seguir."
+    "Presta atención a los stacks. El tamaño de tu stack y el de tus rivales define la estrategia a seguir.",
+    "No juegues demasiadas manos. Ser selectivo preflop es la base de un juego ganador.",
+    "El farol (bluff) funciona mejor contra un solo oponente que contra varios.",
+    "No dejes que el 'tilt' controle tus decisiones. Si estás frustrado, es mejor tomar un descanso.",
+    "Adapta tu juego. La estrategia que funciona contra un jugador puede no funcionar contra otro.",
+    "Piensa en rangos, no en manos exactas. ¿Qué conjunto de manos podría tener tu oponente?",
+    "Las 'implied odds' (odds implícitas) te permiten pagar con manos especulativas si crees que puedes ganar un pozo grande más adelante.",
+    "No subestimes el poder de la iniciativa. Ser el agresor te da más formas de ganar la mano.",
+    "Tu imagen en la mesa importa. Si has estado jugando muy 'tight', tus faroles serán más creíbles.",
+    "Las manos 'suited connectors' (como 7s8s) son excelentes para jugar en pozos multi-jugador porque pueden hacer manos muy fuertes (escaleras y colores).",
+    "El 'sizing' de tus apuestas es importante. Apuestas más grandes para sacar valor, apuestas más pequeñas para faroles de bajo riesgo.",
+    "En torneos, la supervivencia es tan importante como acumular fichas, especialmente cerca de la burbuja.",
+    "Contra un jugador 'loose-aggressive', es mejor tender trampas con tus manos fuertes (slow-play) en lugar de apostar de frente siempre.",
+    "No hagas 'limp' (solo pagar la ciega grande). Casi siempre es mejor entrar a la mano subiendo o foldeando.",
+    "La 'fold equity' es el valor que ganas cuando tu oponente foldea ante tu apuesta. Es una parte clave del EV de un farol.",
+    "Revisa tus manos después de jugar. Analizar tus errores es una de las formas más rápidas de mejorar.",
+    "Una 'continuation bet' (c-bet) en el flop es rentable porque la mayoría de las veces los jugadores no conectan con el flop.",
+    "Sé consciente de los efectos de los 'blockers'. Tener un As de corazones en tu mano hace menos probable que tu oponente tenga el 'nut flush draw'.",
+    "Jugar en vivo es diferente a online. La gente tiende a jugar más pasivo y los 'tells' físicos pueden darte información valiosa."
 ];
 
 
