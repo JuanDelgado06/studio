@@ -24,6 +24,18 @@ const PreflopExplanationSchema = PreflopDecisionSchema.extend({
     isOptimal: z.boolean(),
 });
 
+// Helper function to determine stack bracket
+function getStackBracket(stackSize: number): { min: number; max: number } {
+  if (stackSize <= 20) {
+    return { min: 1, max: 20 };
+  }
+  if (stackSize <= 70) {
+    return { min: 21, max: 70 };
+  }
+  return { min: 71, max: 100 };
+}
+
+
 // Server Action for fetching/generating GTO ranges
 export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenerateRangeSchema>): Promise<{ success: boolean; data?: GenerateGtoRangeOutput | null; error?: string; source?: 'db' | 'ai' }> {
   try {
@@ -32,21 +44,22 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     const db = client.db("poker-pro");
     const rangesCollection = db.collection("gto-ranges");
 
+    const stackBracket = getStackBracket(validatedInput.stackSize);
+
     const query = {
         position: validatedInput.position,
         tableType: validatedInput.tableType,
         previousAction: validatedInput.previousAction,
-        'stackRange.min': { $lte: validatedInput.stackSize },
-        'stackRange.max': { $gte: validatedInput.stackSize },
+        'stackRange.min': stackBracket.min,
+        'stackRange.max': stackBracket.max,
     };
     
     const existingRangeDoc = await rangesCollection.findOne(query);
 
     if (existingRangeDoc) {
-       // The range data is nested under the 'range' property.
-      const rangeData = existingRangeDoc.range;
-      if (rangeData) {
-        return { success: true, data: rangeData, source: 'db' };
+      const parsedDoc = GtoRangeDocumentSchema.extend({ range: GenerateGtoRangeOutputSchema }).safeParse(existingRangeDoc);
+      if (parsedDoc.success) {
+        return { success: true, data: parsedDoc.data.range, source: 'db' };
       }
     }
 
@@ -56,27 +69,11 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
       throw new Error("AI failed to generate a range.");
     }
     
-    // Define a loose range for new entries
-    let minStack, maxStack;
-    if (validatedInput.stackSize <= 25) {
-      minStack = Math.max(10, validatedInput.stackSize - 5);
-      maxStack = validatedInput.stackSize + 5;
-    } else if (validatedInput.stackSize <= 50) {
-      minStack = validatedInput.stackSize - 10;
-      maxStack = validatedInput.stackSize + 10;
-    } else {
-      minStack = validatedInput.stackSize - 15;
-      maxStack = validatedInput.stackSize + 15;
-    }
-
     const newRangeDoc = {
       position: validatedInput.position,
       tableType: validatedInput.tableType,
       previousAction: validatedInput.previousAction,
-      stackRange: {
-        min: minStack,
-        max: maxStack
-      },
+      stackRange: stackBracket,
       range: generatedRange,
       createdAt: new Date(),
     };
