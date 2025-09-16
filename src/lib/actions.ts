@@ -111,7 +111,7 @@ export async function getPreflopExplanationAction(input: z.infer<typeof PreflopE
         
         const stackBracket = getStackBracket(validatedInput.stackSize);
         
-        const { stackSize, ...queryWithoutStack } = validatedInput;
+        const { stackSize, betSize, ...queryWithoutStack } = validatedInput;
 
         const query = {
             ...queryWithoutStack,
