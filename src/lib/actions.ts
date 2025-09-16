@@ -9,6 +9,7 @@ import { generateGtoRange } from "@/ai/flows/generate-gto-range";
 import clientPromise from "./mongodb";
 import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema, GtoRangeDocumentSchema, GtoRangeScenario } from "./types";
 import type { GetPreflopExplanationOutput } from "@/ai/flows/get-preflop-explanation";
+import { GenerateGtoRangeOutputSchema } from "./types";
 
 // Zod Schemas for input validation
 const PreflopDecisionSchema = z.object({
@@ -50,9 +51,9 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     const existingRangeDoc = await rangesCollection.findOne(query);
     
     if (existingRangeDoc) {
-      const parsedDoc = z.object({ range: GenerateGtoRangeOutputSchema }).safeParse(existingRangeDoc);
-      if (parsedDoc.success) {
-        return { success: true, data: parsedDoc.data.range, source: 'db' };
+      const parsedRange = GenerateGtoRangeOutputSchema.safeParse(existingRangeDoc.range);
+      if (parsedRange.success) {
+        return { success: true, data: parsedRange.data, source: 'db' };
       }
     }
 
@@ -201,5 +202,3 @@ export async function suggestImprovementExercises(input: z.infer<typeof SuggestI
         return { success: false, error: 'Failed to get suggested exercises from AI.' };
     }
 }
-
-    
