@@ -7,7 +7,7 @@ import { suggestImprovementExercises as suggestImprovementExercisesFlow } from "
 import { z } from "zod";
 import { generateGtoRange } from "@/ai/flows/generate-gto-range";
 import clientPromise from "./mongodb";
-import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema, GtoRangeDocumentSchema } from "./types";
+import { GenerateGtoRangeOutput, GetOrGenerateRangeSchema, GtoRangeDocumentSchema, GtoRangeScenario } from "./types";
 import type { GetPreflopExplanationOutput } from "@/ai/flows/get-preflop-explanation";
 
 // Zod Schemas for input validation
@@ -39,14 +39,12 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     const db = client.db("poker-pro");
     const rangesCollection = db.collection("gto-ranges");
 
-    const stackBracket = getStackBracket(validatedInput.stackSize);
-
     const query = {
         position: validatedInput.position,
         tableType: validatedInput.tableType,
         previousAction: validatedInput.previousAction,
-        'stackRange.min': stackBracket.min,
-        'stackRange.max': stackBracket.max,
+        'stackRange.min': { $lte: validatedInput.stackSize },
+        'stackRange.max': { $gte: validatedInput.stackSize },
     };
     
     const existingRangeDoc = await rangesCollection.findOne(query);
@@ -58,6 +56,7 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
       }
     }
 
+    const stackBracket = getStackBracket(validatedInput.stackSize);
     const generatedRange = await generateGtoRange(validatedInput);
 
     if (!generatedRange) {
@@ -112,17 +111,14 @@ export async function getPreflopExplanationAction(input: z.infer<typeof PreflopE
         const db = client.db("poker-pro");
         const explanationsCollection = db.collection("explanations");
         
-        const { stackSize, betSize, ...queryWithoutStack } = validatedInput;
-
-        const stackBracket = getStackBracket(stackSize);
+        const { stackSize, betSize, ...queryWithoutStackAndBet } = validatedInput;
 
         const query = {
-            ...queryWithoutStack,
-            'stackRange.min': stackBracket.min,
-            'stackRange.max': stackBracket.max,
+            ...queryWithoutStackAndBet,
+            'stackRange.min': { $lte: stackSize },
+            'stackRange.max': { $gte: stackSize },
         };
         
-        // 1. Try to find the explanation in the database using the stack bracket
         const existingExplanation = await explanationsCollection.findOne(query);
         
         if (existingExplanation) {
@@ -136,16 +132,15 @@ export async function getPreflopExplanationAction(input: z.infer<typeof PreflopE
             };
         }
 
-        // 2. If not found, generate it with AI
         const generatedExplanation = await getPreflopExplanation(validatedInput);
         
         if (!generatedExplanation) {
             throw new Error("AI failed to generate an explanation.");
         }
 
-        // 3. Save the new explanation to the database with the stack bracket
+        const stackBracket = getStackBracket(stackSize);
         const documentToInsert = {
-            ...queryWithoutStack,
+            ...queryWithoutStackAndBet,
             stackRange: stackBracket,
             ...generatedExplanation,
             createdAt: new Date(),
