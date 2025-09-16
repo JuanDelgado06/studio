@@ -1,22 +1,21 @@
 {
-  "theme_color": "#164a2f",
-  "background_color": "#1a3b2a",
-  "display": "standalone",
-  "scope": "/",
-  "start_url": "/",
-  "name": "Preflop Pro Trainer",
-  "short_name": "Preflop Pro",
-  "description": "Entrenador de poker preflop con IA para mejorar tu juego.",
-  "icons": [
-    {
-      "src": "/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+    "name": "Preflop Pro Trainer",
+    "short_name": "PreflopPro",
+    "description": "Entrenador de poker preflop con IA para mejorar tus decisiones.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#E2F5E8",
+    "theme_color": "#A0D6B4",
+    "icons": [
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
 }
