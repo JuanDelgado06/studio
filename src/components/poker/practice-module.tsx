@@ -24,7 +24,7 @@ import type { Position, TableType, Action, PreviousAction, GtoRangeScenario } fr
 import { getPreflopExplanationAction, getOrGenerateRangeAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { CheckCircle, Info, Loader2, Database, Sparkles, Settings, Shuffle, XCircle, Hand } from 'lucide-react';
+import { CheckCircle, Info, Loader2, Database, Sparkles, Settings, Shuffle, XCircle, Hand, Lightbulb } from 'lucide-react';
 import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
@@ -36,6 +36,18 @@ import { Separator } from '../ui/separator';
 
 const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const SUITS = ['s', 'h', 'd', 'c'];
+
+const pokerTips = [
+    "La posición es poder. Las mejores manos se juegan desde las últimas posiciones.",
+    "No te enamores de una mano. A veces, la mejor jugada es foldear tus Ases.",
+    "Observa a tus oponentes. Sus patrones de apuestas revelan más que sus cartas.",
+    "Un 3-bet no es solo por valor. También es una poderosa herramienta para hacer un farol (bluff).",
+    "Controlar el tamaño del pozo es clave para maximizar ganancias y minimizar pérdidas.",
+    "La agresividad selectiva suele ser la estrategia más rentable en No-Limit Hold'em.",
+    "Entender las 'pot odds' es fundamental para decidir si un call es rentable a largo plazo.",
+    "Presta atención a los stacks. El tamaño de tu stack y el de tus rivales define la estrategia a seguir."
+];
+
 
 type Scenario = {
   position: Position;
@@ -272,6 +284,7 @@ export function PracticeModule() {
   const { recordHand } = useStats();
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [customHand, setCustomHand] = useState('');
+  const [currentTip, setCurrentTip] = useState('');
 
   const [state, dispatch] = useReducer(reducer, {
     scenario: {
@@ -292,6 +305,7 @@ export function PracticeModule() {
 
   const findRangeForScenario = useCallback(async (scenario: Scenario) => {
     dispatch({ type: 'START_LOADING', payload: { main: true } });
+    setCurrentTip(pokerTips[Math.floor(Math.random() * pokerTips.length)]);
     const result = await getOrGenerateRangeAction(scenario);
     if (result.success && result.data) {
         const expandedRange = expandRange(result.data);
@@ -462,11 +476,19 @@ export function PracticeModule() {
   if (state.isLoading || !state.currentHand) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[600px]">
-        <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
-        <p className="mt-4 text-muted-foreground">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="mt-6 text-lg font-semibold text-muted-foreground">
           Cargando escenario y buscando rango...
         </p>
-        <p className="mt-2 text-xs text-muted-foreground/50">({state.scenario.position}, {state.scenario.stackSize}BB, {state.scenario.tableType}, vs {state.scenario.previousAction})</p>
+        <p className="mt-2 text-sm text-muted-foreground/80 max-w-sm">
+            ({state.scenario.position}, {state.scenario.stackSize}BB, {state.scenario.tableType}, vs {state.scenario.previousAction})
+        </p>
+        <div className="mt-8 border-t border-dashed w-full max-w-md"></div>
+        <div className="mt-8 flex flex-col items-center gap-3 text-center">
+            <Lightbulb className="h-8 w-8 text-yellow-400" />
+            <p className="font-headline text-xl text-foreground">Consejo del Pro:</p>
+            <p className="text-muted-foreground max-w-xs">{currentTip}</p>
+        </div>
       </div>
     );
   }
