@@ -39,18 +39,20 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     const db = client.db("poker-pro");
     const rangesCollection = db.collection("gto-ranges");
 
+    const stackBracket = getStackBracket(validatedInput.stackSize);
+
     const query = {
         position: validatedInput.position,
         tableType: validatedInput.tableType,
         previousAction: validatedInput.previousAction,
-        'stackRange.min': { $lte: validatedInput.stackSize },
-        'stackRange.max': { $gte: validatedInput.stackSize },
+        'stackRange.min': stackBracket.min,
+        'stackRange.max': stackBracket.max,
     };
     
     const existingRangeDoc = await rangesCollection.findOne(query);
     
     if (existingRangeDoc) {
-      const parsedDoc = GtoRangeDocumentSchema.extend({ range: GenerateGtoRangeOutputSchema }).safeParse(existingRangeDoc);
+      const parsedDoc = z.object({ range: GenerateGtoRangeOutputSchema }).safeParse(existingRangeDoc);
       if (parsedDoc.success) {
         return { success: true, data: parsedDoc.data.range, source: 'db' };
       }
@@ -66,7 +68,7 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
       position: validatedInput.position,
       tableType: validatedInput.tableType,
       previousAction: validatedInput.previousAction,
-      stackRange: getStackBracket(validatedInput.stackSize),
+      stackRange: stackBracket,
       range: generatedRange,
       createdAt: new Date(),
     };
@@ -112,10 +114,12 @@ export async function getPreflopExplanationAction(input: z.infer<typeof PreflopE
         
         const { stackSize, betSize, ...queryWithoutStack } = validatedInput;
 
+        const stackBracket = getStackBracket(stackSize);
+
         const query = {
             ...queryWithoutStack,
-            'stackRange.min': { $lte: stackSize },
-            'stackRange.max': { $gte: stackSize },
+            'stackRange.min': stackBracket.min,
+            'stackRange.max': stackBracket.max,
         };
         
         // 1. Try to find the explanation in the database using the stack bracket
@@ -142,7 +146,7 @@ export async function getPreflopExplanationAction(input: z.infer<typeof PreflopE
         // 3. Save the new explanation to the database with the stack bracket
         const documentToInsert = {
             ...queryWithoutStack,
-            stackRange: getStackBracket(stackSize),
+            stackRange: stackBracket,
             ...generatedExplanation,
             createdAt: new Date(),
         };
@@ -202,3 +206,5 @@ export async function suggestImprovementExercises(input: z.infer<typeof SuggestI
         return { success: false, error: 'Failed to get suggested exercises from AI.' };
     }
 }
+
+    
