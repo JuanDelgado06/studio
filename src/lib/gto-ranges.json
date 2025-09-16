@@ -58,6 +58,13 @@
       "range": { "all-in": ["TT+", "AKs", "AKo", "AQs"] }
     },
     {
+        "position": "BTN",
+        "stackRange": { "min": 1, "max": 20 },
+        "tableType": "cash",
+        "previousAction": "none",
+        "range": { "all-in": ["22+", "A2s+", "K2s+", "Q2s+", "J5s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"] }
+    },
+    {
       "position": "CO",
       "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
@@ -112,6 +119,13 @@
       "tableType": "cash",
       "previousAction": "4-bet",
       "range": { "all-in": ["TT+", "AQs+", "AKo"] }
+    },
+    {
+      "position": "CO",
+      "stackRange": { "min": 1, "max": 20 },
+      "tableType": "cash",
+      "previousAction": "none",
+      "range": { "all-in": ["22+", "A2s+", "K5s+", "Q8s+", "J8s+", "T8s+", "98s", "A9o+", "KTo+", "QTo+", "JTo"] }
     },
     {
       "position": "MP",
@@ -170,6 +184,13 @@
       "range": { "all-in": ["QQ+", "AKs", "AKo"] }
     },
     {
+        "position": "MP",
+        "stackRange": { "min": 1, "max": 20 },
+        "tableType": "cash",
+        "previousAction": "none",
+        "range": { "all-in": ["55+", "A2s+", "K9s+", "QJs", "JTs", "AJo+", "KQo"] }
+    },
+    {
       "position": "UTG",
       "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
@@ -224,6 +245,13 @@
       "tableType": "cash",
       "previousAction": "4-bet",
       "range": { "all-in": ["QQ+", "AKs", "AKo"] }
+    },
+    {
+        "position": "UTG",
+        "stackRange": { "min": 1, "max": 20 },
+        "tableType": "cash",
+        "previousAction": "none",
+        "range": { "all-in": ["66+", "ATs+", "KQs", "AJo+"] }
     },
     {
       "position": "SB",
@@ -282,6 +310,13 @@
       "range": { "all-in": ["TT+", "AQs+", "AKo"] }
     },
     {
+        "position": "SB",
+        "stackRange": { "min": 1, "max": 20 },
+        "tableType": "cash",
+        "previousAction": "none",
+        "range": { "all-in": ["22+", "A2s+", "K2s+", "Q5s+", "J7s+", "T7s+", "97s+", "87s", "A2o+", "K9o+", "QTo+", "JTo"] }
+    },
+    {
       "position": "BB",
       "stackRange": { "min": 71, "max": 100 },
       "tableType": "cash",
@@ -336,6 +371,13 @@
       "tableType": "cash",
       "previousAction": "4-bet",
       "range": { "all-in": ["99+", "AQs+", "AKo"] }
+    },
+     {
+      "position": "BB",
+      "stackRange": { "min": 1, "max": 20 },
+      "tableType": "cash",
+      "previousAction": "raise",
+      "range": { "all-in": ["77+", "A2s+", "K7s+", "Q9s+", "JTs", "T9s", "AJo+", "KQo", "ATo"] }
     },
     {
       "position": "BTN",
