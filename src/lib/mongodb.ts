@@ -36,7 +36,7 @@ async function setupDatabase(client: MongoClient) {
         'stackRange.min': 1,
         'stackRange.max': 1,
         tableType: 1,
-    }, { name: 'explanation_scenario_idx' });
+    }, { name: 'explanation_scenario_v2_idx' });
 }
 
 if (process.env.NODE_ENV === 'development') {
