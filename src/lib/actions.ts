@@ -24,13 +24,6 @@ const PreflopExplanationSchema = PreflopDecisionSchema.extend({
     isOptimal: z.boolean(),
 });
 
-// Schema for the document to be stored in the 'explanations' collection
-const ExplanationDocumentSchema = PreflopExplanationSchema.extend({
-  feedback: z.string(),
-  evExplanation: z.string(),
-});
-
-
 // Server Action for fetching/generating GTO ranges
 export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenerateRangeSchema>): Promise<{ success: boolean; data?: GenerateGtoRangeOutput | null; error?: string; source?: 'db' | 'ai' }> {
   try {
@@ -50,7 +43,13 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
     const existingRangeDoc = await rangesCollection.findOne(query);
 
     if (existingRangeDoc) {
-      return { success: true, data: existingRangeDoc.range as GenerateGtoRangeOutput, source: 'db' };
+      const parsedRange = GtoRangeDocumentSchema.extend({
+        range: GenerateGtoRangeOutputSchema
+      }).safeParse(existingRangeDoc);
+
+      if (parsedRange.success) {
+        return { success: true, data: parsedRange.data.range, source: 'db' };
+      }
     }
 
     const generatedRange = await generateGtoRange(validatedInput);
@@ -59,7 +58,19 @@ export async function getOrGenerateRangeAction(input: z.infer<typeof GetOrGenera
       throw new Error("AI failed to generate a range.");
     }
     
-    // For now, we are not saving AI generated ranges back to the DB to avoid polluting the ranged structure.
+    const newRangeDoc = {
+      position: validatedInput.position,
+      tableType: validatedInput.tableType,
+      previousAction: validatedInput.previousAction,
+      stackRange: {
+        min: validatedInput.stackSize - 5,
+        max: validatedInput.stackSize + 5
+      },
+      range: generatedRange,
+      createdAt: new Date(),
+    };
+
+    await rangesCollection.insertOne(newRangeDoc);
 
     return { success: true, data: generatedRange, source: 'ai' };
 
