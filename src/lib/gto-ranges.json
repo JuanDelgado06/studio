@@ -455,6 +455,63 @@
       "tableType": "tournament",
       "previousAction": "3-bet",
       "range": { "all-in": ["JJ+", "AKs", "AKo"], "call": ["TT"] }
+    },
+    {
+      "position": "UTG",
+      "stackRange": { "min": 21, "max": 70 },
+      "tableType": "tournament",
+      "previousAction": "none",
+      "range": { "raise": ["55+", "A8s+", "KTs+", "QJs", "JTs", "T9s", "ATo+", "KQo"] }
+    },
+    {
+      "position": "MP",
+      "stackRange": { "min": 21, "max": 70 },
+      "tableType": "tournament",
+      "previousAction": "none",
+      "range": { "raise": ["22+", "A2s+", "K9s+", "Q9s+", "JTs", "T9s", "98s", "AJo+", "KQo"] }
+    },
+    {
+      "position": "CO",
+      "stackRange": { "min": 21, "max": 70 },
+      "tableType": "tournament",
+      "previousAction": "none",
+      "range": { "raise": ["22+", "A2s+", "K6s+", "Q8s+", "J8s+", "T8s+", "98s", "A9o+", "KTo+", "QTo+", "JTo"] }
+    },
+    {
+      "position": "BTN",
+      "stackRange": { "min": 21, "max": 70 },
+      "tableType": "tournament",
+      "previousAction": "none",
+      "range": { "raise": ["22+", "A2s+", "K2s+", "Q2s+", "J4s+", "T6s+", "96s+", "86s+", "75s+", "65s", "A2o+", "K8o+", "Q9o+", "J9o+", "T9o"] }
+    },
+    {
+      "position": "UTG",
+      "stackRange": { "min": 1, "max": 20 },
+      "tableType": "tournament",
+      "previousAction": "none",
+      "range": { "all-in": ["77+", "A9s+", "KTs+", "QJs", "AJo+", "KQo"] }
+    },
+    {
+      "position": "MP",
+      "stackRange": { "min": 1, "max": 20 },
+      "tableType": "tournament",
+      "previousAction": "none",
+      "range": { "all-in": ["66+", "A5s+", "K9s+", "Q9s+", "JTs", "T9s", "ATo+", "KJo+"] }
+    },
+    {
+      "position": "CO",
+      "stackRange": { "min": 1, "max": 20 },
+      "tableType": "tournament",
+      "previousAction": "none",
+      "range": { "all-in": ["22+", "A2s+", "K5s+", "Q8s+", "J8s+", "T8s+", "98s", "A8o+", "KTo+", "QTo+", "JTo"] }
+    },
+    {
+      "position": "BTN",
+      "stackRange": { "min": 1, "max": 20 },
+      "tableType": "tournament",
+      "previousAction": "none",
+      "range": { "all-in": ["22+", "A2s+", "K2s+", "Q2s+", "J5s+", "T6s+", "97s+", "87s", "A2o+", "K8o+", "Q9o+", "JTo"] }
     }
   ]
 }
+
