@@ -44,6 +44,6 @@ export const GtoRangeDocumentSchema = z.object({
     stackRange: z.object({ min: z.number(), max: z.number() }),
     tableType: z.enum(['cash', 'tournament']),
     previousAction: z.enum(['none', 'raise', '3-bet', '4-bet']),
-});
+}).passthrough();
 export type GtoRangeScenario = z.infer<typeof GtoRangeDocumentSchema>;
     
