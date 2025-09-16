@@ -31,6 +31,7 @@ export const PokerCard: React.FC<PokerCardProps> = ({ rank, suit, className }) =
       className={cn(
         'relative flex h-24 w-16 flex-col justify-between rounded-md border-2 bg-white p-1.5 shadow-md',
         'sm:h-36 sm:w-24 sm:rounded-lg sm:p-2',
+        'animate-in zoom-in-75 duration-300',
         suitColors[suit],
         className
       )}

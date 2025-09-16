@@ -640,7 +640,7 @@ export function PracticeModule() {
             )}
 
             {state.feedback && (
-                <div className="w-full max-w-md space-y-2">
+                <div className="w-full max-w-md space-y-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95">
                 <Alert
                     variant={state.feedback.isOptimal ? 'default' : 'destructive'}
                 >
@@ -855,7 +855,7 @@ export function PracticeModule() {
             </CardContent>
         </Card>
         {state.feedback && state.currentHandRange && (
-            <div className="p-1">
+            <div className="p-1 animate-in fade-in-0 duration-500">
                 <HandRangeGrid
                     currentHand={state.currentHand?.handNotation}
                     range={state.currentHandRange}
