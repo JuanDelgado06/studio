@@ -24,7 +24,7 @@ import type { Position, TableType, Action, PreviousAction, GtoRangeScenario } fr
 import { getPreflopExplanationAction, getOrGenerateRangeAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { CheckCircle, Info, Loader2, Database, Sparkles, Settings, Shuffle, XCircle, Hand, Lightbulb } from 'lucide-react';
+import { CheckCircle, Info, Loader2, Sparkles, Settings, Shuffle, XCircle, Hand, Lightbulb } from 'lucide-react';
 import { useStats } from '@/context/stats-context';
 import type { GetPreflopExplanationOutput } from '@/ai/flows/get-preflop-explanation';
 import { HandRangeGrid } from './hand-range-grid';
@@ -303,6 +303,7 @@ export function PracticeModule() {
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [customHand, setCustomHand] = useState('');
   const [currentTip, setCurrentTip] = useState('');
+  const [isClient, setIsClient] = useState(false);
 
   const [state, dispatch] = useReducer(reducer, {
     scenario: {
@@ -344,8 +345,9 @@ export function PracticeModule() {
   }, [findRangeForScenario, toast]);
 
 
-  // Initial load
+  // Initial load, only on client
   useEffect(() => {
+    setIsClient(true);
     const initialScenario: Scenario = {
         position: 'BTN',
         stackSize: 100,
@@ -491,7 +493,7 @@ export function PracticeModule() {
 
   const descriptionText = generateDescription();
 
-  if (state.isLoading || !state.currentHand) {
+  if (!isClient || state.isLoading || !state.currentHand) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center min-h-[600px]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -505,7 +507,7 @@ export function PracticeModule() {
         <div className="mt-8 flex flex-col items-center gap-3 text-center">
             <Lightbulb className="h-8 w-8 text-yellow-400" />
             <p className="font-headline text-xl text-foreground">Consejo del Pro:</p>
-            <p className="text-muted-foreground max-w-xs">{currentTip}</p>
+            <p className="text-muted-foreground max-w-xs">{currentTip || "Cargando consejo..."}</p>
         </div>
       </div>
     );
