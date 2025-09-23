@@ -197,6 +197,27 @@ export default function LearnPage() {
              </div>
 
              <Separator className="my-8" />
+
+             <div className="md:col-span-2 my-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="font-headline">
+                      Conceptos Fundamentales en Texas Hold'em
+                    </CardTitle>
+                    <CardDescription>
+                      Explora un glosario detallado de términos, estrategias y conceptos matemáticos clave del póker.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href="/learn/concepts">
+                      <Button>
+                        <BookCopy className="mr-2 h-4 w-4" />
+                        Ir al Glosario
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
             
             <Accordion type="single" collapsible className="w-full">
               {pokerJourneyContent.map((item) => (
@@ -228,27 +249,6 @@ export default function LearnPage() {
                 </AccordionItem>
               ))}
             </Accordion>
-          </CardContent>
-        </Card>
-      </div>
-
-       <div className="md:col-span-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-headline">
-              Conceptos Fundamentales en Texas Hold'em
-            </CardTitle>
-            <CardDescription>
-              Explora un glosario detallado de términos, estrategias y conceptos matemáticos clave del póker.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/learn/concepts">
-              <Button>
-                <BookCopy className="mr-2 h-4 w-4" />
-                Ir al Glosario
-              </Button>
-            </Link>
           </CardContent>
         </Card>
       </div>
