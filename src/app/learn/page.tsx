@@ -95,7 +95,7 @@ export default function LearnPage() {
         <Card>
           <CardHeader>
             <CardTitle className="font-headline">
-              Tu Camino de Principiante a Experto
+              Guia de principiante a experto en Poker
             </CardTitle>
             <CardDescription>
               Una guía paso a paso para mejorar tu juego desde los cimientos hasta la maestría.
