@@ -164,7 +164,7 @@ export default function LearnPage() {
                             Conceptos Fundamentales
                             </CardTitle>
                             <CardDescription>
-                            Explora el glosario detallado de términos clave del póker.
+                            Aprendamos los conceptos fundamentales del poker.
                             </CardDescription>
                         </div>
                         <div className="p-2 rounded-full bg-secondary/50 transition-transform group-hover:translate-x-1">
