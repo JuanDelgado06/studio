@@ -19,10 +19,11 @@ import { Button } from '@/components/ui/button';
 import { useStats } from '@/context/stats-context';
 import * as React from 'react';
 import { suggestImprovementExercises } from '@/lib/actions';
-import { Loader2, Trash2 } from 'lucide-react';
+import { BookCopy, Loader2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import Link from 'next/link';
 
 const pokerJourneyContent = [
     {
@@ -227,6 +228,27 @@ export default function LearnPage() {
                 </AccordionItem>
               ))}
             </Accordion>
+          </CardContent>
+        </Card>
+      </div>
+
+       <div className="md:col-span-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-headline">
+              Conceptos Fundamentales en Texas Hold'em
+            </CardTitle>
+            <CardDescription>
+              Explora un glosario detallado de términos, estrategias y conceptos matemáticos clave del póker.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/learn/concepts">
+              <Button>
+                <BookCopy className="mr-2 h-4 w-4" />
+                Ir al Glosario
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
