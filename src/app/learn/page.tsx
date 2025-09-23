@@ -21,6 +21,8 @@ import * as React from 'react';
 import { suggestImprovementExercises } from '@/lib/actions';
 import { Loader2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const pokerJourneyContent = [
     {
@@ -55,6 +57,19 @@ const pokerJourneyContent = [
         concepts: ['Estrategia GTO compleja', 'Ajustes meta-juego', 'Dominio psicológico y control del tilt', 'Maximizar el EV en situaciones marginales'],
         image: { id: '8', hint: 'trophy award' },
     }
+];
+
+const handRankings = [
+  { rank: 1, name: 'Carta alta', example: 'A♠ sin combinación', value: '📉 Bajo' },
+  { rank: 2, name: 'Pareja', example: '7♣ 7♦', value: '📈 Medio' },
+  { rank: 3, name: 'Doble pareja', example: '9♠ 9♥ + 4♣ 4♦', value: '📈 Medio' },
+  { rank: 4, name: 'Trío', example: 'Q♠ Q♥ Q♦', value: '📊 Alto' },
+  { rank: 5, name: 'Escalera', example: '5♣ 6♦ 7♠ 8♥ 9♠', value: '📊 Alto' },
+  { rank: 6, name: 'Color', example: '2♠ 5♠ 9♠ J♠ K♠', value: '🚀 Muy alto' },
+  { rank: 7, name: 'Full House', example: '3♣ 3♦ 3♠ + 6♥ 6♠', value: '🚀 Muy alto' },
+  { rank: 8, name: 'Póker', example: '10♠ 10♦ 10♣ 10♥', value: '🔥 Altísimo' },
+  { rank: 9, name: 'Escalera de color', example: '7♠ 8♠ 9♠ 10♠ J♠', value: '🏆 Máximo' },
+  { rank: 10, name: 'Escalera real', example: '10♠ J♠ Q♠ K♠ A♠', value: '👑 ¡La mejor!' },
 ];
 
 export default function LearnPage() {
@@ -101,7 +116,87 @@ export default function LearnPage() {
               Una guía paso a paso para mejorar tu juego desde los cimientos hasta la maestría.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="prose prose-sm max-w-none text-foreground/90">
+             <div className="space-y-6 not-prose">
+                <div className="space-y-2">
+                    <h2 className="text-xl font-bold font-headline text-primary">🎯 Objetivo del Juego</h2>
+                    <p>Ganar fichas formando la <strong>mejor mano de cinco cartas</strong> o haciendo que los demás jugadores se retiren (farol o bluff).</p>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                    <h2 className="text-xl font-bold font-headline text-primary">🧩 Tipos de Manos (de menor a mayor valor)</h2>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[50px]">#</TableHead>
+                                <TableHead>Mano</TableHead>
+                                <TableHead>Ejemplo</TableHead>
+                                <TableHead className="text-right">Valor</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {handRankings.map((hand) => (
+                                <TableRow key={hand.rank}>
+                                    <TableCell className="font-medium">{hand.rank}</TableCell>
+                                    <TableCell>{hand.name}</TableCell>
+                                    <TableCell><code>{hand.example}</code></TableCell>
+                                    <TableCell className="text-right">{hand.value}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+                
+                <Separator />
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <h2 className="text-xl font-bold font-headline text-primary">🔄 Rondas de Apuestas</h2>
+                        <ul className="list-decimal list-inside space-y-1">
+                            <li><strong>Preflop:</strong> después de recibir tus 2 cartas privadas</li>
+                            <li><strong>Flop:</strong> se revelan 3 cartas comunitarias</li>
+                            <li><strong>Turn:</strong> se revela una cuarta carta</li>
+                            <li><strong>River:</strong> se revela la quinta y última carta</li>
+                        </ul>
+                    </div>
+                    <div className="space-y-2">
+                        <h2 className="text-xl font-bold font-headline text-primary">🛠️ Acciones Comunes</h2>
+                        <ul className="list-disc list-inside space-y-1">
+                           <li><code className="font-semibold">Fold</code>: retirarse</li>
+                           <li><code className="font-semibold">Call</code>: igualar la apuesta</li>
+                           <li><code className="font-semibold">Raise</code>: subir la apuesta</li>
+                           <li><code className="font-semibold">Check</code>: pasar sin apostar (si nadie ha apostado antes)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <Separator />
+
+                 <div className="space-y-2">
+                    <h2 className="text-xl font-bold font-headline text-primary">🪑 Posiciones en la Mesa</h2>
+                     <p><strong>Dealer (Botón):</strong> última persona en actuar, posición ventajosa.</p>
+                     <p><strong>Small Blind / Big Blind:</strong> apuestas obligatorias antes de repartir cartas.</p>
+                     <p className="text-sm text-primary italic">💡 Cuanto más tarde actúes en la ronda, más información tienes para tomar decisiones estratégicas.</p>
+                </div>
+                 
+                 <Separator />
+
+                 <div className="space-y-2 rounded-lg border border-primary/20 bg-primary/5 p-4">
+                    <h2 className="text-xl font-bold font-headline text-primary">📌 Recomendación para Empezar</h2>
+                     <ul className="list-disc list-inside space-y-1">
+                        <li>🧠 Aprender el valor de las manos</li>
+                        <li>🪑 Jugar en posición tardía</li>
+                        <li>⚠️ No arriesgar demasiadas fichas con manos débiles</li>
+                        <li>👀 Observar cómo juegan los demás</li>
+                     </ul>
+                </div>
+
+             </div>
+
+             <Separator className="my-8" />
+            
             <Accordion type="single" collapsible className="w-full">
               {pokerJourneyContent.map((item) => (
                 <AccordionItem value={item.value} key={item.value}>
@@ -191,3 +286,5 @@ export default function LearnPage() {
     </div>
   );
 }
+
+    
