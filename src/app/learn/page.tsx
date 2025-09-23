@@ -8,13 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useStats } from '@/context/stats-context';
 import * as React from 'react';
@@ -24,41 +17,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
-
-const pokerJourneyContent = [
-    {
-        value: 'journey-1',
-        level: 'Nivel 1: Principiante 🐣',
-        title: 'Los Cimientos del Juego',
-        description: 'En esta etapa, el objetivo es construir una base sólida. Concéntrate en jugar un poker "ABC", sólido y sin complicaciones. Aprende a ser selectivo con tus manos iniciales y a valorar la posición.',
-        concepts: ['Selección de manos preflop (rangos de apertura)', 'El valor de la posición', 'Conceptos básicos: pot odds y outs', 'Agresividad selectiva: cuándo apostar y subir'],
-        image: { id: '5', hint: 'building blocks' },
-    },
-    {
-        value: 'journey-2',
-        level: 'Nivel 2: Intermedio  intermédiaire',
-        title: 'Expandiendo tu Arsenal Estratégico',
-        description: 'Aquí dejas de jugar solo tus cartas y empiezas a jugar contra tu oponente. Comienzas a pensar en rangos y a introducir movimientos más avanzados como el 3-bet de farol (bluff) y el semi-farol.',
-        concepts: ['Juego post-flop: C-bets y second barrels', '3-bet por valor y de farol', 'Equity y Fold Equity', 'Identificar tipos de oponentes (TAG, LAG, Fish)'],
-        image: { id: '6', hint: 'chess strategy' },
-    },
-    {
-        value: 'journey-3',
-        level: 'Nivel 3: Avanzado 🚀',
-        title: 'Pensamiento en Múltiples Niveles',
-        description: 'En el nivel avanzado, tus decisiones se basan en lo que tu oponente *piensa* que tú tienes. Dominas los conceptos matemáticos y empiezas a equilibrar tus rangos para ser impredecible.',
-        concepts: ['Balancear rangos', 'Explotación vs. GTO (Teoría de Juego Óptima)', 'Control del tamaño del pozo', 'Lectura de manos avanzada y blockers'],
-        image: { id: '7', hint: 'brain maze' },
-    },
-    {
-        value: 'journey-4',
-        level: 'Nivel 4: Experto 🏆',
-        title: 'La Maestría del Juego',
-        description: 'El nivel experto se define por la intuición refinada y una profunda comprensión de la dinámica de la mesa. Tomas decisiones óptimas de forma consistente, explotas las más mínimas debilidades de tus rivales y manejas el aspecto mental del juego como un profesional.',
-        concepts: ['Estrategia GTO compleja', 'Ajustes meta-juego', 'Dominio psicológico y control del tilt', 'Maximizar el EV en situaciones marginales'],
-        image: { id: '8', hint: 'trophy award' },
-    }
-];
 
 const handRankings = [
   { rank: 1, name: 'Carta alta', example: 'A♠ sin combinación', value: '📉 Bajo' },
@@ -193,11 +151,10 @@ export default function LearnPage() {
                         <li>👀 Observar cómo juegan los demás</li>
                      </ul>
                 </div>
-
              </div>
 
              <Separator className="my-8" />
-
+             
              <div className="md:col-span-2 my-6">
                 <Card>
                   <CardHeader>
@@ -218,37 +175,7 @@ export default function LearnPage() {
                   </CardContent>
                 </Card>
               </div>
-            
-            <Accordion type="single" collapsible className="w-full">
-              {pokerJourneyContent.map((item) => (
-                <AccordionItem value={item.value} key={item.value}>
-                  <AccordionTrigger className="font-headline text-lg">
-                    {item.level}
-                  </AccordionTrigger>
-                  <AccordionContent className="prose prose-sm max-w-none text-foreground/90">
-                    <div className="grid md:grid-cols-3 gap-6">
-                      <div className="md:col-span-2 space-y-4">
-                        <h3 className="font-bold text-base text-primary not-prose">{item.title}</h3>
-                        <p>{item.description}</p>
-                        <ul className="list-disc pl-5 space-y-1">
-                            {item.concepts.map(concept => <li key={concept}>{concept}</li>)}
-                        </ul>
-                      </div>
-                      <div className="flex items-center justify-center">
-                        <Image
-                          src={`https://picsum.photos/seed/${item.image.id}/300/200`}
-                          width={300}
-                          height={200}
-                          alt={item.title}
-                          className="rounded-lg object-cover shadow-lg"
-                          data-ai-hint={item.image.hint}
-                        />
-                      </div>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+
           </CardContent>
         </Card>
       </div>
@@ -308,5 +235,3 @@ export default function LearnPage() {
     </div>
   );
 }
-
-    
