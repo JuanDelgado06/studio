@@ -22,37 +22,6 @@ import { suggestImprovementExercises } from '@/lib/actions';
 import { Loader2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-const educationalContent = [
-  {
-    value: 'item-1',
-    title: '¿Qué son los Rangos Preflop? 📈',
-    description:
-      'Un rango es el conjunto de manos que un jugador podría tener en una situación específica. En lugar de pensar en una mano exacta, los jugadores profesionales piensan en rangos. Esto te permite tomar decisiones más rentables a largo plazo.',
-    image: { id: '1', hint: 'poker chart' },
-  },
-  {
-    value: 'item-2',
-    title: 'Entendiendo la Equity ⚖️',
-    description:
-      'La equity de tu mano es tu "porcentaje de derecho" al pozo en un momento dado. Si tienes un 60% de equity, en promedio ganarás el pozo el 60% de las veces si la mano llega al showdown. Es crucial para decidir si pagar una apuesta o no (pot odds).',
-    image: { id: '2', hint: 'balance scale' },
-  },
-  {
-    value: 'item-3',
-    title: 'El Poder de los Blockers 🚫',
-    description:
-      'Tener una carta en tu mano (un "blocker") reduce la probabilidad de que tu oponente tenga combinaciones que incluyan esa carta. Por ejemplo, tener el As de picas (A♠) hace imposible que tu oponente tenga el nut flush de picas.',
-    image: { id: '3', hint: 'blocking shield' },
-  },
-  {
-    value: 'item-4',
-    title: 'Tipos de Errores Comunes ❌',
-    description:
-      '1. **Fold Incorrecto:** Foldeas una mano que era rentable para pagar o subir. 2. **Call Incorrecto:** Pagas con una mano demasiado débil, quedando "dominado". 3. **Raise Incorrecto:** Haces un 3-bet o 4-bet con una mano que debería haber sido un call o fold, o con un tamaño incorrecto.',
-    image: { id: '4', hint: 'wrong sign' },
-  },
-];
-
 const pokerJourneyContent = [
     {
         value: 'journey-1',
@@ -122,48 +91,6 @@ export default function LearnPage() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="md:col-span-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-headline">
-              Conceptos Clave del Poker Preflop
-            </CardTitle>
-            <CardDescription>
-              Domina los fundamentos para construir una estrategia sólida desde
-              el inicio.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Accordion type="single" collapsible className="w-full">
-              {educationalContent.map((item) => (
-                <AccordionItem value={item.value} key={item.value}>
-                  <AccordionTrigger className="font-headline text-lg">
-                    {item.title}
-                  </AccordionTrigger>
-                  <AccordionContent className="prose prose-sm max-w-none text-foreground/90">
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <div className="md:col-span-2">
-                        <p>{item.description}</p>
-                      </div>
-                      <div className="flex items-center justify-center">
-                        <Image
-                          src={`https://picsum.photos/seed/${item.image.id}/300/200`}
-                          width={300}
-                          height={200}
-                          alt={item.title}
-                          className="rounded-lg object-cover"
-                          data-ai-hint={item.image.hint}
-                        />
-                      </div>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </CardContent>
-        </Card>
-      </div>
-
        <div className="md:col-span-2">
         <Card>
           <CardHeader>
