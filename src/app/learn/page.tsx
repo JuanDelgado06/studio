@@ -136,100 +136,58 @@ export default function LearnPage() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">
-            Ejercicio Práctico: Pot Odds
-          </CardTitle>
-          <CardDescription>
-            Calcula si tienes las odds para pagar.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 text-sm">
-          <p>
-            <strong>Escenario:</strong> El pozo es de $100. Tu oponente apuesta
-            $50. Tienes un proyecto de color en el turn.
-          </p>
-          <p>
-            <strong>Cálculo:</strong>
-          </p>
-          <ol className="list-decimal list-inside space-y-2 pl-4">
-            <li>
-              <strong>Pozo total:</strong> $100 (pozo inicial) + $50 (apuesta)
-              = $150.
-            </li>
-            <li>
-              <strong>Costo para pagar:</strong> $50.
-            </li>
-            <li>
-              <strong>Pot Odds:</strong> $150:$50, que se simplifica a 3:1.
-            </li>
-            <li>
-              <strong>Equity necesaria:</strong> Debes ganar más de 1 de cada 4
-              veces. $50 / ($150 + $50) = 25%.
-            </li>
-            <li>
-              <strong>Tu equity:</strong> Con 9 outs para color, tienes ~19.6%
-              de equity.
-            </li>
-          </ol>
-          <p>
-            <strong>Conclusión:</strong> No tienes las pot odds directas para
-            pagar. Necesitarías "odds implícitas" (la posibilidad de ganar más
-            dinero en calles futuras) para justificar el call.
-          </p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">
-            Módulo de IA: Ejercicios Personalizados
-          </CardTitle>
-          <CardDescription>
-            El agente de IA analiza tu historial y sugiere ejercicios para
-            mejorar tus puntos débiles.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex gap-2">
-            <Button
-              onClick={handleGenerateExercises}
-              disabled={isLoading || stats.handsPlayed < 5}
-              className="flex-grow"
-            >
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
-              Generar Ejercicios
-            </Button>
-            {suggestedExercises && !isLoading && (
-                 <Button onClick={handleClearExercises} variant="destructive" size="icon">
-                    <Trash2 className="h-4 w-4" />
-                 </Button>
+      <div className="md:col-span-2">
+        <Card>
+            <CardHeader>
+            <CardTitle className="font-headline">
+                Módulo de IA: Ejercicios Personalizados
+            </CardTitle>
+            <CardDescription>
+                El agente de IA analiza tu historial y sugiere ejercicios para
+                mejorar tus puntos débiles.
+            </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+            <div className="flex gap-2">
+                <Button
+                onClick={handleGenerateExercises}
+                disabled={isLoading || stats.handsPlayed < 5}
+                className="flex-grow"
+                >
+                {isLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                Generar Ejercicios
+                </Button>
+                {suggestedExercises && !isLoading && (
+                    <Button onClick={handleClearExercises} variant="destructive" size="icon">
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                )}
+            </div>
+            {stats.handsPlayed < 5 && (
+                <p className="text-xs text-center text-muted-foreground">
+                Juega al menos 5 manos para generar ejercicios.
+                </p>
             )}
-          </div>
-          {stats.handsPlayed < 5 && (
-            <p className="text-xs text-center text-muted-foreground">
-              Juega al menos 5 manos para generar ejercicios.
-            </p>
-          )}
 
-          {isLoading && (
-            <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              <p className="mt-4 text-muted-foreground">
-                Analizando tu historial y generando ejercicios...
-              </p>
-            </div>
-          )}
+            {isLoading && (
+                <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <p className="mt-4 text-muted-foreground">
+                    Analizando tu historial y generando ejercicios...
+                </p>
+                </div>
+            )}
 
-          {suggestedExercises && !isLoading && (
-            <div className="prose prose-sm max-w-none rounded-lg border bg-secondary/50 p-4 text-foreground whitespace-pre-wrap">
-                {suggestedExercises}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            {suggestedExercises && !isLoading && (
+                <div className="prose prose-sm max-w-none rounded-lg border bg-secondary/50 p-4 text-foreground whitespace-pre-wrap">
+                    {suggestedExercises}
+                </div>
+            )}
+            </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
