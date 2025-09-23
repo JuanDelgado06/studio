@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useStats } from '@/context/stats-context';
 import * as React from 'react';
 import { suggestImprovementExercises } from '@/lib/actions';
-import { BookCopy, Loader2, Trash2 } from 'lucide-react';
+import { BookCopy, Loader2, Trash2, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -152,30 +152,28 @@ export default function LearnPage() {
                      </ul>
                 </div>
              </div>
-
+             
              <Separator className="my-8" />
              
-             <div className="md:col-span-2 my-6">
-                <Card>
+             <Link href="/learn/concepts" className="block group">
+                <Card className="transition-all duration-200 group-hover:scale-[1.01] group-hover:shadow-lg group-hover:border-primary/50">
                   <CardHeader>
-                    <CardTitle className="font-headline">
-                      Conceptos Fundamentales en Texas Hold'em
-                    </CardTitle>
-                    <CardDescription>
-                      Explora un glosario detallado de términos, estrategias y conceptos matemáticos clave del póker.
-                    </CardDescription>
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <CardTitle className="font-headline text-primary">
+                            Conceptos Fundamentales
+                            </CardTitle>
+                            <CardDescription>
+                            Explora el glosario detallado de términos clave del póker.
+                            </CardDescription>
+                        </div>
+                        <div className="p-2 rounded-full bg-secondary/50 transition-transform group-hover:translate-x-1">
+                            <ArrowRight className="h-5 w-5 text-secondary-foreground"/>
+                        </div>
+                    </div>
                   </CardHeader>
-                  <CardContent>
-                    <Link href="/learn/concepts">
-                      <Button>
-                        <BookCopy className="mr-2 h-4 w-4" />
-                        Ir al Glosario
-                      </Button>
-                    </Link>
-                  </CardContent>
                 </Card>
-              </div>
-
+              </Link>
           </CardContent>
         </Card>
       </div>
@@ -235,3 +233,5 @@ export default function LearnPage() {
     </div>
   );
 }
+
+    
