@@ -80,7 +80,7 @@ export default function LearnPage() {
           <CardContent className="prose prose-sm max-w-none text-foreground/90">
              <div className="space-y-6 not-prose">
                 <div className="space-y-2">
-                    <h2 className="text-xl font-bold font-headline text-foreground">🎯 Objetivo del Juego</h2>
+                    <h2 className="text-2xl font-bold font-headline text-primary">🎯 Objetivo del Juego</h2>
                     <p>Ganar fichas formando la <strong>mejor mano de cinco cartas</strong> o haciendo que los demás jugadores se retiren (farol o bluff).</p>
                 </div>
 
@@ -89,7 +89,7 @@ export default function LearnPage() {
                 <div className="space-y-4">
                     <Accordion type="single" collapsible className="w-full">
                         <AccordionItem value="hand-rankings">
-                            <AccordionTrigger className="text-xl font-bold font-headline text-foreground">🧩 Tipos de Manos (de menor a mayor valor)</AccordionTrigger>
+                            <AccordionTrigger className="text-2xl font-bold font-headline text-primary">🧩 Tipos de Manos (de menor a mayor valor)</AccordionTrigger>
                             <AccordionContent>
                                 <Table>
                                     <TableHeader>
@@ -120,7 +120,7 @@ export default function LearnPage() {
                 
                 <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                        <h2 className="text-xl font-bold font-headline text-foreground">🔄 Rondas de Apuestas</h2>
+                        <h2 className="text-2xl font-bold font-headline text-primary">🔄 Rondas de Apuestas</h2>
                         <ul className="list-decimal list-inside space-y-1">
                             <li><strong>Preflop:</strong> después de recibir tus 2 cartas privadas</li>
                             <li><strong>Flop:</strong> se revelan 3 cartas comunitarias</li>
@@ -129,7 +129,7 @@ export default function LearnPage() {
                         </ul>
                     </div>
                     <div className="space-y-2">
-                        <h2 className="text-xl font-bold font-headline text-foreground">🛠️ Acciones Comunes</h2>
+                        <h2 className="text-2xl font-bold font-headline text-primary">🛠️ Acciones Comunes</h2>
                         <ul className="list-disc list-inside space-y-1">
                            <li><code className="font-semibold">Fold</code>: retirarse</li>
                            <li><code className="font-semibold">Call</code>: igualar la apuesta</li>
@@ -142,7 +142,7 @@ export default function LearnPage() {
                 <Separator />
 
                  <div className="space-y-2">
-                    <h2 className="text-xl font-bold font-headline text-foreground">🪑 Posiciones en la Mesa</h2>
+                    <h2 className="text-2xl font-bold font-headline text-primary">🪑 Posiciones en la Mesa</h2>
                      <p><strong>Dealer (Botón):</strong> última persona en actuar, posición ventajosa.</p>
                      <p><strong>Small Blind / Big Blind:</strong> apuestas obligatorias antes de repartir cartas.</p>
                      <p className="text-sm text-primary italic">💡 Cuanto más tarde actúes en la ronda, más información tienes para tomar decisiones estratégicas.</p>
@@ -151,7 +151,7 @@ export default function LearnPage() {
                  <Separator />
 
                  <div className="space-y-2 rounded-lg border border-primary/20 bg-primary/5 p-4">
-                    <h2 className="text-xl font-bold font-headline text-foreground">📌 Recomendación para Empezar</h2>
+                    <h2 className="text-2xl font-bold font-headline text-primary">📌 Recomendación para Empezar</h2>
                      <ul className="list-disc list-inside space-y-1">
                         <li>🧠 Aprender el valor de las manos</li>
                         <li>🪑 Jugar en posición tardía</li>
@@ -241,3 +241,5 @@ export default function LearnPage() {
     </div>
   );
 }
+
+    
