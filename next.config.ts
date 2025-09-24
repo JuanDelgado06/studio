@@ -27,6 +27,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.gipsyteam.es',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
