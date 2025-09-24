@@ -14,6 +14,7 @@ import Link from 'next/link';
 
 const concepts = [
     {
+        id: "position",
         title: "1. Posición en la mesa",
         emoji: "🔹",
         content: "La posición determina cuándo actúas en cada ronda de apuestas. Cuanto más tarde actúes, más información tienes, lo que te da una mayor ventaja estratégica.",
@@ -26,6 +27,7 @@ const concepts = [
         subTitle: "¿Por qué importa la posición?"
     },
     {
+        id: "pot-odds",
         title: "2. Pot Odds (Probabilidades del bote)",
         emoji: "🔹",
         content: "Compara el tamaño del bote con la cantidad que debes pagar. Si tus probabilidades de mejorar la mano son mayores que el costo relativo, ¡vale la pena pagar!",
@@ -40,26 +42,31 @@ const concepts = [
         }
     },
     {
+        id: "implied-odds",
         title: "2.1. Implied Odds (Probabilidades implícitas)",
         emoji: "💰",
         content: "Las Implied Odds estiman cuánto podrías ganar en total si conectas tu mano, no solo lo que hay en el bote actual. Te ayudan a decidir si vale la pena pagar una apuesta aunque tus Pot Odds sean desfavorables, porque podrías ganar más en calles futuras.",
     },
     {
+        id: "equity",
         title: "3. Equity",
         emoji: "🔹",
         content: "Es el porcentaje de probabilidad de ganar la mano en función de las cartas conocidas. Se usa para tomar decisiones matemáticamente correctas."
     },
     {
+        id: "hand-range",
         title: "4. Rango de manos",
         emoji: "🔹",
         content: "Conjunto de manos que un jugador podría tener en una situación dada. Aprender a leer rangos te ayuda a anticipar jugadas y ajustar tu estrategia."
     },
     {
+        id: "tells",
         title: "5. Tells (Comportamientos reveladores)",
         emoji: "🔹",
         content: "En juegos en vivo, los gestos, tiempos de reacción y patrones pueden revelar información. En línea, observa patrones de apuestas, tiempos de respuesta y tamaños de apuesta."
     },
     {
+        id: "bet-types",
         title: "6. Tipos de apuestas",
         emoji: "🔹",
         details: [
@@ -71,6 +78,7 @@ const concepts = [
         ]
     },
     {
+        id: "player-types",
         title: "7. Tipos de jugadores",
         emoji: "🔹",
         details: [
@@ -81,16 +89,19 @@ const concepts = [
         ]
     },
     {
+        id: "preflop-strategy",
         title: "8. Estrategia Preflop",
         emoji: "🔹",
         content: "Decide si entrar en la mano según tu posición, fuerza de cartas y estilo de juego. Usa tablas de rango para mejorar tus decisiones."
     },
     {
+        id: "postflop-strategy",
         title: "9. Juego postflop",
         emoji: "🔹",
         content: "Evalúa cómo el flop afecta tu mano y la de tus rivales. Ajusta tu estrategia según la textura del tablero (conectado, con color, seco, etc.)."
     },
     {
+        id: "bankroll-management",
         title: "10. Bankroll Management",
         emoji: "🔹",
         content: "Administra tu dinero para evitar quiebras. Nunca juegues con más del 5% de tu bankroll en una sola sesión."
@@ -149,7 +160,7 @@ export default function ConceptsPage() {
                     )}
                 </CardContent>
                  <CardFooter>
-                    <Link href="/learn/concepts" className="w-full">
+                    <Link href={`/learn/concepts/${concept.id}`} className="w-full">
                         <Button className="w-full">
                             <BookOpen className="mr-2 h-4 w-4" />
                             Explorar Concepto
