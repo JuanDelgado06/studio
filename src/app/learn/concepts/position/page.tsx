@@ -10,8 +10,8 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { PokerTable } from '@/components/poker/poker-table';
 
 const positionTips = [
     { position: 'Early Position (UTG)', advice: 'Juega solo manos premium (pares altos, AK, AQ). Evita proyectos débiles.' },
@@ -47,15 +47,20 @@ export default function PositionConceptPage() {
             Volver a todos los Conceptos
           </Button>
         </Link>
-        <div className="flex flex-col gap-1">
+        <div className="text-center">
           <h1 className="text-4xl font-bold font-headline text-primary">
             Posición en la Mesa: El Factor Decisivo
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-muted-foreground mt-2 max-w-3xl mx-auto">
             La posición determina cuándo actúas. Actuar más tarde te da más información, y la información es poder.
           </p>
         </div>
       </div>
+      
+      <div className="w-full flex justify-center py-8">
+        <PokerTable />
+      </div>
+
       <Separator />
 
       <Card className="bg-card/50">
@@ -71,25 +76,6 @@ export default function PositionConceptPage() {
             </ul>
         </CardContent>
       </Card>
-      
-      <div className="space-y-4">
-        <h2 className="text-3xl font-bold font-headline text-center">🪑 Tipos de Posición en la Mesa</h2>
-        <Card>
-            <CardContent className="p-4 flex flex-col md:flex-row items-center gap-6">
-                <div className="w-full md:w-1/2">
-                    <Image src="https://www.gipsyteam.es/upload/Pageimage/default/3/8/3844-1695631368.jpg" alt="Posiciones en la mesa de poker" width={500} height={300} className="rounded-lg shadow-md" />
-                </div>
-                 <div className="w-full md:w-1/2 text-sm text-muted-foreground space-y-3">
-                    <p><strong>UTG (Under the Gun):</strong> Primer jugador en actuar post-flop. Menos información → juega manos fuertes.</p>
-                    <p><strong>MP (Middle Position):</strong> Actúa después de UTG. Más flexible, pero aún con cautela.</p>
-                    <p><strong>CO (Cutoff):</strong> Justo antes del botón. Ideal para faroles y control del bote.</p>
-                    <p><strong>BTN (Button):</strong> Último en actuar post-flop. Máxima ventaja → puedes jugar más manos.</p>
-                    <p><strong>SB (Small Blind):</strong> Apuesta obligatoria. Actúa primero post-flop → posición débil.</p>
-                    <p><strong>BB (Big Blind):</strong> Apuesta obligatoria. Actúa segundo post-flop → algo más de ventaja que SB.</p>
-                </div>
-            </CardContent>
-        </Card>
-      </div>
 
        <div className="space-y-4">
         <h2 className="text-3xl font-bold font-headline text-center">📌 Consejos Estratégicos por Posición</h2>
@@ -158,3 +144,5 @@ export default function PositionConceptPage() {
     </div>
   );
 }
+
+    
