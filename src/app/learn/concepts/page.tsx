@@ -149,10 +149,12 @@ export default function ConceptsPage() {
                     )}
                 </CardContent>
                  <CardFooter>
-                    <Button className="w-full">
-                        <BookOpen className="mr-2 h-4 w-4" />
-                        Explorar Concepto
-                    </Button>
+                    <Link href="/learn/concepts" className="w-full">
+                        <Button className="w-full">
+                            <BookOpen className="mr-2 h-4 w-4" />
+                            Explorar Concepto
+                        </Button>
+                    </Link>
                 </CardFooter>
             </Card>
         ))}
