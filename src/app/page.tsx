@@ -87,23 +87,32 @@ export default function LearnPage() {
                 <Separator />
 
                 <div className="space-y-4">
-                    <h2 className="text-xl font-bold font-headline text-primary">🧩 Tipos de Manos (de mayor a mayor valor)</h2>
-                     <Accordion type="single" collapsible className="w-full">
-                        {handRankings.map((hand) => (
-                            <AccordionItem value={`item-${hand.rank}`} key={hand.rank}>
-                                <AccordionTrigger>
-                                    <div className="flex items-center justify-between w-full">
-                                        <span className="font-semibold">{hand.rank}. {hand.name}</span>
-                                        <span className="text-sm text-muted-foreground mr-2">{hand.value}</span>
-                                    </div>
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                    <p className="text-sm text-muted-foreground px-4 py-2 bg-secondary/50 rounded-md">
-                                        Ejemplo: <code>{hand.example}</code>
-                                    </p>
-                                </AccordionContent>
-                            </AccordionItem>
-                        ))}
+                    <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="hand-rankings">
+                            <AccordionTrigger className="text-xl font-bold font-headline text-primary">🧩 Tipos de Manos (de menor a mayor valor)</AccordionTrigger>
+                            <AccordionContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                        <TableHead className="w-[50px]">#</TableHead>
+                                        <TableHead>Mano</TableHead>
+                                        <TableHead>Ejemplo</TableHead>
+                                        <TableHead className="text-right">Valor</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {handRankings.map((hand) => (
+                                        <TableRow key={hand.rank}>
+                                            <TableCell className="font-medium">{hand.rank}</TableCell>
+                                            <TableCell>{hand.name}</TableCell>
+                                            <TableCell><code>{hand.example}</code></TableCell>
+                                            <TableCell className="text-right">{hand.value}</TableCell>
+                                        </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </AccordionContent>
+                        </AccordionItem>
                     </Accordion>
                 </div>
                 
@@ -160,10 +169,10 @@ export default function LearnPage() {
                     <div className="flex justify-between items-start">
                         <div>
                             <CardTitle className="font-headline text-primary">
-                            Conceptos Fundamentales
+                            Conceptos Fundamentales en Texas Hold'em
                             </CardTitle>
                             <CardDescription>
-                            Aprendamos los conceptos fundamentales del poker.
+                            Explora un glosario detallado de términos, estrategias y conceptos matemáticos clave del póker.
                             </CardDescription>
                         </div>
                         <div className="p-2 rounded-full bg-secondary/50 transition-transform group-hover:translate-x-1">
