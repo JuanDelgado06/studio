@@ -164,24 +164,24 @@ export default function LearnPage() {
              <Separator className="my-8" />
              
              <Link href="/learn/concepts" className="block group">
-                <Card className="transition-all duration-200 group-hover:scale-[1.01] group-hover:shadow-lg group-hover:border-primary/50">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <CardTitle className="font-headline text-primary">
-                            Conceptos Fundamentales en Texas Hold'em
+                <Card className="relative overflow-hidden rounded-xl transition-all duration-300 ease-in-out group-hover:scale-[1.02] group-hover:shadow-xl bg-gradient-to-br from-primary/80 to-secondary/60 border-primary/20">
+                    <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-primary/30 opacity-50 blur-2xl"></div>
+                    <div className="absolute -left-16 -bottom-16 w-48 h-48 rounded-full bg-secondary/30 opacity-50 blur-3xl"></div>
+                    <CardHeader className="relative z-10 flex flex-row items-center justify-between gap-4">
+                        <div className="flex-1 space-y-1">
+                            <CardTitle className="font-headline text-primary-foreground text-2xl">
+                                Conceptos Fundamentales
                             </CardTitle>
-                            <CardDescription>
-                            Explora un glosario detallado de términos, estrategias y conceptos matemáticos clave del póker.
+                            <CardDescription className="text-primary-foreground/80">
+                                Explora el glosario detallado de estrategias y términos clave.
                             </CardDescription>
                         </div>
-                        <div className="p-2 rounded-full bg-secondary/50 transition-transform group-hover:translate-x-1">
-                            <ArrowRight className="h-5 w-5 text-secondary-foreground"/>
+                        <div className="p-3 rounded-full bg-black/20 group-hover:bg-black/30 transition-colors">
+                            <ArrowRight className="h-6 w-6 text-white transform transition-transform group-hover:translate-x-1" />
                         </div>
-                    </div>
-                  </CardHeader>
+                    </CardHeader>
                 </Card>
-              </Link>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -189,7 +189,7 @@ export default function LearnPage() {
       <div className="md:col-span-2">
         <Card>
             <CardHeader>
-            <CardTitle className="font-headline">
+            <CardTitle className="font-headline text-primary">
                 Módulo de IA: Ejercicios Personalizados
             </CardTitle>
             <CardDescription>
