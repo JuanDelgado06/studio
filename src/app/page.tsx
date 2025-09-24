@@ -17,18 +17,20 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
 
 const handRankings = [
-  { rank: 1, name: 'Carta alta', example: 'A♠ sin combinación', value: '📉 Bajo' },
-  { rank: 2, name: 'Pareja', example: '7♣ 7♦', value: '📈 Medio' },
-  { rank: 3, name: 'Doble pareja', example: '9♠ 9♥ + 4♣ 4♦', value: '📈 Medio' },
-  { rank: 4, name: 'Trío', example: 'Q♠ Q♥ Q♦', value: '📊 Alto' },
-  { rank: 5, name: 'Escalera', example: '5♣ 6♦ 7♠ 8♥ 9♠', value: '📊 Alto' },
-  { rank: 6, name: 'Color', example: '2♠ 5♠ 9♠ J♠ K♠', value: '🚀 Muy alto' },
-  { rank: 7, name: 'Full House', example: '3♣ 3♦ 3♠ + 6♥ 6♠', value: '🚀 Muy alto' },
-  { rank: 8, name: 'Póker', example: '10♠ 10♦ 10♣ 10♥', value: '🔥 Altísimo' },
-  { rank: 9, name: 'Escalera de color', example: '7♠ 8♠ 9♠ 10♠ J♠', value: '🏆 Máximo' },
   { rank: 10, name: 'Escalera real', example: '10♠ J♠ Q♠ K♠ A♠', value: '👑 ¡La mejor!' },
+  { rank: 9, name: 'Escalera de color', example: '7♠ 8♠ 9♠ 10♠ J♠', value: '🏆 Máximo' },
+  { rank: 8, name: 'Póker', example: '10♠ 10♦ 10♣ 10♥', value: '🔥 Altísimo' },
+  { rank: 7, name: 'Full House', example: '3♣ 3♦ 3♠ + 6♥ 6♠', value: '🚀 Muy alto' },
+  { rank: 6, name: 'Color', example: '2♠ 5♠ 9♠ J♠ K♠', value: '🚀 Muy alto' },
+  { rank: 5, name: 'Escalera', example: '5♣ 6♦ 7♠ 8♥ 9♠', value: '📊 Alto' },
+  { rank: 4, name: 'Trío', example: 'Q♠ Q♥ Q♦', value: '📊 Alto' },
+  { rank: 3, name: 'Doble pareja', example: '9♠ 9♥ + 4♣ 4♦', value: '📈 Medio' },
+  { rank: 2, name: 'Pareja', example: '7♣ 7♦', value: '📈 Medio' },
+  { rank: 1, name: 'Carta alta', example: 'A♠ sin combinación', value: '📉 Bajo' },
 ];
 
 export default function LearnPage() {
@@ -84,28 +86,25 @@ export default function LearnPage() {
 
                 <Separator />
 
-                <div className="space-y-2">
-                    <h2 className="text-xl font-bold font-headline text-primary">🧩 Tipos de Manos (de menor a mayor valor)</h2>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-[50px]">#</TableHead>
-                                <TableHead>Mano</TableHead>
-                                <TableHead>Ejemplo</TableHead>
-                                <TableHead className="text-right">Valor</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {handRankings.map((hand) => (
-                                <TableRow key={hand.rank}>
-                                    <TableCell className="font-medium">{hand.rank}</TableCell>
-                                    <TableCell>{hand.name}</TableCell>
-                                    <TableCell><code>{hand.example}</code></TableCell>
-                                    <TableCell className="text-right">{hand.value}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                <div className="space-y-4">
+                    <h2 className="text-xl font-bold font-headline text-primary">🧩 Tipos de Manos (de mayor a mayor valor)</h2>
+                     <Accordion type="single" collapsible className="w-full">
+                        {handRankings.map((hand) => (
+                            <AccordionItem value={`item-${hand.rank}`} key={hand.rank}>
+                                <AccordionTrigger>
+                                    <div className="flex items-center justify-between w-full">
+                                        <span className="font-semibold">{hand.rank}. {hand.name}</span>
+                                        <span className="text-sm text-muted-foreground mr-2">{hand.value}</span>
+                                    </div>
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                    <p className="text-sm text-muted-foreground px-4 py-2 bg-secondary/50 rounded-md">
+                                        Ejemplo: <code>{hand.example}</code>
+                                    </p>
+                                </AccordionContent>
+                            </AccordionItem>
+                        ))}
+                    </Accordion>
                 </div>
                 
                 <Separator />
