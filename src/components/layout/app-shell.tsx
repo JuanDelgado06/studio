@@ -26,9 +26,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 
 const menuItems = [
-  { href: '/', label: 'Práctica', icon: BrainCircuit },
+  { href: '/', label: 'Aprender', icon: BookOpen },
+  { href: '/practice', label: 'Práctica', icon: BrainCircuit },
   { href: '/dashboard', label: 'Estadísticas', icon: BarChart3 },
-  { href: '/learn', label: 'Aprender', icon: BookOpen },
   { href: '/settings', label: 'Ajustes', icon: Settings },
 ];
 
