@@ -2,7 +2,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -10,8 +9,8 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PokerTable } from '@/components/poker/poker-table';
 
 const positionTips = [
     { position: 'Early Position (UTG)', advice: 'Juega solo manos premium (pares altos, AK, AQ). Evita proyectos débiles.' },
@@ -57,10 +56,6 @@ export default function PositionConceptPage() {
         </div>
       </div>
       
-      <div className="w-full flex justify-center py-8">
-        <PokerTable />
-      </div>
-
       <Separator />
 
       <Card className="bg-card/50">
@@ -74,6 +69,25 @@ export default function PositionConceptPage() {
                 <li>Mejora tus probabilidades de <strong>bluffear con éxito</strong>.</li>
                 <li>Te ayuda a <strong>maximizar ganancias</strong> con manos fuertes y <strong>minimizar pérdidas</strong> con manos marginales.</li>
             </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+            <CardTitle className="font-headline text-2xl">🪑 Tipos de Posición en la Mesa</CardTitle>
+        </CardHeader>
+        <CardContent className="p-4 flex flex-col items-center gap-6">
+            <div className="w-full">
+                <Image src="https://www.gipsyteam.es/upload/Pageimage/default/3/8/3844-1695631368.jpg" alt="Posiciones en la mesa de poker" width={500} height={300} className="rounded-lg shadow-md mx-auto" />
+            </div>
+            <div className="w-full text-sm text-muted-foreground space-y-3">
+                <p><strong>UTG (Under the Gun):</strong> Primer jugador en actuar post-flop. Menos información → juega manos fuertes.</p>
+                <p><strong>MP (Middle Position):</strong> Actúa después de UTG. Más flexible, pero aún con cautela.</p>
+                <p><strong>CO (Cutoff):</strong> Justo antes del botón. Ideal para faroles y control del bote.</p>
+                <p><strong>BTN (Button):</strong> Último en actuar post-flop. Máxima ventaja → puedes jugar más manos.</p>
+                <p><strong>SB (Small Blind):</strong> Apuesta obligatoria. Actúa primero post-flop → posición débil.</p>
+                <p><strong>BB (Big Blind):</strong> Apuesta obligatoria. Actúa segundo post-flop → algo más de ventaja que SB.</p>
+            </div>
         </CardContent>
       </Card>
 
