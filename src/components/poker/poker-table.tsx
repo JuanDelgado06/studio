@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -69,5 +68,3 @@ export const PokerTable: React.FC = () => {
     </div>
   );
 };
-
-    
