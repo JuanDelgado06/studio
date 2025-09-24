@@ -7,6 +7,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 const concepts = [
     {
@@ -96,13 +99,21 @@ const concepts = [
 export default function ConceptsPage() {
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold font-headline text-primary">
-          Conceptos Fundamentales del Póker
-        </h1>
-        <p className="text-muted-foreground">
-          Un glosario detallado para entender la terminología y los principios del Texas Hold'em.
-        </p>
+       <div className="flex flex-col gap-4">
+        <Link href="/" className="self-start">
+            <Button variant="outline">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Volver a Aprender
+            </Button>
+        </Link>
+        <div className="flex flex-col gap-1">
+            <h1 className="text-3xl font-bold font-headline text-primary">
+            Conceptos Fundamentales del Póker
+            </h1>
+            <p className="text-muted-foreground">
+            Un glosario detallado para entender la terminología y los principios del Texas Hold'em.
+            </p>
+        </div>
       </div>
       <Separator />
 
