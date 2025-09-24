@@ -5,10 +5,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 
 const concepts = [
@@ -147,6 +148,12 @@ export default function ConceptsPage() {
                         </div>
                     )}
                 </CardContent>
+                 <CardFooter>
+                    <Button className="w-full">
+                        <BookOpen className="mr-2 h-4 w-4" />
+                        Explorar Concepto
+                    </Button>
+                </CardFooter>
             </Card>
         ))}
       </div>
