@@ -101,7 +101,7 @@ export default function ConceptsPage() {
     <div className="space-y-6">
        <div className="flex flex-col gap-4">
         <Link href="/" className="self-start">
-            <Button variant="outline">
+            <Button variant="default" className="shadow-md hover:shadow-lg transition-shadow">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Volver a Aprender
             </Button>
