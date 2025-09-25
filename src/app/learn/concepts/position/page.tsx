@@ -303,7 +303,7 @@ export default function PositionConceptPage() {
                     <TableCell>6♠ 7♦</TableCell>
                     <TableCell>Raise</TableCell>
                     <TableCell>Presión máxima a las ciegas. Se puede ganar sin resistencia.</TableCell>
-                  TableRow>
+                  </TableRow>
                    <TableRow>
                     <TableCell>SB</TableCell>
                     <TableCell>K♠ 9♦</TableCell>
@@ -335,9 +335,9 @@ export default function PositionConceptPage() {
                 <p>El botón es clave para aplicar presión con manos marginales.</p>
             </CardContent>
           </Card>
-          <Card className="border-destructive/50">
+          <Card>
             <CardHeader>
-              <CardTitle className="font-headline text-2xl text-destructive">❌ Errores Comunes</CardTitle>
+                <CardTitle className="font-headline text-2xl text-destructive">❌ Errores Comunes</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div>
