@@ -2,9 +2,26 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, BookOpen } from 'lucide-react';
+import Link from 'next/link';
 
-// --- Componente PokerTable ---
-// Los datos de cada posición se pueden mantener aquí o importar desde un archivo JSON/JS separado.
+// --- Interactive Poker Table Component ---
 const positionData = {
     sb: {
         title: 'Ciega Pequeña (SB)',
@@ -67,11 +84,11 @@ const positionData = {
 };
 
 const PokerTable = () => {
-    const [modalData, setModalData] = useState(null);
+    const [modalData, setModalData] = useState<any>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const openModal = (positionId) => {
-        setModalData(positionData[positionId]);
+    const openModal = (positionId: string) => {
+        setModalData((positionData as any)[positionId]);
         setIsModalVisible(true);
     };
 
@@ -79,13 +96,13 @@ const PokerTable = () => {
         setIsModalVisible(false);
     };
 
-    const getAbbreviation = (title) => {
+    const getAbbreviation = (title: string) => {
         if (title.startsWith('Dealer')) return 'D';
         const match = title.match(/\(([^)]+)\)/);
         return match ? match[1] : title.substring(0, 2).toUpperCase();
     }
     
-    const getSuitColor = (abbreviation) => {
+    const getSuitColor = (abbreviation: string) => {
         const redSuits = ['UTG', 'UTG+1', 'CO', 'BU'];
         if (redSuits.some(pos => abbreviation.includes(pos))) return 'text-red-600';
         return 'text-black';
@@ -93,12 +110,12 @@ const PokerTable = () => {
 
     return (
         <>
-            <div className="w-full max-w-4xl mx-auto">
+            <div className="w-full max-w-4xl mx-auto my-8">
                  <div className="bg-gray-800 bg-gradient-to-br from-gray-800 to-gray-900 p-4 sm:p-6 md:p-8 rounded-2xl shadow-2xl border border-gray-700">
                     <div className="relative w-full" style={{ paddingBottom: '50%' }}>
                         <div className="absolute inset-0">
                             <div className="absolute inset-0 bg-gray-900 poker-table-shape shadow-[inset_0_8px_10px_rgba(0,0,0,0.6),_inset_0_-5px_10px_rgba(255,255,255,0.1)]"></div>
-                            <div className="absolute inset-2 sm:inset-4 md:inset-6 poker-table-shape" style={{ backgroundImage: 'radial-gradient(ellipse at center, #2f855a, #1a472a)' }}>
+                            <div className="absolute inset-2 sm:inset-4 md:inset-6 poker-table-shape" style={{ backgroundImage: 'radial-gradient(ellipse at center, hsl(var(--primary)), #1a472a)' }}>
                                 <div className="absolute inset-0 poker-table-shape shadow-[inset_0_0_25px_rgba(0,0,0,0.7)]"></div>
                                 <div className="absolute inset-2 sm:inset-3 md:inset-4 border-2 border-black/20 border-dashed poker-table-shape"></div>
                             </div>
@@ -206,21 +223,149 @@ const PokerTable = () => {
     );
 };
 
-// --- Página Principal ---
+
 export default function PositionConceptPage() {
   return (
-    <>
-      <div className="bg-gray-900 min-h-screen flex flex-col items-center justify-center p-4 font-sans">
-        <main className="w-full">
-          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white text-center mb-4 md:mb-8 text-shadow-sm">
-            Guía Interactiva de Póker
+    <div className="space-y-8">
+      <div className="flex flex-col gap-4">
+        <Link href="/learn/concepts" className="self-start">
+          <Button variant="default" className="shadow-md hover:shadow-lg transition-shadow">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Volver a Conceptos
+          </Button>
+        </Link>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-bold font-headline text-primary">
+            Guía Exhaustiva de Posición en la Mesa
           </h1>
-          <PokerTable />
-        </main>
+          <p className="text-muted-foreground">
+            Domina el concepto más importante del póker para tomar decisiones rentables.
+          </p>
+        </div>
+      </div>
+      
+      <PokerTable />
+
+      {/* Main content grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column */}
+        <div className="lg:col-span-2 space-y-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-headline text-2xl">🧠 ¿Por qué importa la posición?</CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-invert max-w-none text-foreground/90">
+                <p>La posición determina cuándo actúas en cada ronda de apuestas. Cuanto más tarde actúes, más información tienes → mayor ventaja estratégica. Estar "en posición" (actuar último) te permite:</p>
+                <ul>
+                    <li>Controlar el tamaño del bote.</li>
+                    <li>Ver cómo actúan tus rivales antes de decidir.</li>
+                    <li>Mejorar tus probabilidades de bluffear con éxito.</li>
+                    <li>Maximizar ganancias con manos fuertes y minimizar pérdidas con marginales.</li>
+                </ul>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-headline text-2xl">🃏 Ejemplos prácticos por posición</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Posición</TableHead>
+                    <TableHead>Mano</TableHead>
+                    <TableHead>Decisión</TableHead>
+                    <TableHead>Justificación</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>UTG</TableCell>
+                    <TableCell>A♠ K♦</TableCell>
+                    <TableCell>Raise</TableCell>
+                    <TableCell>Mano premium, se juega fuerte desde cualquier posición.</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>MP</TableCell>
+                    <TableCell>9♠ 10♠</TableCell>
+                    <TableCell>Fold/Raise</TableCell>
+                    <TableCell>Depende de la mesa. Raise si es pasiva, fold si hay raises previos.</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>CO</TableCell>
+                    <TableCell>A♣ 5♣</TableCell>
+                    <TableCell>Raise</TableCell>
+                    <TableCell>Ideal para robar ciegas o jugar postflop con potencial de color y escalera.</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>BTN</TableCell>
+                    <TableCell>6♠ 7♦</TableCell>
+                    <TableCell>Raise</TableCell>
+                    <TableCell>Presión máxima a las ciegas. Se puede ganar sin resistencia.</TableCell>
+                  </TableRow>
+                   <TableRow>
+                    <TableCell>SB</TableCell>
+                    <TableCell>K♠ 9♦</TableCell>
+                    <TableCell>Fold</TableCell>
+                    <TableCell>Mano débil para jugar fuera de posición contra un raise.</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>BB</TableCell>
+                    <TableCell>A♦ 4♠</TableCell>
+                    <TableCell>Call</TableCell>
+                    <TableCell>Defensa barata si no hay un raise muy fuerte, pero con precaución.</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column */}
+        <div className="space-y-8">
+           <Card>
+            <CardHeader>
+              <CardTitle className="font-headline text-2xl">📌 Tips Avanzados</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-foreground/90">
+                <p>En torneos, la posición es aún más valiosa con stacks cortos.</p>
+                <p>En mesas agresivas, juega más tight en early position.</p>
+                <p>Identifica el tipo de jugador en las ciegas antes de robar.</p>
+                <p>El botón es clave para aplicar presión con manos marginales.</p>
+            </CardContent>
+          </Card>
+          <Card className="border-destructive/50 bg-destructive/10">
+            <CardHeader>
+              <CardTitle className="font-headline text-2xl text-destructive">❌ Errores Comunes</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div>
+                    <h4 className="font-bold">🔴 Early Position (UTG)</h4>
+                    <p className="text-sm text-destructive/90">Jugar manos especulativas como 76s o hacer limp.</p>
+                </div>
+                <div>
+                    <h4 className="font-bold">🟡 Middle Position (MP)</h4>
+                    <p className="text-sm text-destructive/90">Pagar raises sin tener posición ni una mano fuerte.</p>
+                </div>
+                <div>
+                    <h4 className="font-bold">🟢 Late Position (CO, BTN)</h4>
+                    <p className="text-sm text-destructive/90">No ser suficientemente agresivo para robar las ciegas.</p>
+                </div>
+                 <div>
+                    <h4 className="font-bold">⚠️ Blinds (SB, BB)</h4>
+                    <p className="text-sm text-destructive/90">Defender en exceso solo porque "ya has invertido dinero".</p>
+                </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
       <style>{`
-        body {
-          font-family: 'Georgia', 'Times New Roman', Times, serif;
+        .prose {
+            color: hsl(var(--foreground));
+        }
+        .prose ul > li::before {
+            background-color: hsl(var(--primary));
         }
         .poker-table-shape {
           border-radius: 125px / 60px;
@@ -248,7 +393,7 @@ export default function PositionConceptPage() {
           line-height: 1.6;
         }
       `}</style>
-    </>
+    </div>
   );
 }
 
