@@ -357,6 +357,42 @@ export default function PositionConceptPage() {
                 </Table>
               </AccordionContent>
             </AccordionItem>
+             <AccordionItem value="gto-examples">
+                <AccordionTrigger className="font-headline text-lg text-primary hover:no-underline">Ver ejemplos prácticos de GTO (La base matemática)</AccordionTrigger>
+                <AccordionContent className="pt-2">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Situación</TableHead>
+                                <TableHead>Jugada GTO Estándar</TableHead>
+                                <TableHead>La Razón (Equilibrio y EV)</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>Defensa de BB vs. robo de BTN.</TableCell>
+                                <TableCell>Hacer 'call' con un rango muy amplio (~50% de las manos) que incluye manos como K7o, Q5s, 86o, 75s.</TableCell>
+                                <TableCell>Las 'pot odds' que te dan (pagas 1 para ganar un bote de 2.5) hacen que sea rentable defender un rango amplio. El GTO defiende para no ser explotado y poder conectar con una variedad de flops.</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>SB vs. Open-Raise de UTG.</TableCell>
+                                <TableCell>Hacer 3-bet con un rango 'polarizado': manos de mucho valor (QQ+, AK) y algunos bluffs (A5s-A2s, K9s).</TableCell>
+                                <TableCell>El 'call' desde la SB es una jugada de -EV por estar fuera de posición. El 3-bet te da la iniciativa y equilibra tu rango; si solo haces 3-bet con AA/KK, tus rivales pueden foldear siempre que no tengan un monstruo.</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Hero hace Open-Raise en MP y BB paga. Flop: A K 2.</TableCell>
+                                <TableCell>Hacer una 'continuation bet' (c-bet) con un tamaño pequeño (1/3 del bote) con casi el 100% de tu rango.</TableCell>
+                                <TableCell>Este flop favorece enormemente tu rango de apertura de MP (tienes todos los Ax, Kx, AA, KK). Apostar con todo tu rango presiona al rival, te da 'fold equity' y es difícil de contrarrestar sin que él se exponga.</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Estás en posición (BTN) con un proyecto de color (flush draw) y el rival (BB) hace 'check' en el flop.</TableCell>
+                                <TableCell>Hacer una apuesta (semi-bluff) en lugar de 'check'.</TableCell>
+                                <TableCell>Equilibra tus faroles. Tienes dos formas de ganar: el rival puede foldear inmediatamente (fold equity) o puedes completar tu color. Si solo apuestas tus manos hechas, te vuelves predecible.</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </AccordionContent>
+            </AccordionItem>
           </Accordion>
 
         </CardContent>
@@ -465,3 +501,4 @@ export default function PositionConceptPage() {
 }
     
     
+
