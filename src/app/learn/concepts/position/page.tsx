@@ -74,14 +74,14 @@ const positionData = {
         title: 'Botón (BU)',
         explanation: 'La mejor y más rentable posición en la mesa. Actúas último en cada ronda de apuestas post-flop (flop, turn y river), lo que te da la máxima información posible para tomar tus decisiones.',
         playStyle: 'La posición más agresiva. Abre el rango más amplio de manos. Roba las ciegas constantemente. Paga para ver flops con manos especulativas porque siempre tendrás la ventaja posicional.',
-        hands: 'El rango más amplio de todos. Depende de la acción previa, pero puedes abrir con más del 40-50% de tus manos si los jugadores en las ciegas son débiles o conservadores.',
+        hands: 'El rango más amplio de todos. Depende de la acción previa, pero puedes abrir con más del 40-50% de tus manos si los jugadores en las ciegas son débiles. Esto incluye: cualquier par (22+), ases suited (A2s+), muchos ases off-suit (A5o+), conectores suited (98s, 76s, 54s) y manos broadway (KTo, QJo).',
         tips: 'El botón es tu máquina de hacer dinero. No la desperdicies jugando de forma pasiva. Controla el tamaño del bote, farolea de forma efectiva y extrae el máximo valor con tus manos fuertes.'
     },
     dealer: {
         title: 'Dealer (Botón)',
         explanation: 'La ficha "D" o "Dealer Button" indica quién es el repartidor nominal de la mano. Esta ficha se mueve en el sentido de las agujas del reloj un puesto en cada mano. El jugador en el Botón (BU) es quien tiene esta ficha.',
         playStyle: 'Estratégicamente, esta es la mejor y más rentable posición en la mesa. Actúas último en cada ronda de apuestas post-flop (flop, turn y river), lo que te da la máxima información posible para tomar tus decisiones.',
-        hands: 'El rango más amplio de todos. Depende de la acción previa, pero puedes abrir con más del 40-50% de tus manos si los jugadores en las ciegas son débiles o conservadores.',
+        hands: 'El rango más amplio de todos. Depende de la acción previa, pero puedes abrir con más del 40-50% de tus manos si los jugadores en las ciegas son débiles. Esto incluye: cualquier par (22+), ases suited (A2s+), muchos ases off-suit (A5o+), conectores suited (98s, 76s, 54s) y manos broadway (KTo, QJo).',
         tips: 'El botón es tu máquina de hacer dinero. No la desperdicies jugando de forma pasiva. Controla el tamaño del bote, farolea de forma efectiva y extrae el máximo valor con tus manos fuertes.'
     }
 };
