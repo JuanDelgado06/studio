@@ -251,17 +251,29 @@ export default function PositionConceptPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline text-2xl">🧠 ¿Por qué la posición es la clave del universo en el póker?</CardTitle>
+          <CardTitle className="font-headline text-2xl">🧠 Posición: El Centro de Gravedad Estratégico</CardTitle>
         </CardHeader>
         <CardContent className="prose prose-invert max-w-none text-foreground/90">
-            <p>En el póker, la información es la moneda más valiosa, y la posición es la máquina que la imprime. Actuar después que tus rivales te otorga una ventaja informativa tan masiva que es, sin lugar a dudas, el factor más determinante para ganar a largo plazo. Estar "en posición" (actuar último post-flop) te permite:</p>
-            <ul>
-                <li><strong>Controlar el tamaño del bote:</strong> Puedes decidir si mantener el bote pequeño con una mano marginal o inflarlo con una mano fuerte.</li>
-                <li><strong>Realizar faroles (bluffs) más efectivos:</strong> Cuando todos tus oponentes hacen 'check', tienes una oportunidad de oro para llevarte el bote con una apuesta, independientemente de tus cartas.</li>
-                <li><strong>Maximizar ganancias:</strong> Ves la acción de todos antes de decidir, lo que te permite apostar por valor de forma más precisa cuando tienes la mejor mano.</li>
-                <li><strong>Minimizar pérdidas:</strong> Si hay mucha acción antes de tu turno, puedes retirarte con una mano mediocre y evitar perder más fichas.</li>
-                <li><strong>Obtener cartas gratis:</strong> Si estás en posición y con un proyecto (draw), a menudo puedes hacer 'check' y ver la siguiente carta sin costo si tu rival también pasa.</li>
-            </ul>
+            <p>En el póker, la información es la moneda más valiosa, y la posición es la máquina que la imprime. Actuar después que tus rivales te otorga una ventaja informativa tan masiva que es, sin lugar a dudas, el factor más determinante para ganar a largo plazo. Veamos por qué desde la perspectiva GTO y Exploit:</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div className="rounded-lg border border-sky-500/30 bg-sky-900/10 p-4">
+                    <h4 className="font-headline text-lg text-sky-400">🔍 Desde la lógica GTO</h4>
+                    <ul className="mt-2 list-disc list-inside">
+                        <li><strong>Ventaja informativa estructural:</strong> GTO asume que actuar último permite tomar decisiones más balanceadas, con rangos más amplios y frecuencias más precisas.</li>
+                        <li><strong>Equilibrio de rangos:</strong> En posición puedes bluffear más, apostar por valor con mayor precisión y defender menos, porque tu rango se beneficia de actuar con más información.</li>
+                        <li><strong>Simuladores GTO lo confirman:</strong> Las líneas óptimas en turn y river cambian drásticamente según la posición. En posición se apuesta más, se bluffea más y se gana más EV.</li>
+                    </ul>
+                </div>
+                 <div className="rounded-lg border border-red-500/30 bg-red-900/10 p-4">
+                    <h4 className="font-headline text-lg text-red-400">🎯 Desde el enfoque Exploit (Phil Gordon)</h4>
+                    <ul className="mt-2 list-disc list-inside">
+                        <li><strong>Lectura de rivales mejorada:</strong> Estar en posición te permite ver cómo reaccionan antes de actuar, lo que facilita detectar debilidades.</li>
+                        <li><strong>Manipulación del metajuego:</strong> Puedes inducir errores, controlar el ritmo de la mano y aplicar presión psicológica.</li>
+                        <li><strong>Faroles oportunistas:</strong> Como bien dices, cuando todos hacen check, tienes una “licencia para robar”. Gordon lo llama “el arte de la agresión informada”.</li>
+                         <li><strong>Control emocional:</strong> Estar en posición reduce el tilt, porque tomas decisiones con más contexto y menos incertidumbre.</li>
+                    </ul>
+                </div>
+            </div>
         </CardContent>
       </Card>
       
