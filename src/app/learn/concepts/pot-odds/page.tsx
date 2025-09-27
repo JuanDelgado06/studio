@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -18,10 +18,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BrainCircuit } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, Calculator } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 
 const outsData = [
     { situation: 'Proyecto de color', outs: 9, probability: '~ 36%' },
@@ -32,6 +35,77 @@ const outsData = [
     { situation: 'Trío → full house o póker', outs: 10, probability: '~ 40%' },
     { situation: 'Proyecto de escalera + color', outs: 15, probability: '~ 60%' },
 ];
+
+
+const PotOddsCalculator = () => {
+    const [potSize, setPotSize] = useState(100);
+    const [betToCall, setBetToCall] = useState(20);
+
+    const totalPot = potSize + betToCall + betToCall;
+    const potOddsDecimal = totalPot > 0 ? betToCall / totalPot : 0;
+    const potOddsPercentage = (potOddsDecimal * 100).toFixed(1);
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl flex items-center gap-2">
+                    <Calculator className="text-primary"/>
+                    Calculadora Interactiva de Pot Odds
+                </CardTitle>
+                <CardDescription>Ajusta los valores para ver cómo cambian las pot odds en tiempo real.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="pot-size">Tamaño del Bote (Antes de la apuesta)</Label>
+                            <Input 
+                                id="pot-size" 
+                                type="number" 
+                                value={potSize}
+                                onChange={(e) => setPotSize(Number(e.target.value))}
+                                className="text-lg"
+                            />
+                            <Slider
+                                value={[potSize]}
+                                onValueChange={(value) => setPotSize(value[0])}
+                                max={1000}
+                                step={10}
+                            />
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="bet-to-call">Apuesta a Igualar (Bet a pagar)</Label>
+                            <Input 
+                                id="bet-to-call" 
+                                type="number" 
+                                value={betToCall}
+                                onChange={(e) => setBetToCall(Number(e.target.value))}
+                                className="text-lg"
+                            />
+                             <Slider
+                                value={[betToCall]}
+                                onValueChange={(value) => setBetToCall(value[0])}
+                                max={500}
+                                step={5}
+                            />
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-center justify-center rounded-lg bg-secondary/50 p-6 h-full text-center">
+                        <p className="text-sm text-muted-foreground">Necesitas una Equity de:</p>
+                        <p className="text-4xl font-bold text-primary my-2">{potOddsPercentage}%</p>
+                        <Separator className="my-3"/>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                            Esto significa que necesitas tener una probabilidad de ganar la mano de al menos un <strong>{potOddsPercentage}%</strong> para que igualar la apuesta de ${betToCall} sea una decisión rentable a largo plazo.
+                        </p>
+                    </div>
+                </div>
+                 <div className="text-center text-xs text-muted-foreground pt-2">
+                    Fórmula aplicada: {betToCall} / ({potSize} + {betToCall} + {betToCall})
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
 
 export default function PotOddsConceptPage() {
   return (
@@ -89,6 +163,8 @@ export default function PotOddsConceptPage() {
                 </div>
             </CardContent>
         </Card>
+
+        <PotOddsCalculator />
 
         <Card>
             <CardHeader>
