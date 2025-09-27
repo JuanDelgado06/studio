@@ -238,7 +238,6 @@ const PokerTable = () => {
     );
 };
 
-
 export default function PositionConceptPage() {
   return (
     <div className="space-y-8">
@@ -384,7 +383,7 @@ export default function PositionConceptPage() {
                             <TableRow>
                                 <TableCell>Defensa de BB vs. robo de BTN.</TableCell>
                                 <TableCell>Hacer 'call' con un rango muy amplio (~50% de las manos) que incluye manos como K7o, Q5s, 86o, 75s.</TableCell>
-                                <TableCell>Las 'pot odds' que te dan (pagas 1 para ganar un bote de 2.5) hacen que sea rentable defender un rango amplio. El GTO defiende para no ser explotado y poder conectar con una variedad de flops.</TableCell>
+                                <TableCell>Las 'pot odds' que te dan (pagas 1 para ganar un bote de 2.5) hacen que es rentable defender un rango amplio. El GTO defiende para no ser explotado y poder conectar con una variedad de flops.</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>SB vs. Open-Raise de UTG.</TableCell>
@@ -579,14 +578,3 @@ export default function PositionConceptPage() {
     </div>
   );
 }
-    
-    
-
-
-
-
-
-    
-
-
-    
