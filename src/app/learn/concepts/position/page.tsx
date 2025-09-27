@@ -397,8 +397,52 @@ export default function PositionConceptPage() {
 
         </CardContent>
       </Card>
+      
+       <Card>
+        <CardHeader>
+            <CardTitle className="font-headline text-2xl">🧠 Tabla Comparativa: GTO vs Exploit</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Situación</TableHead>
+                        <TableHead>Jugada GTO</TableHead>
+                        <TableHead>Jugada Exploit</TableHead>
+                        <TableHead>Razonamiento</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    <TableRow>
+                        <TableCell>Estás en BTN con 87s y la BB foldea mucho</TableCell>
+                        <TableCell>Abrir con rango estándar (50–60%)</TableCell>
+                        <TableCell>Abrir con rango ampliado (hasta 80%)</TableCell>
+                        <TableCell>GTO busca equilibrio, exploit maximiza fold equity</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>Recibes 3-bet desde SB con AQo</TableCell>
+                        <TableCell>Pagar con frecuencia media (según solver)</TableCell>
+                        <TableCell>Foldear si el rival solo 3-betea manos premium</TableCell>
+                        <TableCell>GTO defiende el rango, exploit evita spots dominados</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>Flop seco (K♠ 7♦ 2♣) y rival hace check</TableCell>
+                        <TableCell>Cbet pequeño con alta frecuencia</TableCell>
+                        <TableCell>Cbet siempre si el rival foldea mucho</TableCell>
+                        <TableCell>GTO balancea bluff/value, exploit castiga pasividad</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>Turn agresivo y tienes top set</TableCell>
+                        <TableCell>Apostar por valor con size medio</TableCell>
+                        <TableCell>Hacer check para inducir bluff si el rival es agresivo</TableCell>
+                        <TableCell>GTO maximiza EV directo, exploit manipula la acción</TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+        </CardContent>
+      </Card>
 
-       <Card className="lg:col-span-3 w-full">
+       <Card className="w-full">
             <CardHeader>
                 <CardTitle className="font-headline text-2xl text-destructive">❌ Errores Comunes y Cómo Explotarlos</CardTitle>
                  <CardDescription>
@@ -501,4 +545,5 @@ export default function PositionConceptPage() {
 }
     
     
+
 
