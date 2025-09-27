@@ -29,46 +29,58 @@ const positionData = {
     sb: {
         title: 'Ciega Pequeña (SB)',
         explanation: 'Es la peor posición en la mesa. Actúas primero después del flop, lo que te da muy poca información sobre las intenciones de tus rivales. Ya tienes medio big blind invertido obligatoriamente.',
-        playStyle: 'Juega de forma muy conservadora y selectiva. Evita entrar en muchos botes. Aunque es tentador defender tu ciega, hacerlo con manos débiles a menudo te costará más fichas a largo plazo.',
-        hands: 'Pares altos (AA-TT), conectores suited altos (AKs, AQs), y broadways fuertes (AQo, KQs). Contra un solo robo y con buenas odds, puedes defender con un rango un poco más amplio.',
-        tips: 'No te sientas obligado a defender tu ciega con cualquier mano. Es mejor foldear una mano marginal que perder más fichas en una situación desfavorable post-flop.'
+        playStyle: 'Juega de forma muy conservadora y selectiva. La estrategia GTO sugiere un enfoque de 3-bet o fold, evitando el call en la mayoría de los casos para no jugar botes grandes fuera de posición. Exploit: si el BB es muy pasivo y foldea mucho post-flop, puedes ampliar tu rango de open-raise.',
+        hands: 'Open-raise con un rango fuerte pero más amplio que en posiciones tempranas (22+, A2s+, K8s+, Q9o+). Para 3-bet contra un open, usa un rango polarizado: manos de valor (TT+, AQs+, AKo) y bluffs con potencial (A5s-A2s, K9s, 87s).',
+        tips: 'Evita la tentación de solo completar la ciega (limp). Es una jugada que invita a la agresión y rara vez es rentable. La iniciativa de un raise es casi siempre preferible.'
     },
     bb: {
         title: 'Ciega Grande (BB)',
-        explanation: 'Tienes una ciega completa invertida. Actúas último antes del flop, lo que te permite ver la acción de todos y a veces cerrar la mano. Sin embargo, después del flop, eres de los primeros en actuar.',
-        playStyle: 'Puedes defender tu ciega con un rango más amplio de manos, especialmente si no hay subidas o solo un raise pequeño. Tienes buenas "pot odds" para pagar y ver un flop.',
-        hands: 'Un rango muy amplio si la acción llega limpia: cualquier par, ases suited, broadways (K-Q, K-J), conectores suited. Contra una subida, debes ser más selectivo.',
-        tips: 'Aprovecha tu posición pre-flop para ver flops baratos. Sin embargo, no te enamores de manos marginales post-flop cuando estás fuera de posición.'
+        explanation: 'Tienes una ciega completa invertida. Actúas último antes del flop, lo que te da un "descuento" para ver la mano. Sin embargo, después del flop, eres de los primeros en actuar, lo cual es una desventaja significativa.',
+        playStyle: 'Defiende tu ciega con un rango muy amplio contra robos de posiciones tardías (CO, BTN). Tienes excelentes "pot odds" para pagar. Exploit: si el raiser es un jugador "tight", defiende un rango más ajustado. Si es muy agresivo, puedes hacer 3-bet con más frecuencia.',
+        hands: 'Contra un robo del BTN, puedes defender hasta el 50-60% de tus manos, incluyendo manos como K7o, Q5s, 86o, 75s. El 3-bet se hace con manos de valor y algunos bluffs semi-conectados.',
+        tips: 'Aprovecha tu posición pre-flop para ver flops baratos. Sin embargo, no te enamores de manos marginales post-flop cuando estás fuera de posición. Juega "check-fold" a menudo si no mejoras.'
     },
     utg1: {
         title: 'Under The Gun (UTG)',
-        explanation: 'Conocida como "Bajo la Pistola", eres el primero en actuar antes del flop. Es una posición temprana y peligrosa porque todos los demás jugadores actúan después de ti.',
-        playStyle: 'Juega un rango de manos extremadamente fuerte y ajustado. Cualquier mano que juegues debe ser capaz de soportar subidas y resubidas de los jugadores que vienen detrás.',
-        hands: 'Solo las mejores manos iniciales son rentables: Pares premium (AA-JJ), AK, AQs. En mesas completas, este rango es aún más estricto.',
-        tips: 'La paciencia es tu mayor aliada. Foldear la gran mayoría de tus manos aquí es la jugada correcta y más rentable. Evita la tentación de jugar manos especulativas.'
+        explanation: 'Conocida como "Bajo la Pistola", eres el primero en actuar antes del flop. Es la posición más temprana y peligrosa porque todos los demás jugadores actúan después de ti.',
+        playStyle: 'Juega un rango de manos extremadamente fuerte y ajustado (tight). Cualquier mano que juegues debe ser capaz de soportar subidas y resubidas. Entra siempre al bote con un raise, nunca haciendo limp.',
+        hands: 'Solo las mejores manos iniciales son rentables: Pares medios-altos (66+), Ases suited fuertes (A9s+), broadways suited (KTs+), y las mejores manos off-suit (ATo+, KQo). En una mesa de 9 jugadores, este rango es aún más estricto.',
+        tips: 'La paciencia es tu mayor aliada. Foldear la gran mayoría de tus manos aquí es la jugada correcta y más rentable. Jugar tight en UTG construye una imagen sólida que hará que tus manos fuertes se paguen más a menudo.'
     },
     utg2: {
         title: 'Posición Temprana (UTG+1)',
-        explanation: 'Sigue siendo una posición temprana. Aunque uno o dos jugadores ya han actuado, todavía tienes muchos oponentes por hablar detrás de ti, lo que te pone en desventaja de información.',
-        playStyle: 'Muy similar a UTG, pero puedes ser ligeramente más flexible. Tu estrategia sigue siendo jugar un rango de manos fuerte y entrar al bote subiendo.',
-        hands: 'Puedes añadir pares como TT y 99, y manos como AJs o KQs a tu rango de apertura con respecto a UTG.',
-        tips: 'Presta atención a los jugadores que quedan por hablar. Si hay jugadores muy agresivos (que resuben con frecuencia) detrás, sé aún más cauteloso.'
+        explanation: 'Sigue siendo una posición temprana. Aunque un jugador ya ha actuado, todavía tienes muchos oponentes por hablar detrás, lo que te pone en desventaja de información.',
+        playStyle: 'Muy similar a UTG, pero puedes añadir unas pocas manos más a tu rango de apertura. Tu estrategia sigue siendo jugar un rango de manos fuerte y entrar al bote subiendo.',
+        hands: 'Puedes añadir manos como 55, A8s, K9s, y QJs a tu rango de apertura con respecto a UTG. Sigue siendo un rango muy orientado al valor.',
+        tips: 'Presta atención a los jugadores que quedan por hablar. Si hay jugadores muy agresivos (que resuben con frecuencia) detrás, sé aún más cauteloso y considera jugar un rango más cercano al de UTG.'
     },
-    mp1: { title: 'Posición Media (MP1)', explanation: 'Estás en el medio de la mesa. Tu rango de apertura puede ser más amplio que en posiciones tempranas, pero aún debes ser selectivo.', playStyle: 'Puedes empezar a abrir con manos más especulativas, como conectores suited y pares medios/bajos, especialmente si los jugadores a tu izquierda son pasivos.', hands: 'Pares medios (88-66), ases suited (ATs-A2s), broadways (KQ, KJ, QJ).', tips: 'El robo de ciegas se vuelve una opción viable, pero tu objetivo principal sigue siendo jugar manos sólidas por valor.'},
-    mp2: { title: 'Posición Media (MP2)', explanation: 'Estás en el medio de la mesa. Tu rango de apertura puede ser más amplio que en posiciones tempranas, pero aún debes ser selectivo.', playStyle: 'Puedes empezar a abrir con manos más especulativas, como conectores suited y pares medios/bajos, especialmente si los jugadores a tu izquierda son pasivos.', hands: 'Pares medios (88-66), ases suited (ATs-A2s), broadways (KQ, KJ, QJ).', tips: 'El robo de ciegas se vuelve una opción viable, pero tu objetivo principal sigue siendo jugar manos sólidas por valor.'},
+    mp1: { 
+        title: 'Posición Media (MP1)', 
+        explanation: 'Estás en el medio de la mesa. Tu rango de apertura puede ser más amplio que en posiciones tempranas, pero aún debes ser selectivo, ya que hay jugadores en posición tardía que pueden atacarte.', 
+        playStyle: 'Puedes empezar a abrir con manos más especulativas, como conectores suited (suited connectors) y pares medios. Exploit: si los jugadores en CO y BTN son muy pasivos, puedes jugar un rango más amplio, similar al de HJ.', 
+        hands: 'Añade a tu rango pares como 22+, más Ases suited (A2s+), y algunos broadways off-suit más débiles como KJo y QJo.', 
+        tips: 'El robo de ciegas se vuelve una opción viable, pero tu objetivo principal sigue siendo jugar manos sólidas por valor. Ten cuidado con los 3-bets de jugadores en posición tardía.'
+    },
+    mp2: { 
+        title: 'Posición Media (MP2)', 
+        explanation: 'También conocida como Lojack (LJ). Es una posición donde puedes empezar a ser más agresivo, pero con el Hijack, Cutoff y Botón todavía por hablar, debes ser consciente de la dinámica de la mesa.', 
+        playStyle: 'Puedes abrir un rango más amplio. Es un buen momento para empezar a aislar a jugadores más débiles (limpers) con un raise. Tu PFR (Pre-Flop Raise) debería ser significativamente mayor aquí que en UTG.', 
+        hands: 'Añade manos como K7s+, Q8s+, J8s+, T8s+, y algunos conectores suited como 98s y 87s. En el lado off-suit, puedes empezar a abrir A9o y KTo.', 
+        tips: 'Esta es la primera posición donde robar las ciegas se convierte en un objetivo secundario realista. Tu objetivo principal sigue siendo jugar por valor, pero la fold equity empieza a ser un factor.'
+    },
     hijack: {
         title: 'Hijack (HJ)',
         explanation: 'Situado justo antes del Cutoff, es la primera de las posiciones consideradas "tardías". Es una posición excelente para robar las ciegas si los jugadores en el Cutoff y el Botón son conservadores.',
         playStyle: 'Se juega de manera similar al Cutoff, pero con un poco más de precaución, ya que tienes al CO y al Botón (dos posiciones muy agresivas) actuando después de ti. Es un buen lugar para abrir subiendo con un rango más amplio que en MP.',
         hands: 'Puedes añadir más ases suited (A9s-A6s), conectores suited (98s, 87s) y algunos broadways off-suit (KJo, QTo) a tu rango de apertura en comparación con la posición media.',
-        tips: 'Si el Cutoff y el Botón son jugadores pasivos, puedes tratar el Hijack casi como si fuera el Cutoff y robar con mucha frecuencia. Si son agresivos, ten cuidado con las resubidas.'
+        tips: 'Si el Cutoff y el Botón son jugadores pasivos, puedes tratar el Hijack casi como si fuera el Cutoff y robar con mucha frecuencia. Si son agresivos, ten cuidado con las resubidas (3-bets) y prepara tu rango de defensa.'
     },
     co: {
         title: 'Cut Off (CO)',
-        explanation: 'Una posición tardía y muy rentable, justo a la derecha del botón. Desde aquí tienes una gran oportunidad para robar las ciegas y el botón si foldean.',
-        playStyle: 'Juega de forma agresiva. Abre un rango amplio de manos, especialmente si los jugadores en el botón y las ciegas son conservadores. Puedes aislar a jugadores más débiles.',
-        hands: 'Un rango muy amplio. Casi cualquier par, la mayoría de ases, broadways, conectores suited, e incluso algunas manos off-suit fuertes si la situación es propicia.',
-        tips: 'Usa la posición para presionar a tus oponentes. Una subida desde el CO a menudo hará que el botón y las ciegas abandonen manos marginales, dándote el bote sin lucha.'
+        explanation: 'Una posición tardía y muy rentable, justo a la derecha del botón. Desde aquí tienes una gran oportunidad para robar las ciegas y presionar al botón.',
+        playStyle: 'Juega de forma agresiva. Abre un rango amplio de manos, especialmente si el jugador en el botón es conservador. Exploit: si el BTN es muy agresivo y hace mucho 3-bet, puedes ajustar tu rango de apertura para incluir más manos que jueguen bien contra 3-bets (4-bet/call).',
+        hands: 'Un rango de apertura GTO aquí es de aproximadamente 27% de las manos. Esto incluye cualquier par, la mayoría de ases, broadways, conectores suited, y algunas manos off-suit fuertes (K9o+, Q9o+, JTo).',
+        tips: 'El CO es la segunda mejor posición. Úsala para presionar a tus oponentes. Una subida desde el CO a menudo hará que el botón y las ciegas abandonen manos marginales, dándote el bote sin lucha.'
     },
     bu: {
         title: 'Botón (BU)',
@@ -466,13 +478,13 @@ export default function PositionConceptPage() {
         </CardContent>
       </Card>
 
-       <Card className="w-full">
+      <Card className="w-full">
             <CardHeader>
                 <CardTitle className="font-headline text-2xl text-destructive">❌ Errores Comunes y Cómo Explotarlos</CardTitle>
                  <CardDescription>
                     Cada error de tus rivales es una oportunidad de oro. Aprende a identificarlos y castigarlos.
                 </CardDescription>
-            </CardHeader>
+            </Header>
             <CardContent>
                  <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="item-1">
@@ -572,6 +584,9 @@ export default function PositionConceptPage() {
 
 
 
+
+
+    
 
 
     
