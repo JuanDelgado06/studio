@@ -18,9 +18,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BookOpen } from 'lucide-react';
+import { ArrowLeft, BookOpen, BrainCircuit, Shield, Sword } from 'lucide-react';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Separator } from '@/components/ui/separator';
 
 
 // --- Interactive Poker Table Component ---
@@ -238,7 +239,7 @@ export default function PositionConceptPage() {
         </Link>
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold font-headline text-primary">
-            Guía Exhaustiva de Posición en la Mesa
+            Guía de Posición: De Novato a Profesional
           </h1>
           <p className="text-muted-foreground">
             Domina el concepto más importante del póker para tomar decisiones rentables.
@@ -248,101 +249,113 @@ export default function PositionConceptPage() {
       
       <PokerTable />
 
-      {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column */}
-        <div className="lg:col-span-2 space-y-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-headline text-2xl">🧠 ¿Por qué importa la posición?</CardTitle>
-            </CardHeader>
-            <CardContent className="prose prose-invert max-w-none text-foreground/90">
-                <p>La posición determina cuándo actúas en cada ronda de apuestas. Cuanto más tarde actúes, más información tienes → mayor ventaja estratégica. Estar "en posición" (actuar último) te permite:</p>
-                <ul>
-                    <li>Controlar el tamaño del bote.</li>
-                    <li>Ver cómo actúan tus rivales antes de decidir.</li>
-                    <li>Mejorar tus probabilidades de bluffear con éxito.</li>
-                    <li>Maximizar ganancias con manos fuertes y minimizar pérdidas con marginales.</li>
-                </ul>
-            </CardContent>
-          </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-headline text-2xl">🧠 ¿Por qué la posición es la clave del universo en el póker?</CardTitle>
+        </CardHeader>
+        <CardContent className="prose prose-invert max-w-none text-foreground/90">
+            <p>En el póker, la información es la moneda más valiosa, y la posición es la máquina que la imprime. Actuar después que tus rivales te otorga una ventaja informativa tan masiva que es, sin lugar a dudas, el factor más determinante para ganar a largo plazo. Estar "en posición" (actuar último post-flop) te permite:</p>
+            <ul>
+                <li><strong>Controlar el tamaño del bote:</strong> Puedes decidir si mantener el bote pequeño con una mano marginal o inflarlo con una mano fuerte.</li>
+                <li><strong>Realizar faroles (bluffs) más efectivos:</strong> Cuando todos tus oponentes hacen 'check', tienes una oportunidad de oro para llevarte el bote con una apuesta, independientemente de tus cartas.</li>
+                <li><strong>Maximizar ganancias:</strong> Ves la acción de todos antes de decidir, lo que te permite apostar por valor de forma más precisa cuando tienes la mejor mano.</li>
+                <li><strong>Minimizar pérdidas:</strong> Si hay mucha acción antes de tu turno, puedes retirarte con una mano mediocre y evitar perder más fichas.</li>
+                <li><strong>Obtener cartas gratis:</strong> Si estás en posición y con un proyecto (draw), a menudo puedes hacer 'check' y ver la siguiente carta sin costo si tu rival también pasa.</li>
+            </ul>
+        </CardContent>
+      </Card>
+      
+      <Separator />
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-headline text-2xl">🃏 Ejemplos prácticos por posición</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Posición</TableHead>
-                    <TableHead>Mano</TableHead>
-                    <TableHead>Decisión</TableHead>
-                    <TableHead>Justificación</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>UTG</TableCell>
-                    <TableCell>A♠ K♦</TableCell>
-                    <TableCell>Raise</TableCell>
-                    <TableCell>Mano premium, se juega fuerte desde cualquier posición.</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>MP</TableCell>
-                    <TableCell>9♠ 10♠</TableCell>
-                    <TableCell>Fold/Raise</TableCell>
-                    <TableCell>Depende de la mesa. Raise si es pasiva, fold si hay raises previos.</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>CO</TableCell>
-                    <TableCell>A♣ 5♣</TableCell>
-                    <TableCell>Raise</TableCell>
-                    <TableCell>Ideal para robar ciegas o jugar postflop con potencial de color y escalera.</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>BTN</TableCell>
-                    <TableCell>6♠ 7♦</TableCell>
-                    <TableCell>Raise</TableCell>
-                    <TableCell>Presión máxima a las ciegas. Se puede ganar sin resistencia.</TableCell>
-                  </TableRow>
-                   <TableRow>
-                    <TableCell>SB</TableCell>
-                    <TableCell>K♠ 9♦</TableCell>
-                    <TableCell>Fold</TableCell>
-                    <TableCell>Mano débil para jugar fuera de posición contra un raise.</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>BB</TableCell>
-                    <TableCell>A♦ 4♠</TableCell>
-                    <TableCell>Call</TableCell>
-                    <TableCell>Defensa barata si no hay un raise muy fuerte, pero con precaución.</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </div>
+       <Card>
+        <CardHeader>
+          <CardTitle className="font-headline text-2xl flex items-center gap-3">
+            <BrainCircuit className="h-7 w-7 text-primary" />
+            El Duelo Estratégico: GTO vs. Juego Explotador
+          </CardTitle>
+          <CardDescription>
+            Entender cuándo ser un robot matemático y cuándo ser un tiburón depredador es la esencia del juego de alto nivel.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* GTO Column */}
+            <div className="space-y-3 p-4 rounded-lg border border-sky-500/30 bg-sky-900/10">
+              <h3 className="font-headline text-xl text-sky-400 flex items-center gap-2"><Shield className="h-6 w-6"/>Juego GTO (Game Theory Optimal)</h3>
+              <p className="text-sm text-sky-200/80">
+                GTO es tu <strong>estrategia base defensiva</strong>. Es un enfoque matemáticamente equilibrado, calculado por 'solvers', que te hace teóricamente <strong>inexplotable</strong>. Si juegas GTO, no importa lo que hagan tus rivales, no pueden ganar dinero contra ti a largo plazo (sin contar el rake).
+              </p>
+              <ul className="list-disc list-inside text-sm space-y-1 text-sky-200/80">
+                <li><strong>Objetivo:</strong> Jugar de forma equilibrada para no ser explotado.</li>
+                <li><strong>Cuándo usarlo:</strong> Como base por defecto, contra rivales muy buenos (Regs), en mesas de high stakes, o cuando no tienes información sobre tus oponentes.</li>
+                <li><strong>Mentalidad:</strong> "No me importa lo que tengas; voy a jugar mis cartas y mis rangos de una manera tan perfecta que no podrás aprovecharte de mí".</li>
+              </ul>
+            </div>
+            {/* Exploitative Column */}
+            <div className="space-y-3 p-4 rounded-lg border border-red-500/30 bg-red-900/10">
+              <h3 className="font-headline text-xl text-red-400 flex items-center gap-2"><Sword className="h-6 w-6"/>Juego Explotador</h3>
+              <p className="text-sm text-red-200/80">
+                Aquí es donde se hace el <strong>dinero de verdad</strong>. El juego explotador implica <strong>desviarse intencionadamente del GTO</strong> para atacar y maximizar las ganancias contra los errores específicos y predecibles de tus oponentes.
+              </p>
+              <ul className="list-disc list-inside text-sm space-y-1 text-red-200/80">
+                <li><strong>Objetivo:</strong> Maximizar tu EV (Valor Esperado) contra los fallos de un rival.</li>
+                <li><strong>Cuándo usarlo:</strong> Contra jugadores recreacionales (peces), rivales con tendencias muy marcadas (demasiado pasivos, demasiado agresivos), y en la mayoría de partidas de low/mid-stakes.</li>
+                <li><strong>Mentalidad:</strong> "He visto tu error. Ahora voy a ajustar mi estrategia para castigarlo sin piedad y llevarme tus fichas".</li>
+              </ul>
+            </div>
+          </div>
+          <div className="text-center p-4 bg-background/50 rounded-md">
+            <p className="text-lg font-semibold font-headline">Un profesional domina el GTO como su escudo y el juego explotador como su espada. Sabe cuándo defenderse y cuándo atacar.</p>
+          </div>
 
-        {/* Right Column */}
-        <div className="space-y-8">
-           <Card>
-            <CardHeader>
-              <CardTitle className="font-headline text-2xl">📌 Tips Avanzados</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-foreground/90">
-                <p>En torneos, la posición es aún más valiosa con stacks cortos.</p>
-                <p>En mesas agresivas, juega más tight en early position.</p>
-                <p>Identifica el tipo de jugador en las ciegas antes de robar.</p>
-                <p>El botón es clave para aplicar presión con manos marginales.</p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+          <Accordion type="single" collapsible>
+            <AccordionItem value="exploit-examples">
+              <AccordionTrigger className="font-headline text-lg text-primary hover:no-underline">Ver ejemplos prácticos de explotación</AccordionTrigger>
+              <AccordionContent className="pt-2">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Si tu rival...</TableHead>
+                      <TableHead>La jugada explotadora es...</TableHead>
+                      <TableHead>La razón</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>Foldea demasiado en la Ciega Grande (BB) contra un robo.</TableCell>
+                      <TableCell>Robar las ciegas desde el Botón (BTN) y Cutoff (CO) con un rango mucho más amplio de lo normal (casi cualquier par de cartas).</TableCell>
+                      <TableCell>Estás imprimiendo dinero. Ganas el bote sin resistencia la mayoría de las veces. El riesgo es bajo y la recompensa es inmediata.</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Solo hace 3-bet con manos ultra-premium (AA, KK, AK).</TableCell>
+                      <TableCell>Foldear casi todas tus manos a su 3-bet, excepto las más fuertes. No intentes pagar con manos como AQ o 88.</TableCell>
+                      <TableCell>Sabes que estás dominado. Pagar sería regalarle dinero. Tu fold se vuelve 100% correcto y rentable.</TableCell>
+                    </TableRow>
+                     <TableRow>
+                      <TableCell>Paga demasiadas apuestas post-flop ('Calling Station').</TableCell>
+                      <TableCell>Dejar de farolear por completo contra él. Apuesta por valor con un rango más amplio (incluso con top pair, no kicker) y con un tamaño de apuesta más grande.</TableCell>
+                      <TableCell>Su botón de 'fold' está roto. No intentes tirarlo de una mano. Simplemente, apuesta cuando tengas algo y hazle pagar.</TableCell>
+                    </TableRow>
+                     <TableRow>
+                      <TableCell>Es un maníaco que apuesta y sube con todo ('Maniac').</TableCell>
+                      <TableCell>Jugar más pasivo ('slow play' / 'trap') con tus manos monstruo. En lugar de resubir, solo paga y deja que él mismo se estrelle contra tu mano.</TableCell>
+                      <TableCell>Él hará el trabajo de inflar el bote por ti. Tu objetivo es mantenerlo en la mano para que siga apostando con su aire.</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+        </CardContent>
+      </Card>
 
        <Card className="lg:col-span-3 w-full">
             <CardHeader>
-                <CardTitle className="font-headline text-2xl text-destructive">❌ Errores Comunes</CardTitle>
+                <CardTitle className="font-headline text-2xl text-destructive">❌ Errores Comunes y Cómo Explotarlos</CardTitle>
+                 <CardDescription>
+                    Cada error de tus rivales es una oportunidad de oro. Aprende a identificarlos y castigarlos.
+                </CardDescription>
             </CardHeader>
             <CardContent>
                  <Accordion type="single" collapsible className="w-full">
