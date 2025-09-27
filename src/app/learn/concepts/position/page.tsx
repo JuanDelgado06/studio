@@ -437,6 +437,30 @@ export default function PositionConceptPage() {
                         <TableCell>Hacer check para inducir bluff si el rival es agresivo</TableCell>
                         <TableCell>GTO maximiza EV directo, exploit manipula la acción</TableCell>
                     </TableRow>
+                    <TableRow>
+                        <TableCell>Rival es un 'Calling Station' (paga todo)</TableCell>
+                        <TableCell>Apostar por valor y semi-bluff, balanceando el rango.</TableCell>
+                        <TableCell>Eliminar los bluffs por completo. Apostar solo por valor y más grande.</TableCell>
+                        <TableCell>GTO asume que el rival puede foldear, exploit se adapta a un rival que no lo hace.</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>Rival es un 'Maniac' (muy agresivo)</TableCell>
+                        <TableCell>Defender un rango más ajustado, 4-betear polarizado.</TableCell>
+                        <TableCell>Jugar 'trap' (slow play) con manos muy fuertes, dejar que se farolee.</TableCell>
+                        <TableCell>GTO contraataca con agresión equilibrada, exploit usa la sobre-agresión del rival en su contra.</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>Tienes un proyecto de color en el flop</TableCell>
+                        <TableCell>Hacer semi-bluff con una frecuencia X, pagar con Y.</TableCell>
+                        <TableCell>Pagar siempre si las odds implícitas son enormes (rival con mucho stack y paga fácil).</TableCell>
+                        <TableCell>GTO balancea agresión, exploit prioriza el potencial de ganar un bote gigante a bajo costo.</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>Rival hace 'Donk Bet' (apuesta de cara en el flop)</TableCell>
+                        <TableCell>Raise con un rango polarizado que ataca el capado rango de donk.</TableCell>
+                        <TableCell>Raise con cualquier par o proyecto si el rival foldea mucho post-agresión.</TableCell>
+                        <TableCell>GTO explota la debilidad teórica del donk, exploit ataca el patrón específico del jugador.</TableCell>
+                    </TableRow>
                 </TableBody>
             </Table>
         </CardContent>
@@ -545,5 +569,6 @@ export default function PositionConceptPage() {
 }
     
     
+
 
 
