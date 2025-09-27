@@ -20,6 +20,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import Link from 'next/link';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
 
 // --- Interactive Poker Table Component ---
 const positionData = {
@@ -342,39 +344,61 @@ export default function PositionConceptPage() {
             <CardHeader>
                 <CardTitle className="font-headline text-2xl text-destructive">❌ Errores Comunes</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-                <div>
-                    <h4 className="font-bold text-destructive">🔴 Early Position (UTG): "El Ansioso"</h4>
-                    <p className="text-sm text-foreground/90">
-                        <strong>Error:</strong> Jugar manos especulativas como 76s, A5o o hacer 'limp'.<br/>
-                        <strong>Por qué es un error:</strong> Abres la puerta a que 7 jugadores actúen después de ti. Es casi seguro que te enfrentarás a un 'raise' y tendrás que jugar un bote grande fuera de posición, una receta para el desastre. Hacer 'limp' es una invitación a que te ataquen.
-                        <br/><strong>Mentalidad Pro:</strong> "Si mi mano no es lo suficientemente fuerte para subir, no es lo suficientemente fuerte para jugar desde aquí. Paciencia."
-                    </p>
-                </div>
-                <div>
-                    <h4 className="font-bold text-destructive">🟡 Middle Position (MP): "El Indeciso"</h4>
-                    <p className="text-sm text-foreground/90">
-                        <strong>Error:</strong> Pagar 'raises' de UTG con manos marginales como AJo o KQs. <br/>
-                        <strong>Por qué es un error:</strong> Te conviertes en 'sandwich meat'. Los jugadores en posición tardía pueden hacer 'squeeze' (un 3-bet grande) y te obligarán a foldear tu mano, perdiendo tu 'call'. Si pagas, a menudo estarás dominado por el rango de UTG.
-                        <br/><strong>Mentalidad Pro:</strong> "Contra un 'raise' de una posición temprana, necesito una mano que juegue bien en botes multi-way o que sea lo suficientemente fuerte para un 3-bet. El 'call' pasivo es mi enemigo."
-                    </p>
-                </div>
-                <div>
-                    <h4 className="font-bold text-destructive">🟢 Late Position (CO, BTN): "El Tímido"</h4>
-                    <p className="text-sm text-foreground/90">
-                        <strong>Error:</strong> No ser suficientemente agresivo y solo subir con manos premium. <br/>
-                        <strong>Por qué es un error:</strong> Estás desperdiciando la ventaja más grande del póker: la posición. El 70-80% de tus ganancias vendrán de estas dos posiciones. Foldear manos jugables aquí es como tirar dinero.
-                        <br/><strong>Mentalidad Pro:</strong> "El bote está huérfano. Las ciegas son mi objetivo. Mi rango de 'open-raise' aquí es muy amplio. Mi objetivo es robar las ciegas. Si me pagan, tengo la ventaja de la posición post-flop."
-                    </p>
-                </div>
-                 <div>
-                    <h4 className="font-bold text-destructive">⚠️ Blinds (SB, BB): "El Defensor Obligado"</h4>
-                    <p className="text-sm text-foreground/90">
-                        <strong>Error:</strong> Defender en exceso solo porque "ya has invertido dinero".<br/>
-                        <strong>Por qué es un error:</strong> La falacia del costo hundido. Ese dinero ya no es tuyo. Jugar una mano débil fuera de posición te costará mucho más a largo plazo que simplemente foldear. La Ciega Pequeña (SB) es la peor posición post-flop.
-                        <br/><strong>Mentalidad Pro:</strong> "Este no es 'mi' dinero, es una apuesta forzada. ¿Es esta mano rentable para jugar fuera de posición contra el rango de mi oponente? Si no, es un 'fold' fácil. Desde la SB, prefiero hacer 3-bet o foldear, evitando el 'call'."
-                    </p>
-                </div>
+            <CardContent>
+                 <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="item-1">
+                        <AccordionTrigger className="font-semibold text-lg hover:no-underline">
+                            <span className="text-destructive">🔴</span>
+                            <span className="ml-2">Early Position (UTG): "El Ansioso"</span>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2 pl-8 pr-4">
+                            <p className="text-foreground/90">
+                                <strong>Error:</strong> Jugar manos especulativas como 76s, A5o o hacer 'limp'.<br/>
+                                <strong className="text-destructive/80">Por qué es un error:</strong> Abres la puerta a que 7 jugadores actúen después de ti. Es casi seguro que te enfrentarás a un 'raise' y tendrás que jugar un bote grande fuera de posición, una receta para el desastre. Hacer 'limp' es una invitación a que te ataquen.
+                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "Si mi mano no es lo suficientemente fuerte para subir, no es lo suficientemente fuerte para jugar desde aquí. Paciencia."
+                            </p>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-2">
+                        <AccordionTrigger className="font-semibold text-lg hover:no-underline">
+                            <span className="text-destructive">🟡</span>
+                            <span className="ml-2">Middle Position (MP): "El Indeciso"</span>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2 pl-8 pr-4">
+                            <p className="text-foreground/90">
+                                <strong>Error:</strong> Pagar 'raises' de UTG con manos marginales como AJo o KQs. <br/>
+                                <strong className="text-destructive/80">Por qué es un error:</strong> Te conviertes en 'sandwich meat'. Los jugadores en posición tardía pueden hacer 'squeeze' (un 3-bet grande) y te obligarán a foldear tu mano, perdiendo tu 'call'. Si pagas, a menudo estarás dominado por el rango de UTG.
+                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "Contra un 'raise' de una posición temprana, necesito una mano que juegue bien en botes multi-way o que sea lo suficientemente fuerte para un 3-bet. El 'call' pasivo es mi enemigo."
+                            </p>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-3">
+                         <AccordionTrigger className="font-semibold text-lg hover:no-underline">
+                            <span className="text-destructive">🟢</span>
+                            <span className="ml-2">Late Position (CO, BTN): "El Tímido"</span>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2 pl-8 pr-4">
+                            <p className="text-foreground/90">
+                                <strong>Error:</strong> No ser suficientemente agresivo y solo subir con manos premium. <br/>
+                                <strong className="text-destructive/80">Por qué es un error:</strong> Estás desperdiciando la ventaja más grande del póker: la posición. El 70-80% de tus ganancias vendrán de estas dos posiciones. Foldear manos jugables aquí es como tirar dinero.
+                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "El bote está huérfano. Las ciegas son mi objetivo. Mi rango de 'open-raise' aquí es muy amplio. Mi objetivo es robar las ciegas. Si me pagan, tengo la ventaja de la posición post-flop."
+                            </p>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-4">
+                         <AccordionTrigger className="font-semibold text-lg hover:no-underline">
+                            <span className="text-destructive">⚠️</span>
+                            <span className="ml-2">Blinds (SB, BB): "El Defensor Obligado"</span>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2 pl-8 pr-4">
+                            <p className="text-foreground/90">
+                                <strong>Error:</strong> Defender en exceso solo porque "ya has invertido dinero".<br/>
+                                <strong className="text-destructive/80">Por qué es un error:</strong> La falacia del costo hundido. Ese dinero ya no es tuyo. Jugar una mano débil fuera de posición te costará mucho más a largo plazo que simplemente foldear. La Ciega Pequeña (SB) es la peor posición post-flop.
+                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "Este no es 'mi' dinero, es una apuesta forzada. ¿Es esta mano rentable para jugar fuera de posición contra el rango de mi oponente? Si no, es un 'fold' fácil. Desde la SB, prefiero hacer 3-bet o foldear, evitando el 'call'."
+                            </p>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
             </CardContent>
           </Card>
 
