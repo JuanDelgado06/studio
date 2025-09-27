@@ -18,7 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BookOpen, BrainCircuit, Shield, Sword } from 'lucide-react';
+import { ArrowLeft, BookOpen, BrainCircuit, Shield, Sword, ChevronsRight } from 'lucide-react';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Separator } from '@/components/ui/separator';
@@ -84,14 +84,14 @@ const positionData = {
         title: 'Botón (BU)',
         explanation: 'La mejor y más rentable posición en la mesa. Actúas último en cada ronda de apuestas post-flop (flop, turn y river), lo que te da la máxima información posible para tomar tus decisiones.',
         playStyle: 'La posición más agresiva. Abre el rango más amplio de manos. Roba las ciegas constantemente. Paga para ver flops con manos especulativas porque siempre tendrás la ventaja posicional.',
-        hands: 'El rango más amplio de todos. Depende de la acción previa, pero puedes abrir con más del 40-50% de tus manos si los jugadores en las ciegas son débiles. Esto incluye: cualquier par (22+), ases suited (A2s+), muchos ases off-suit (A5o+), conectores suited (98s, 76s, 54s) y manos broadway (KTo, QJo).',
+        hands: 'El rango más amplio de todos. Puedes abrir con más del 40-50% de tus manos si los jugadores en las ciegas son débiles. Esto incluye: cualquier par (22+), ases suited (A2s+), muchos ases off-suit (A5o+), conectores suited (98s, 76s, 54s) y manos broadway (KTo, QJo).',
         tips: 'El botón es tu máquina de hacer dinero. No la desperdicies jugando de forma pasiva. Controla el tamaño del bote, farolea de forma efectiva y extrae el máximo valor con tus manos fuertes.'
     },
     dealer: {
         title: 'Dealer (Botón)',
         explanation: 'La ficha "D" o "Dealer Button" indica quién es el repartidor nominal de la mano. Esta ficha se mueve en el sentido de las agujas del reloj un puesto en cada mano. El jugador en el Botón (BU) es quien tiene esta ficha.',
         playStyle: 'Estratégicamente, esta es la mejor y más rentable posición en la mesa. Actúas último en cada ronda de apuestas post-flop (flop, turn y river), lo que te da la máxima información posible para tomar tus decisiones.',
-        hands: 'El rango más amplio de todos. Depende de la acción previa, pero puedes abrir con más del 40-50% de tus manos si los jugadores en las ciegas son débiles. Esto incluye: cualquier par (22+), ases suited (A2s+), muchos ases off-suit (A5o+), conectores suited (98s, 76s, 54s) y manos broadway (KTo, QJo).',
+        hands: 'El rango más amplio de todos. Puedes abrir con más del 40-50% de tus manos si los jugadores en las ciegas son débiles. Esto incluye: cualquier par (22+), ases suited (A2s+), muchos ases off-suit (A5o+), conectores suited (98s, 76s, 54s) y manos broadway (KTo, QJo).',
         tips: 'El botón es tu máquina de hacer dinero. No la desperdicies jugando de forma pasiva. Controla el tamaño del bote, farolea de forma efectiva y extrae el máximo valor con tus manos fuertes.'
     }
 };
@@ -256,8 +256,10 @@ export default function PositionConceptPage() {
         </div>
       </div>
       
+      {/* 1. Lo Básico: La mesa interactiva (el qué y el dónde) */}
       <PokerTable />
 
+      {/* 2. El "Porqué" Fundamental */}
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-2xl">🧠 Posición: El Centro de Gravedad Estratégico</CardTitle>
@@ -286,9 +288,8 @@ export default function PositionConceptPage() {
         </CardContent>
       </Card>
       
-      <Separator />
-
-       <Card>
+      {/* 3. El Duelo Estratégico */}
+      <Card>
         <CardHeader>
           <CardTitle className="font-headline text-2xl flex items-center gap-3">
             <BrainCircuit className="h-7 w-7 text-primary" />
@@ -300,7 +301,6 @@ export default function PositionConceptPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* GTO Column */}
             <div className="space-y-3 p-4 rounded-lg border border-sky-500/30 bg-sky-900/10">
               <h3 className="font-headline text-xl text-sky-400 flex items-center gap-2"><Shield className="h-6 w-6"/>Juego GTO (Game Theory Optimal)</h3>
               <p className="text-sm text-sky-200/80">
@@ -312,7 +312,6 @@ export default function PositionConceptPage() {
                 <li><strong>Mentalidad:</strong> "No me importa lo que tengas; voy a jugar mis cartas y mis rangos de una manera tan perfecta que no podrás aprovecharte de mí".</li>
               </ul>
             </div>
-            {/* Exploitative Column */}
             <div className="space-y-3 p-4 rounded-lg border border-red-500/30 bg-red-900/10">
               <h3 className="font-headline text-xl text-red-400 flex items-center gap-2"><Sword className="h-6 w-6"/>Juego Explotador</h3>
               <p className="text-sm text-red-200/80">
@@ -328,8 +327,16 @@ export default function PositionConceptPage() {
           <div className="text-center p-4 bg-background/50 rounded-md">
             <p className="text-lg font-semibold font-headline">Un profesional domina el GTO como su escudo y el juego explotador como su espada. Sabe cuándo defenderse y cuándo atacar.</p>
           </div>
-
-          <Accordion type="single" collapsible>
+        </CardContent>
+      </Card>
+      
+      {/* 4. Aplicación Práctica */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-headline text-2xl">⚡️ Aplicación Práctica: GTO y Exploit en Acción</CardTitle>
+        </CardHeader>
+        <CardContent>
+           <Accordion type="single" collapsible>
             <AccordionItem value="exploit-examples">
               <AccordionTrigger className="font-headline text-lg text-primary hover:no-underline">Ver ejemplos prácticos de explotación</AccordionTrigger>
               <AccordionContent className="pt-2">
@@ -403,146 +410,175 @@ export default function PositionConceptPage() {
                 </AccordionContent>
             </AccordionItem>
           </Accordion>
-
+          <Separator className="my-6" />
+          <CardTitle className="font-headline text-xl mb-4">🧠 Tabla Comparativa Rápida</CardTitle>
+          <Table>
+              <TableHeader>
+                  <TableRow>
+                      <TableHead>Situación</TableHead>
+                      <TableHead>Jugada GTO</TableHead>
+                      <TableHead>Jugada Exploit</TableHead>
+                      <TableHead>Razonamiento</TableHead>
+                  </TableRow>
+              </TableHeader>
+              <TableBody>
+                  <TableRow>
+                      <TableCell>Estás en BTN con 87s y la BB foldea mucho</TableCell>
+                      <TableCell>Abrir con rango estándar (50–60%)</TableCell>
+                      <TableCell>Abrir con rango ampliado (hasta 80%)</TableCell>
+                      <TableCell>GTO busca equilibrio, exploit maximiza fold equity</TableCell>
+                  </TableRow>
+                  <TableRow>
+                      <TableCell>Recibes 3-bet desde SB con AQo</TableCell>
+                      <TableCell>Pagar con frecuencia media (según solver)</TableCell>
+                      <TableCell>Foldear si el rival solo 3-betea manos premium</TableCell>
+                      <TableCell>GTO defiende el rango, exploit evita spots dominados</TableCell>
+                  </TableRow>
+                  <TableRow>
+                      <TableCell>Flop seco (K♠ 7♦ 2♣) y rival hace check</TableCell>
+                      <TableCell>Cbet pequeño con alta frecuencia</TableCell>
+                      <TableCell>Cbet siempre si el rival foldea mucho</TableCell>
+                      <TableCell>GTO balancea bluff/value, exploit castiga pasividad</TableCell>
+                  </TableRow>
+                  <TableRow>
+                      <TableCell>Turn agresivo y tienes top set</TableCell>
+                      <TableCell>Apostar por valor con size medio</TableCell>
+                      <TableCell>Hacer check para inducir bluff si el rival es agresivo</TableCell>
+                      <TableCell>GTO maximiza EV directo, exploit manipula la acción</TableCell>
+                  </TableRow>
+                  <TableRow>
+                      <TableCell>Rival es un 'Calling Station' (paga todo)</TableCell>
+                      <TableCell>Apostar por valor y semi-bluff, balanceando el rango.</TableCell>
+                      <TableCell>Eliminar los bluffs por completo. Apostar solo por valor y más grande.</TableCell>
+                      <TableCell>GTO asume que el rival puede foldear, exploit se adapta a un rival que no lo hace.</TableCell>
+                  </TableRow>
+                  <TableRow>
+                      <TableCell>Rival es un 'Maniac' (muy agresivo)</TableCell>
+                      <TableCell>Defender un rango más ajustado, 4-betear polarizado.</TableCell>
+                      <TableCell>Jugar 'trap' (slow play) con manos muy fuertes, dejar que se farolee.</TableCell>
+                      <TableCell>GTO contraataca con agresión equilibrada, exploit usa la sobre-agresión del rival en su contra.</TableCell>
+                  </TableRow>
+                  <TableRow>
+                      <TableCell>Tienes un proyecto de color en el flop</TableCell>
+                      <TableCell>Hacer semi-bluff con una frecuencia X, pagar con Y.</TableCell>
+                      <TableCell>Pagar siempre si las odds implícitas son enormes (rival con mucho stack y paga fácil).</TableCell>
+                      <TableCell>GTO balancea agresión, exploit prioriza el potencial de ganar un bote gigante a bajo costo.</TableCell>
+                  </TableRow>
+                  <TableRow>
+                      <TableCell>Rival hace 'Donk Bet' (apuesta de cara en el flop)</TableCell>
+                      <TableCell>Raise con un rango polarizado que ataca el capado rango de donk.</TableCell>
+                      <TableCell>Raise con cualquier par o proyecto si el rival foldea mucho post-agresión.</TableCell>
+                      <TableCell>GTO explota la debilidad teórica del donk, exploit ataca el patrón específico del jugador.</TableCell>
+                  </TableRow>
+              </TableBody>
+          </Table>
         </CardContent>
       </Card>
       
-       <Card>
+      {/* 5. Errores y Explotación */}
+      <Card>
         <CardHeader>
-            <CardTitle className="font-headline text-2xl">🧠 Tabla Comparativa: GTO vs Exploit</CardTitle>
+            <CardTitle className="font-headline text-2xl text-destructive">❌ Errores Comunes y Cómo Explotarlos</CardTitle>
+             <CardDescription>
+                Cada error de tus rivales es una oportunidad de oro. Aprende a identificarlos y castigarlos.
+            </CardDescription>
         </CardHeader>
         <CardContent>
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Situación</TableHead>
-                        <TableHead>Jugada GTO</TableHead>
-                        <TableHead>Jugada Exploit</TableHead>
-                        <TableHead>Razonamiento</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    <TableRow>
-                        <TableCell>Estás en BTN con 87s y la BB foldea mucho</TableCell>
-                        <TableCell>Abrir con rango estándar (50–60%)</TableCell>
-                        <TableCell>Abrir con rango ampliado (hasta 80%)</TableCell>
-                        <TableCell>GTO busca equilibrio, exploit maximiza fold equity</TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell>Recibes 3-bet desde SB con AQo</TableCell>
-                        <TableCell>Pagar con frecuencia media (según solver)</TableCell>
-                        <TableCell>Foldear si el rival solo 3-betea manos premium</TableCell>
-                        <TableCell>GTO defiende el rango, exploit evita spots dominados</TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell>Flop seco (K♠ 7♦ 2♣) y rival hace check</TableCell>
-                        <TableCell>Cbet pequeño con alta frecuencia</TableCell>
-                        <TableCell>Cbet siempre si el rival foldea mucho</TableCell>
-                        <TableCell>GTO balancea bluff/value, exploit castiga pasividad</TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell>Turn agresivo y tienes top set</TableCell>
-                        <TableCell>Apostar por valor con size medio</TableCell>
-                        <TableCell>Hacer check para inducir bluff si el rival es agresivo</TableCell>
-                        <TableCell>GTO maximiza EV directo, exploit manipula la acción</TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell>Rival es un 'Calling Station' (paga todo)</TableCell>
-                        <TableCell>Apostar por valor y semi-bluff, balanceando el rango.</TableCell>
-                        <TableCell>Eliminar los bluffs por completo. Apostar solo por valor y más grande.</TableCell>
-                        <TableCell>GTO asume que el rival puede foldear, exploit se adapta a un rival que no lo hace.</TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell>Rival es un 'Maniac' (muy agresivo)</TableCell>
-                        <TableCell>Defender un rango más ajustado, 4-betear polarizado.</TableCell>
-                        <TableCell>Jugar 'trap' (slow play) con manos muy fuertes, dejar que se farolee.</TableCell>
-                        <TableCell>GTO contraataca con agresión equilibrada, exploit usa la sobre-agresión del rival en su contra.</TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell>Tienes un proyecto de color en el flop</TableCell>
-                        <TableCell>Hacer semi-bluff con una frecuencia X, pagar con Y.</TableCell>
-                        <TableCell>Pagar siempre si las odds implícitas son enormes (rival con mucho stack y paga fácil).</TableCell>
-                        <TableCell>GTO balancea agresión, exploit prioriza el potencial de ganar un bote gigante a bajo costo.</TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell>Rival hace 'Donk Bet' (apuesta de cara en el flop)</TableCell>
-                        <TableCell>Raise con un rango polarizado que ataca el capado rango de donk.</TableCell>
-                        <TableCell>Raise con cualquier par o proyecto si el rival foldea mucho post-agresión.</TableCell>
-                        <TableCell>GTO explota la debilidad teórica del donk, exploit ataca el patrón específico del jugador.</TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
+             <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1">
+                    <AccordionTrigger className="font-semibold text-lg hover:no-underline">
+                        <span className="text-destructive mr-2">🔴</span>
+                        Early Position (UTG): "El Ansioso"
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-2 pl-8 pr-4">
+                        <p className="text-foreground/90">
+                            <strong>Error Común:</strong> Jugar manos especulativas como 76s, A5o o hacer 'limp' (solo pagar la ciega).<br/>
+                            <strong className="text-destructive/80">Por qué es un error de EV:</strong> Abres la puerta a que hasta 8 jugadores actúen después de ti. Es casi seguro que te enfrentarás a un 'raise' y tendrás que jugar un bote grande fuera de posición, una receta para el desastre de EV negativo. Hacer 'limp' es una invitación a la agresión, regalando la iniciativa.
+                            <br/><strong className="text-primary">Mentalidad Pro:</strong> "Si mi mano no es lo suficientemente fuerte para subir, no es lo suficientemente fuerte para jugar desde aquí. Paciencia y disciplina."
+                            <br/><strong className="text-yellow-400">Cómo Explotarlo:</strong> Si identificas a un jugador que hace 'limp' desde UTG, aíslalo con un 'raise' grande (4-5x BB) con un rango mucho más amplio de lo normal. Le obligarás a jugar fuera de posición con una mano débil o a foldear, regalándote el bote.
+                        </p>
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-2">
+                    <AccordionTrigger className="font-semibold text-lg hover:no-underline">
+                        <span className="text-destructive mr-2">🟡</span>
+                         Middle Position (MP): "El Indeciso"
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-2 pl-8 pr-4">
+                        <p className="text-foreground/90">
+                            <strong>Error Común:</strong> Pagar 'raises' de UTG con manos marginales y dominadas como AJo o KQs. <br/>
+                            <strong className="text-destructive/80">Por qué es un error de EV:</strong> Te conviertes en 'carne de sándwich'. Los jugadores en posición tardía (CO, BTN) pueden hacer 'squeeze' (un 3-bet grande) y te obligarán a foldear tu mano, perdiendo tu 'call'. Si pagas, a menudo estarás dominado por el rango de UTG (que tiene AK, AQ).
+                            <br/><strong className="text-primary">Mentalidad Pro:</strong> "Contra un 'raise' de una posición temprana, mi rango debe ser más fuerte. O hago 3-bet por valor/bluff o foldeo. El 'call' pasivo es mi enemigo."
+                            <br/><strong className="text-yellow-400">Cómo Explotarlo:</strong> Cuando un jugador en MP paga un 'raise' de UTG, su rango está 'capado' (no tiene las mejores manos como AA, KK, AKs porque las habría resubido). Puedes hacer 'squeeze' desde CO o BTN con un rango más amplio (incluyendo bluffs como A5s, 87s) para llevarte un bote jugoso pre-flop.
+                        </p>
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-3">
+                     <AccordionTrigger className="font-semibold text-lg hover:no-underline">
+                        <span className="text-destructive mr-2">🟢</span>
+                         Late Position (CO, BTN): "El Tímido"
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-2 pl-8 pr-4">
+                        <p className="text-foreground/90">
+                            <strong>Error Común:</strong> No ser suficientemente agresivo y solo subir con manos premium, foldeando manos jugables. <br/>
+                            <strong className="text-destructive/80">Por qué es un error de EV:</strong> Estás desperdiciando la ventaja más grande del póker: la posición. La mayoría de tus ganancias vendrán de estas dos posiciones. Foldear manos con potencial de robo o jugabilidad post-flop aquí es literalmente tirar dinero a la basura.
+                            <br/><strong className="text-primary">Mentalidad Pro:</strong> "El bote está huérfano. Las ciegas son mi objetivo. Mi rango de 'open-raise' aquí es muy amplio. Mi objetivo principal es robar. Si me pagan, tengo la ventaja de la posición, lo que me da más formas de ganar."
+                            <br/><strong className="text-yellow-400">Cómo Explotarlo:</strong> Si estás en las ciegas y los jugadores en CO/BTN son muy pasivos (tímidos), puedes defender tus ciegas con un rango más amplio (3-bet y call) porque su rango de apertura es más fuerte y predecible de lo que debería ser. También, si estás en el BTN y el CO es tímido, puedes robar con un rango aún más amplio.
+                        </p>
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-4">
+                     <AccordionTrigger className="font-semibold text-lg hover:no-underline">
+                        <span className="text-destructive mr-2">⚠️</span>
+                         Blinds (SB, BB): "El Defensor Obligado"
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-2 pl-8 pr-4">
+                        <p className="text-foreground/90">
+                            <strong>Error Común:</strong> Defender en exceso (hacer 'call') desde las ciegas solo porque "ya has invertido dinero".<br/>
+                            <strong className="text-destructive/80">Por qué es un error de EV:</strong> Es la falacia del costo hundido. Ese dinero ya no es tuyo. Jugar una mano débil fuera de posición contra un rango de apertura fuerte te costará mucho más a largo plazo que simplemente foldear. La Ciega Pequeña (SB) es la peor posición post-flop; el 'call' es raramente la mejor opción.
+                            <br/><strong className="text-primary">Mentalidad Pro:</strong> "Este no es 'mi' dinero, es una apuesta forzada. ¿Es esta mano rentable para jugar fuera de posición contra el rango de mi oponente? En la SB, prefiero hacer 3-bet o foldear. En la BB, las 'pot odds' me permiten defender un rango más amplio, pero debo estar listo para abandonar el post-flop."
+                            <br/><strong className="text-yellow-400">Cómo Explotarlo:</strong> Si estás en posición (BTN, CO) contra jugadores en las ciegas que defienden demasiado y luego juegan pasivamente post-flop ('fit or fold'), puedes hacer 'continuation bets' (c-bets) en el flop con una frecuencia muy alta (casi 100% del tiempo) y te llevarás el bote la mayoría de las veces.
+                        </p>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        </CardContent>
+      </Card>
+      
+      {/* 6. Conceptos Avanzados */}
+       <Card>
+        <CardHeader>
+          <CardTitle className="font-headline text-2xl flex items-center gap-3">
+            <ChevronsRight className="h-7 w-7 text-primary" />
+            Conceptos Avanzados de Posición
+          </CardTitle>
+          <CardDescription>
+            Lleva tu juego al siguiente nivel entendiendo la dinámica profunda de la posición.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+            <div className="space-y-3 p-4 rounded-lg border border-primary/20 bg-primary/5">
+              <h3 className="font-headline text-xl text-primary flex items-center gap-2">Ventaja de Rango y Posición</h3>
+              <p className="text-sm text-foreground/80">
+                La <strong>Ventaja de Rango</strong> (Range Advantage) significa que la textura actual del flop, turn o river favorece más a tu posible conjunto de manos (tu rango) que al de tu oponente. La posición te da la visión perfecta para evaluar esto.
+              </p>
+              <ul className="list-disc list-inside text-sm space-y-1 text-foreground/80">
+                <li><strong>Ejemplo:</strong> Haces open-raise desde UTG y la BB paga. El flop es A♦ K♠ 7♣. Tienes una enorme ventaja de rango. Tu rango contiene AA, KK, AK, mientras que el rango de la BB rara vez tiene estas manos (las habría resubido preflop).</li>
+                <li><strong>Aplicación desde Posición:</strong> Si fueras tú quien pagó en la BB y el flop es 7♦ 6♦ 5♠, la ventaja de rango se inclina hacia ti. Si el jugador UTG (fuera de posición) hace check, puedes apostar agresivamente para representar la mano fuerte y robar el bote, ya que ese flop rara vez impacta su rango.</li>
+              </ul>
+            </div>
+            <div className="space-y-3 p-4 rounded-lg border border-secondary/20 bg-secondary/5">
+              <h3 className="font-headline text-xl text-secondary-foreground flex items-center gap-2">Iniciativa y Posición: La Fórmula del Éxito</h3>
+              <p className="text-sm text-muted-foreground">
+                Tener la <strong>iniciativa</strong> (ser el último agresor preflop) te da una ventaja. Tener <strong>posición</strong> te da otra. Tener <strong>ambas</strong> es la situación más rentable del No-Limit Hold'em.
+              </p>
+               <p className="text-sm text-foreground/80">
+                Cuando subes preflop y tienes posición, tienes el control total. Puedes hacer una C-bet y llevarte el bote si tu rival muestra debilidad. Si conectas tu mano, puedes extraer máximo valor. Si tu rival muestra fuerza, puedes controlar el tamaño del bote y minimizar pérdidas. Esta combinación te da el mayor número de herramientas para ganar la mano, con o sin las mejores cartas.
+              </p>
+            </div>
         </CardContent>
       </Card>
 
-      <Card className="w-full">
-            <CardHeader>
-                <CardTitle className="font-headline text-2xl text-destructive">❌ Errores Comunes y Cómo Explotarlos</CardTitle>
-                 <CardDescription>
-                    Cada error de tus rivales es una oportunidad de oro. Aprende a identificarlos y castigarlos.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                 <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="item-1">
-                        <AccordionTrigger className="font-semibold text-lg hover:no-underline">
-                            <span className="text-destructive mr-2">🔴</span>
-                            Early Position (UTG): "El Ansioso"
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-2 pl-8 pr-4">
-                            <p className="text-foreground/90">
-                                <strong>Error Común:</strong> Jugar manos especulativas como 76s, A5o o hacer 'limp' (solo pagar la ciega).<br/>
-                                <strong className="text-destructive/80">Por qué es un error de EV:</strong> Abres la puerta a que hasta 8 jugadores actúen después de ti. Es casi seguro que te enfrentarás a un 'raise' y tendrás que jugar un bote grande fuera de posición, una receta para el desastre de EV negativo. Hacer 'limp' es una invitación a la agresión, regalando la iniciativa.
-                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "Si mi mano no es lo suficientemente fuerte para subir, no es lo suficientemente fuerte para jugar desde aquí. Paciencia y disciplina."
-                                <br/><strong className="text-yellow-400">Cómo Explotarlo:</strong> Si identificas a un jugador que hace 'limp' desde UTG, aíslalo con un 'raise' grande (4-5x BB) con un rango mucho más amplio de lo normal. Le obligarás a jugar fuera de posición con una mano débil o a foldear, regalándote el bote.
-                            </p>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-2">
-                        <AccordionTrigger className="font-semibold text-lg hover:no-underline">
-                            <span className="text-destructive mr-2">🟡</span>
-                             Middle Position (MP): "El Indeciso"
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-2 pl-8 pr-4">
-                            <p className="text-foreground/90">
-                                <strong>Error Común:</strong> Pagar 'raises' de UTG con manos marginales y dominadas como AJo o KQs. <br/>
-                                <strong className="text-destructive/80">Por qué es un error de EV:</strong> Te conviertes en 'carne de sándwich'. Los jugadores en posición tardía (CO, BTN) pueden hacer 'squeeze' (un 3-bet grande) y te obligarán a foldear tu mano, perdiendo tu 'call'. Si pagas, a menudo estarás dominado por el rango de UTG (que tiene AK, AQ).
-                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "Contra un 'raise' de una posición temprana, mi rango debe ser más fuerte. O hago 3-bet por valor/bluff o foldeo. El 'call' pasivo es mi enemigo."
-                                <br/><strong className="text-yellow-400">Cómo Explotarlo:</strong> Cuando un jugador en MP paga un 'raise' de UTG, su rango está 'capado' (no tiene las mejores manos como AA, KK, AKs porque las habría resubido). Puedes hacer 'squeeze' desde CO o BTN con un rango más amplio (incluyendo bluffs como A5s, 87s) para llevarte un bote jugoso pre-flop.
-                            </p>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-3">
-                         <AccordionTrigger className="font-semibold text-lg hover:no-underline">
-                            <span className="text-destructive mr-2">🟢</span>
-                             Late Position (CO, BTN): "El Tímido"
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-2 pl-8 pr-4">
-                            <p className="text-foreground/90">
-                                <strong>Error Común:</strong> No ser suficientemente agresivo y solo subir con manos premium, foldeando manos jugables. <br/>
-                                <strong className="text-destructive/80">Por qué es un error de EV:</strong> Estás desperdiciando la ventaja más grande del póker: la posición. La mayoría de tus ganancias vendrán de estas dos posiciones. Foldear manos con potencial de robo o jugabilidad post-flop aquí es literalmente tirar dinero a la basura.
-                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "El bote está huérfano. Las ciegas son mi objetivo. Mi rango de 'open-raise' aquí es muy amplio. Mi objetivo principal es robar. Si me pagan, tengo la ventaja de la posición, lo que me da más formas de ganar."
-                                <br/><strong className="text-yellow-400">Cómo Explotarlo:</strong> Si estás en las ciegas y los jugadores en CO/BTN son muy pasivos (tímidos), puedes defender tus ciegas con un rango más amplio (3-bet y call) porque su rango de apertura es más fuerte y predecible de lo que debería ser. También, si estás en el BTN y el CO es tímido, puedes robar con un rango aún más amplio.
-                            </p>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-4">
-                         <AccordionTrigger className="font-semibold text-lg hover:no-underline">
-                            <span className="text-destructive mr-2">⚠️</span>
-                             Blinds (SB, BB): "El Defensor Obligado"
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-2 pl-8 pr-4">
-                            <p className="text-foreground/90">
-                                <strong>Error Común:</strong> Defender en exceso (hacer 'call') desde las ciegas solo porque "ya has invertido dinero".<br/>
-                                <strong className="text-destructive/80">Por qué es un error de EV:</strong> Es la falacia del costo hundido. Ese dinero ya no es tuyo. Jugar una mano débil fuera de posición contra un rango de apertura fuerte te costará mucho más a largo plazo que simplemente foldear. La Ciega Pequeña (SB) es la peor posición post-flop; el 'call' es raramente la mejor opción.
-                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "Este no es 'mi' dinero, es una apuesta forzada. ¿Es esta mano rentable para jugar fuera de posición contra el rango de mi oponente? En la SB, prefiero hacer 3-bet o foldear. En la BB, las 'pot odds' me permiten defender un rango más amplio, pero debo estar listo para abandonar el post-flop."
-                                <br/><strong className="text-yellow-400">Cómo Explotarlo:</strong> Si estás en posición (BTN, CO) contra jugadores en las ciegas que defienden demasiado y luego juegan pasivamente post-flop ('fit or fold'), puedes hacer 'continuation bets' (c-bets) en el flop con una frecuencia muy alta (casi 100% del tiempo) y te llevarás el bote la mayoría de las veces.
-                            </p>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
-            </CardContent>
-          </Card>
 
       <style>{`
         .prose {
@@ -580,5 +616,3 @@ export default function PositionConceptPage() {
     </div>
   );
 }
-
-    
