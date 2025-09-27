@@ -335,7 +335,10 @@ export default function PositionConceptPage() {
                 <p>El botón es clave para aplicar presión con manos marginales.</p>
             </CardContent>
           </Card>
-          <Card>
+        </div>
+      </div>
+
+       <Card className="lg:col-span-3 w-full">
             <CardHeader>
                 <CardTitle className="font-headline text-2xl text-destructive">❌ Errores Comunes</CardTitle>
             </CardHeader>
@@ -374,8 +377,7 @@ export default function PositionConceptPage() {
                 </div>
             </CardContent>
           </Card>
-        </div>
-      </div>
+
       <style>{`
         .prose {
             color: hsl(var(--foreground));
@@ -412,5 +414,5 @@ export default function PositionConceptPage() {
     </div>
   );
 }
-
+    
     
