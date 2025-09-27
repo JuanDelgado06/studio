@@ -23,8 +23,6 @@ import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Separator } from '@/components/ui/separator';
 
-
-// --- Interactive Poker Table Component ---
 const positionData = {
     sb: {
         title: 'Ciega Pequeña (SB)',
@@ -483,58 +481,62 @@ export default function PositionConceptPage() {
                  <CardDescription>
                     Cada error de tus rivales es una oportunidad de oro. Aprende a identificarlos y castigarlos.
                 </CardDescription>
-            </Header>
+            </CardHeader>
             <CardContent>
                  <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="item-1">
                         <AccordionTrigger className="font-semibold text-lg hover:no-underline">
-                            <span className="text-destructive">🔴</span>
-                            <span className="ml-2">Early Position (UTG): "El Ansioso"</span>
+                            <span className="text-destructive mr-2">🔴</span>
+                            Early Position (UTG): "El Ansioso"
                         </AccordionTrigger>
                         <AccordionContent className="pt-2 pl-8 pr-4">
                             <p className="text-foreground/90">
-                                <strong>Error:</strong> Jugar manos especulativas como 76s, A5o o hacer 'limp'.<br/>
-                                <strong className="text-destructive/80">Por qué es un error:</strong> Abres la puerta a que 7 jugadores actúen después de ti. Es casi seguro que te enfrentarás a un 'raise' y tendrás que jugar un bote grande fuera de posición, una receta para el desastre. Hacer 'limp' es una invitación a que te ataquen.
-                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "Si mi mano no es lo suficientemente fuerte para subir, no es lo suficientemente fuerte para jugar desde aquí. Paciencia."
+                                <strong>Error Común:</strong> Jugar manos especulativas como 76s, A5o o hacer 'limp' (solo pagar la ciega).<br/>
+                                <strong className="text-destructive/80">Por qué es un error de EV:</strong> Abres la puerta a que hasta 8 jugadores actúen después de ti. Es casi seguro que te enfrentarás a un 'raise' y tendrás que jugar un bote grande fuera de posición, una receta para el desastre de EV negativo. Hacer 'limp' es una invitación a la agresión, regalando la iniciativa.
+                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "Si mi mano no es lo suficientemente fuerte para subir, no es lo suficientemente fuerte para jugar desde aquí. Paciencia y disciplina."
+                                <br/><strong className="text-yellow-400">Cómo Explotarlo:</strong> Si identificas a un jugador que hace 'limp' desde UTG, aíslalo con un 'raise' grande (4-5x BB) con un rango mucho más amplio de lo normal. Le obligarás a jugar fuera de posición con una mano débil o a foldear, regalándote el bote.
                             </p>
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-2">
                         <AccordionTrigger className="font-semibold text-lg hover:no-underline">
-                            <span className="text-destructive">🟡</span>
-                            <span className="ml-2">Middle Position (MP): "El Indeciso"</span>
+                            <span className="text-destructive mr-2">🟡</span>
+                             Middle Position (MP): "El Indeciso"
                         </AccordionTrigger>
                         <AccordionContent className="pt-2 pl-8 pr-4">
                             <p className="text-foreground/90">
-                                <strong>Error:</strong> Pagar 'raises' de UTG con manos marginales como AJo o KQs. <br/>
-                                <strong className="text-destructive/80">Por qué es un error:</strong> Te conviertes en 'sandwich meat'. Los jugadores en posición tardía pueden hacer 'squeeze' (un 3-bet grande) y te obligarán a foldear tu mano, perdiendo tu 'call'. Si pagas, a menudo estarás dominado por el rango de UTG.
-                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "Contra un 'raise' de una posición temprana, necesito una mano que juegue bien en botes multi-way o que sea lo suficientemente fuerte para un 3-bet. El 'call' pasivo es mi enemigo."
+                                <strong>Error Común:</strong> Pagar 'raises' de UTG con manos marginales y dominadas como AJo o KQs. <br/>
+                                <strong className="text-destructive/80">Por qué es un error de EV:</strong> Te conviertes en 'carne de sándwich'. Los jugadores en posición tardía (CO, BTN) pueden hacer 'squeeze' (un 3-bet grande) y te obligarán a foldear tu mano, perdiendo tu 'call'. Si pagas, a menudo estarás dominado por el rango de UTG (que tiene AK, AQ).
+                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "Contra un 'raise' de una posición temprana, mi rango debe ser más fuerte. O hago 3-bet por valor/bluff o foldeo. El 'call' pasivo es mi enemigo."
+                                <br/><strong className="text-yellow-400">Cómo Explotarlo:</strong> Cuando un jugador en MP paga un 'raise' de UTG, su rango está 'capado' (no tiene las mejores manos como AA, KK, AKs porque las habría resubido). Puedes hacer 'squeeze' desde CO o BTN con un rango más amplio (incluyendo bluffs como A5s, 87s) para llevarte un bote jugoso pre-flop.
                             </p>
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-3">
                          <AccordionTrigger className="font-semibold text-lg hover:no-underline">
-                            <span className="text-destructive">🟢</span>
-                            <span className="ml-2">Late Position (CO, BTN): "El Tímido"</span>
+                            <span className="text-destructive mr-2">🟢</span>
+                             Late Position (CO, BTN): "El Tímido"
                         </AccordionTrigger>
                         <AccordionContent className="pt-2 pl-8 pr-4">
                             <p className="text-foreground/90">
-                                <strong>Error:</strong> No ser suficientemente agresivo y solo subir con manos premium. <br/>
-                                <strong className="text-destructive/80">Por qué es un error:</strong> Estás desperdiciando la ventaja más grande del póker: la posición. El 70-80% de tus ganancias vendrán de estas dos posiciones. Foldear manos jugables aquí es como tirar dinero.
-                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "El bote está huérfano. Las ciegas son mi objetivo. Mi rango de 'open-raise' aquí es muy amplio. Mi objetivo es robar las ciegas. Si me pagan, tengo la ventaja de la posición post-flop."
+                                <strong>Error Común:</strong> No ser suficientemente agresivo y solo subir con manos premium, foldeando manos jugables. <br/>
+                                <strong className="text-destructive/80">Por qué es un error de EV:</strong> Estás desperdiciando la ventaja más grande del póker: la posición. La mayoría de tus ganancias vendrán de estas dos posiciones. Foldear manos con potencial de robo o jugabilidad post-flop aquí es literalmente tirar dinero a la basura.
+                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "El bote está huérfano. Las ciegas son mi objetivo. Mi rango de 'open-raise' aquí es muy amplio. Mi objetivo principal es robar. Si me pagan, tengo la ventaja de la posición, lo que me da más formas de ganar."
+                                <br/><strong className="text-yellow-400">Cómo Explotarlo:</strong> Si estás en las ciegas y los jugadores en CO/BTN son muy pasivos (tímidos), puedes defender tus ciegas con un rango más amplio (3-bet y call) porque su rango de apertura es más fuerte y predecible de lo que debería ser. También, si estás en el BTN y el CO es tímido, puedes robar con un rango aún más amplio.
                             </p>
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-4">
                          <AccordionTrigger className="font-semibold text-lg hover:no-underline">
-                            <span className="text-destructive">⚠️</span>
-                            <span className="ml-2">Blinds (SB, BB): "El Defensor Obligado"</span>
+                            <span className="text-destructive mr-2">⚠️</span>
+                             Blinds (SB, BB): "El Defensor Obligado"
                         </AccordionTrigger>
                         <AccordionContent className="pt-2 pl-8 pr-4">
                             <p className="text-foreground/90">
-                                <strong>Error:</strong> Defender en exceso solo porque "ya has invertido dinero".<br/>
-                                <strong className="text-destructive/80">Por qué es un error:</strong> La falacia del costo hundido. Ese dinero ya no es tuyo. Jugar una mano débil fuera de posición te costará mucho más a largo plazo que simplemente foldear. La Ciega Pequeña (SB) es la peor posición post-flop.
-                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "Este no es 'mi' dinero, es una apuesta forzada. ¿Es esta mano rentable para jugar fuera de posición contra el rango de mi oponente? Si no, es un 'fold' fácil. Desde la SB, prefiero hacer 3-bet o foldear, evitando el 'call'."
+                                <strong>Error Común:</strong> Defender en exceso (hacer 'call') desde las ciegas solo porque "ya has invertido dinero".<br/>
+                                <strong className="text-destructive/80">Por qué es un error de EV:</strong> Es la falacia del costo hundido. Ese dinero ya no es tuyo. Jugar una mano débil fuera de posición contra un rango de apertura fuerte te costará mucho más a largo plazo que simplemente foldear. La Ciega Pequeña (SB) es la peor posición post-flop; el 'call' es raramente la mejor opción.
+                                <br/><strong className="text-primary">Mentalidad Pro:</strong> "Este no es 'mi' dinero, es una apuesta forzada. ¿Es esta mano rentable para jugar fuera de posición contra el rango de mi oponente? En la SB, prefiero hacer 3-bet o foldear. En la BB, las 'pot odds' me permiten defender un rango más amplio, pero debo estar listo para abandonar el post-flop."
+                                <br/><strong className="text-yellow-400">Cómo Explotarlo:</strong> Si estás en posición (BTN, CO) contra jugadores en las ciegas que defienden demasiado y luego juegan pasivamente post-flop ('fit or fold'), puedes hacer 'continuation bets' (c-bets) en el flop con una frecuencia muy alta (casi 100% del tiempo) y te llevarás el bote la mayoría de las veces.
                             </p>
                         </AccordionContent>
                     </AccordionItem>
@@ -578,3 +580,5 @@ export default function PositionConceptPage() {
     </div>
   );
 }
+
+    
