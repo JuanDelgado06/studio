@@ -18,117 +18,150 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, PlusCircle, Trash2, Save } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Trash2, Save, FilePlus, Loader2, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Separator } from '@/components/ui/separator';
 
-// Define types for our state
 type DecisionRow = { id: number; hand: string; position: string; action: string; ev: boolean; result: string; };
 type FoldEquityRow = { id: number; hand: string; position: string; stack: string; action: string; rivalFolded: boolean; };
 type MindsetRow = { id: number; hand: string; emotion: string; logic: string; };
-type GeneralData = { date: string; tournamentName: string; buyIn: string; playerCount: string; stage: string; stacks: string; };
-type NotesData = { errors: string; improvements: string; plan: string; finalFeeling: string; };
 
-const LOG_STORAGE_KEY = 'strategic-log-data';
+type LogEntry = {
+    id: number;
+    generalData: { date: string; tournamentName: string; buyIn: string; playerCount: string; stage: string; stacks: string; };
+    decisions: DecisionRow[];
+    foldEquitySpots: FoldEquityRow[];
+    mindset: MindsetRow[];
+    notes: { errors: string; improvements: string; plan: string; finalFeeling: string; };
+};
+
+const LOGS_STORAGE_KEY = 'strategic-log-entries';
+
+const createNewLogEntry = (): LogEntry => ({
+    id: Date.now(),
+    generalData: { date: new Date().toISOString().split('T')[0], tournamentName: '', buyIn: '', playerCount: '', stage: '', stacks: '' },
+    decisions: [],
+    foldEquitySpots: [],
+    mindset: [],
+    notes: { errors: '', improvements: '', plan: '', finalFeeling: '' },
+});
 
 export default function StrategicLogPage() {
   const { toast } = useToast();
-  // State for all form data
-  const [generalData, setGeneralData] = useState<GeneralData>({ date: '', tournamentName: '', buyIn: '', playerCount: '', stage: '', stacks: '' });
-  const [decisions, setDecisions] = useState<DecisionRow[]>([]);
-  const [foldEquitySpots, setFoldEquitySpots] = useState<FoldEquityRow[]>([]);
-  const [mindset, setMindset] = useState<MindsetRow[]>([]);
-  const [notes, setNotes] = useState<NotesData>({ errors: '', improvements: '', plan: '', finalFeeling: '' });
+  
+  const [savedLogs, setSavedLogs] = useState<LogEntry[]>([]);
+  const [currentLog, setCurrentLog] = useState<LogEntry | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load data from localStorage on initial render
   useEffect(() => {
     try {
-      const savedData = window.localStorage.getItem(LOG_STORAGE_KEY);
+      const savedData = window.localStorage.getItem(LOGS_STORAGE_KEY);
       if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        setGeneralData(parsedData.generalData || { date: '', tournamentName: '', buyIn: '', playerCount: '', stage: '', stacks: '' });
-        setDecisions(parsedData.decisions || []);
-        setFoldEquitySpots(parsedData.foldEquitySpots || []);
-        setMindset(parsedData.mindset || []);
-        setNotes(parsedData.notes || { errors: '', improvements: '', plan: '', finalFeeling: '' });
+        setSavedLogs(JSON.parse(savedData));
       }
+      setCurrentLog(createNewLogEntry());
     } catch (error) {
-      console.error("Failed to load strategic log from localStorage", error);
+      console.error("Failed to load strategic logs from localStorage", error);
     }
+    setIsLoading(false);
   }, []);
-
+  
   const handleSave = () => {
-    const dataToSave = { generalData, decisions, foldEquitySpots, mindset, notes };
-    try {
-      window.localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(dataToSave));
-      toast({
-        title: "Registro Guardado",
-        description: "Tu sesión de análisis ha sido guardada en tu navegador.",
-      });
-    } catch (error) {
-      console.error("Failed to save strategic log to localStorage", error);
-      toast({
-        variant: "destructive",
-        title: "Error al Guardar",
-        description: "No se pudo guardar el registro en el almacenamiento local.",
-      });
-    }
-  };
-
-
-  // Generic handler for top-level inputs
-  const handleGeneralDataChange = (field: keyof GeneralData, value: string) => {
-    setGeneralData(prev => ({ ...prev, [field]: value }));
-  };
-  
-  const handleNotesChange = (field: keyof NotesData, value: string) => {
-      setNotes(prev => ({ ...prev, [field]: value}));
-  }
-
-  // Generic handler to update a row in any table
-  const handleRowChange = <T extends { id: number }>(
-    setter: React.Dispatch<React.SetStateAction<T[]>>,
-    id: number,
-    field: keyof T,
-    value: any
-  ) => {
-    setter(prev => prev.map(row => (row.id === id ? { ...row, [field]: value } : row)));
-  };
-
-
-  // Handlers for Decisions Table
-  const addDecision = () => setDecisions(prev => [...prev, { id: Date.now(), hand: '', position: '', action: '', ev: true, result: '' }]);
-  const removeDecision = (id: number) => setDecisions(prev => prev.filter(d => d.id !== id));
-
-  // Handlers for Fold Equity Table
-  const addFoldEquitySpot = () => setFoldEquitySpots(prev => [...prev, { id: Date.now(), hand: '', position: '', stack: '', action: '', rivalFolded: true }]);
-  const removeFoldEquitySpot = (id: number) => setFoldEquitySpots(prev => prev.filter(spot => spot.id !== id));
-  
-  // Handlers for Mindset Table
-  const addMindsetRow = () => setMindset(prev => [...prev, { id: Date.now(), hand: '', emotion: '', logic: '' }]);
-  const removeMindsetRow = (id: number) => setMindset(prev => prev.filter(m => m.id !== id));
-
-  const clearAll = () => {
-    if (window.confirm("¿Estás seguro de que quieres borrar todos los datos del registro? Esta acción no se puede deshacer.")) {
-        setGeneralData({ date: '', tournamentName: '', buyIn: '', playerCount: '', stage: '', stacks: '' });
-        setDecisions([]);
-        setFoldEquitySpots([]);
-        setMindset([]);
-        setNotes({ errors: '', improvements: '', plan: '', finalFeeling: '' });
+    if (!currentLog) return;
+    
+    setSavedLogs(prevLogs => {
+        const existingLogIndex = prevLogs.findIndex(log => log.id === currentLog.id);
+        let updatedLogs;
+        if (existingLogIndex > -1) {
+            // Update existing log
+            updatedLogs = [...prevLogs];
+            updatedLogs[existingLogIndex] = currentLog;
+        } else {
+            // Add new log
+            updatedLogs = [...prevLogs, currentLog];
+        }
+        
         try {
-            window.localStorage.removeItem(LOG_STORAGE_KEY);
+            window.localStorage.setItem(LOGS_STORAGE_KEY, JSON.stringify(updatedLogs));
             toast({
-                title: "Registro Borrado",
-                description: "Se han limpiado todos los datos del formulario.",
+                title: "Registro Guardado",
+                description: "Tu sesión de análisis ha sido guardada.",
             });
         } catch (error) {
-            console.error("Failed to clear localStorage", error);
+            console.error("Failed to save logs to localStorage", error);
+            toast({
+                variant: "destructive",
+                title: "Error al Guardar",
+                description: "No se pudo guardar el registro.",
+            });
         }
-    }
+        return updatedLogs;
+    });
+  };
+
+  const handleNewLog = () => {
+      setCurrentLog(createNewLogEntry());
+      toast({
+          title: "Nuevo Registro",
+          description: "Formulario limpiado para una nueva entrada."
+      })
+  }
+
+  const handleLoadLog = (logId: number) => {
+      const logToLoad = savedLogs.find(log => log.id === logId);
+      if (logToLoad) {
+          setCurrentLog(logToLoad);
+          toast({
+              title: "Registro Cargado",
+              description: `Has cargado el registro del torneo "${logToLoad.generalData.tournamentName || 'Sin Nombre'}".`
+          });
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+  }
+
+  const handleDeleteLog = (logId: number) => {
+      if (window.confirm("¿Estás seguro de que quieres borrar este registro permanentemente?")) {
+        setSavedLogs(prevLogs => {
+            const updatedLogs = prevLogs.filter(log => log.id !== logId);
+            try {
+                window.localStorage.setItem(LOGS_STORAGE_KEY, JSON.stringify(updatedLogs));
+                toast({
+                    title: "Registro Eliminado",
+                });
+                if (currentLog?.id === logId) {
+                    handleNewLog();
+                }
+            } catch (error) {
+                 console.error("Failed to update logs in localStorage after deletion", error);
+            }
+            return updatedLogs;
+        });
+      }
+  }
+
+  const handleUpdateCurrentLog = (updateFn: (draft: LogEntry) => void) => {
+      setCurrentLog(prev => {
+          if (!prev) return null;
+          const newLog = { ...prev }; // Shallow copy
+          // Deep copy nested objects that will be modified
+          newLog.generalData = { ...newLog.generalData };
+          newLog.notes = { ...newLog.notes };
+          newLog.decisions = newLog.decisions.map(d => ({...d}));
+          newLog.foldEquitySpots = newLog.foldEquitySpots.map(f => ({...f}));
+          newLog.mindset = newLog.mindset.map(m => ({...m}));
+          updateFn(newLog);
+          return newLog;
+      });
+  };
+
+  if (isLoading || !currentLog) {
+      return <div className="flex justify-center items-center h-96"><Loader2 className="h-16 w-16 animate-spin"/></div>
   }
 
   return (
@@ -145,249 +178,256 @@ export default function StrategicLogPage() {
                     📓 Registro Estratégico Interactivo – Torneos
                 </h1>
                 <p className="text-muted-foreground">
-                    Tus datos se guardan en tu navegador cuando presionas &quot;Guardar&quot;.
+                    Crea y guarda tus análisis de sesión. Tus datos se guardan en tu navegador.
                 </p>
             </div>
         </div>
-      
-        <Card>
-            <CardHeader>
-                <CardTitle className="font-headline text-2xl">🧩 1. Datos Generales del Torneo</CardTitle>
-                <CardDescription>Información clave para contextualizar tu sesión de juego.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-medium">Fecha</label>
-                        <Input type="date" value={generalData.date} onChange={e => handleGeneralDataChange('date', e.target.value)} />
-                    </div>
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-medium">Nombre/ID del Torneo</label>
-                        <Input placeholder="Ej: Daily Freeroll" value={generalData.tournamentName} onChange={e => handleGeneralDataChange('tournamentName', e.target.value)} />
-                    </div>
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-medium">Buy-in</label>
-                        <Input placeholder="Ej: 10 USDT" value={generalData.buyIn} onChange={e => handleGeneralDataChange('buyIn', e.target.value)} />
-                    </div>
-                     <div className="space-y-1.5">
-                        <label className="text-sm font-medium">Nº de Jugadores</label>
-                        <Input type="number" placeholder="Ej: 500" value={generalData.playerCount} onChange={e => handleGeneralDataChange('playerCount', e.target.value)} />
-                    </div>
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-medium">Etapa Alcanzada</label>
-                        <Select value={generalData.stage} onValueChange={value => handleGeneralDataChange('stage', value)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Selecciona etapa..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="early">Early</SelectItem>
-                                <SelectItem value="mid">Mid</SelectItem>
-                                <SelectItem value="late">Late</SelectItem>
-                                <SelectItem value="itm">ITM</SelectItem>
-                                <SelectItem value="ft">Final Table (FT)</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                     <div className="space-y-1.5">
-                        <label className="text-sm font-medium">Stack Inicial / Final</label>
-                        <Input placeholder="Ej: 1000 / 0" value={generalData.stacks} onChange={e => handleGeneralDataChange('stacks', e.target.value)} />
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
 
-        <Card>
+        <Card className="border-primary/50 border-2">
             <CardHeader>
-                <CardTitle className="font-headline text-2xl">🧠 2. Decisiones Clave Tomadas</CardTitle>
-                <CardDescription>Analiza jugadas importantes, correctas o incorrectas, para reforzar tu disciplina y detectar errores.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Mano</TableHead>
-                            <TableHead>Posición</TableHead>
-                            <TableHead>Acción</TableHead>
-                            <TableHead>¿Fue EV+?</TableHead>
-                            <TableHead>Resultado</TableHead>
-                            <TableHead className="text-right">Acción</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {decisions.map(decision => (
-                             <TableRow key={decision.id}>
-                                <TableCell><Input placeholder="A♠Q♠" value={decision.hand} onChange={e => handleRowChange(setDecisions, decision.id, 'hand', e.target.value)} /></TableCell>
-                                <TableCell><Input placeholder="CO" value={decision.position} onChange={e => handleRowChange(setDecisions, decision.id, 'position', e.target.value)} /></TableCell>
-                                <TableCell><Input placeholder="Push" value={decision.action} onChange={e => handleRowChange(setDecisions, decision.id, 'action', e.target.value)} /></TableCell>
-                                <TableCell>
-                                    <Badge onClick={() => handleRowChange(setDecisions, decision.id, 'ev', !decision.ev)} variant={decision.ev ? "default" : "destructive"} className="cursor-pointer">
-                                        {decision.ev ? '✅ Sí' : '❌ No'}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell><Input placeholder="Perdí vs KK" value={decision.result} onChange={e => handleRowChange(setDecisions, decision.id, 'result', e.target.value)} /></TableCell>
-                                <TableCell className="text-right">
-                                    <Button onClick={() => removeDecision(decision.id)} variant="ghost" size="icon">
-                                        <Trash2 className="h-4 w-4 text-destructive" />
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                <Button onClick={addDecision} variant="outline" className="mt-4 w-full">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Añadir Decisión
-                </Button>
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle className="font-headline text-2xl">🎯 3. Spots de Fold Equity</CardTitle>
-                <CardDescription>Evalúa la efectividad de tus faroles y semi-faroles.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                 <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Mano</TableHead>
-                            <TableHead>Posición</TableHead>
-                            <TableHead>Stack (BB)</TableHead>
-                            <TableHead>Acción</TableHead>
-                            <TableHead>¿Rival foldeó?</TableHead>
-                            <TableHead className="text-right">Acción</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {foldEquitySpots.map(spot => (
-                            <TableRow key={spot.id}>
-                                <TableCell><Input placeholder="K♠J♠" value={spot.hand} onChange={e => handleRowChange(setFoldEquitySpots, spot.id, 'hand', e.target.value)} /></TableCell>
-                                <TableCell><Input placeholder="BTN" value={spot.position} onChange={e => handleRowChange(setFoldEquitySpots, spot.id, 'position', e.target.value)} /></TableCell>
-                                <TableCell><Input type="number" placeholder="12" value={spot.stack} onChange={e => handleRowChange(setFoldEquitySpots, spot.id, 'stack', e.target.value)} /></TableCell>
-                                <TableCell><Input placeholder="Push" value={spot.action} onChange={e => handleRowChange(setFoldEquitySpots, spot.id, 'action', e.target.value)} /></TableCell>
-                                <TableCell>
-                                    <Badge onClick={() => handleRowChange(setFoldEquitySpots, spot.id, 'rivalFolded', !spot.rivalFolded)} variant={spot.rivalFolded ? "default" : "destructive"} className="cursor-pointer">
-                                        {spot.rivalFolded ? '✅ Sí' : '❌ No'}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Button onClick={() => removeFoldEquitySpot(spot.id)} variant="ghost" size="icon">
-                                        <Trash2 className="h-4 w-4 text-destructive" />
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                 <Button onClick={addFoldEquitySpot} variant="outline" className="mt-4 w-full">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Añadir Spot
-                </Button>
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle className="font-headline text-2xl">🔍 4. Errores Detectados y Leaks</CardTitle>
-                <CardDescription>Sé brutalmente honesto. Identifica tus fugas de dinero (leaks) para poder corregirlas.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <Textarea 
-                    placeholder="Ejemplo: Aposté fuerte con AJ en un board con Q, creyendo que tenía fold equity. El rival ya me ganaba desde el turn y pagó. Error de lectura de la fuerza del rival." 
-                    value={notes.errors}
-                    onChange={e => handleNotesChange('errors', e.target.value)}
-                 />
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle className="font-headline text-2xl">💭 5. Estado Emocional (Mindset)</CardTitle>
-                <CardDescription>El póker es un juego mental. Analiza cómo tus emociones influyeron en tus decisiones.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Mano Clave</TableHead>
-                            <TableHead>Emoción Sentida</TableHead>
-                            <TableHead>¿Decisión Lógica o Emocional?</TableHead>
-                            <TableHead className="text-right">Acción</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {mindset.map(m => (
-                            <TableRow key={m.id}>
-                                <TableCell><Input placeholder="A♠J♠" value={m.hand} onChange={e => handleRowChange(setMindset, m.id, 'hand', e.target.value)} /></TableCell>
-                                <TableCell><Input placeholder="Frustración" value={m.emotion} onChange={e => handleRowChange(setMindset, m.id, 'emotion', e.target.value)} /></TableCell>
-                                <TableCell><Input placeholder="Emocional (quería que foldeara)" value={m.logic} onChange={e => handleRowChange(setMindset, m.id, 'logic', e.target.value)} /></TableCell>
-                                <TableCell className="text-right">
-                                    <Button onClick={() => removeMindsetRow(m.id)} variant="ghost" size="icon">
-                                        <Trash2 className="h-4 w-4 text-destructive" />
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                 <Button onClick={addMindsetRow} variant="outline" className="mt-4 w-full">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Añadir Registro Emocional
-                </Button>
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle className="font-headline text-2xl">📈 6. Reflexión Final y Plan de Acción</CardTitle>
-                <CardDescription>Destila las lecciones más importantes de la sesión para aplicarlas en el futuro.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="space-y-2">
-                    <label className="font-semibold text-sm">¿Qué hice mejor que en torneos anteriores?</label>
-                    <Textarea 
-                        placeholder="Ej: Fui más disciplinado en early position, robé más desde el botón..." 
-                        value={notes.improvements}
-                        onChange={e => handleNotesChange('improvements', e.target.value)}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <label className="font-semibold text-sm">¿Qué patrón de error se repitió?</label>
-                    <Textarea 
-                        placeholder="Ej: Volví a pagar de más con proyectos débiles fuera de posición..." 
-                        value={notes.errors}
-                        onChange={e => handleNotesChange('errors', e.target.value)}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <label className="font-semibold text-sm">¿Qué ajustaré específicamente en el próximo torneo? (Plan de acción)</label>
-                    <Textarea 
-                        placeholder="Ej: Seré más consciente de los tamaños de stack para 3-betear, foldearé AJo a raises de UTG..." 
-                        value={notes.plan}
-                        onChange={e => handleNotesChange('plan', e.target.value)}
-                    />
-                </div>
-                 <div className="space-y-2">
-                    <label className="font-semibold text-sm">¿Cómo me sentí al terminar?</label>
-                    <Textarea 
-                        placeholder="Ej: Satisfecho con mis decisiones a pesar del resultado, frustrado por un mal beat, etc." 
-                        value={notes.finalFeeling}
-                        onChange={e => handleNotesChange('finalFeeling', e.target.value)}
-                    />
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                    <Button onClick={handleSave} className="flex-1">
-                        <Save className="mr-2 h-4 w-4" />
-                        Guardar Registro
-                    </Button>
-                    <Button onClick={clearAll} variant="destructive" className="flex-1">
-                         <Trash2 className="mr-2 h-4 w-4" />
-                        Borrar Todo
+                <div className="flex justify-between items-start">
+                    <div>
+                        <CardTitle className="font-headline text-2xl">📝 Editor de Registro</CardTitle>
+                        <CardDescription>Usa este formulario para crear un nuevo registro o editar uno cargado.</CardDescription>
+                    </div>
+                     <Button onClick={handleNewLog}>
+                        <FilePlus className="mr-2 h-4 w-4"/>
+                        Nuevo Registro
                     </Button>
                 </div>
+            </CardHeader>
+            <CardContent>
+                {/* General Data Card */}
+                <Card className="mb-6">
+                    <CardHeader>
+                        <CardTitle className="font-headline text-xl">🧩 1. Datos Generales del Torneo</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="space-y-1.5">
+                            <label className="text-sm font-medium">Fecha</label>
+                            <Input type="date" value={currentLog.generalData.date} onChange={e => handleUpdateCurrentLog(draft => { draft.generalData.date = e.target.value })} />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-sm font-medium">Nombre/ID del Torneo</label>
+                            <Input placeholder="Ej: Daily Freeroll" value={currentLog.generalData.tournamentName} onChange={e => handleUpdateCurrentLog(draft => { draft.generalData.tournamentName = e.target.value })} />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-sm font-medium">Buy-in</label>
+                            <Input placeholder="Ej: 10 USDT" value={currentLog.generalData.buyIn} onChange={e => handleUpdateCurrentLog(draft => { draft.generalData.buyIn = e.target.value })} />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-sm font-medium">Nº de Jugadores</label>
+                            <Input type="number" placeholder="Ej: 500" value={currentLog.generalData.playerCount} onChange={e => handleUpdateCurrentLog(draft => { draft.generalData.playerCount = e.target.value })} />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-sm font-medium">Etapa Alcanzada</label>
+                            <Select value={currentLog.generalData.stage} onValueChange={value => handleUpdateCurrentLog(draft => { draft.generalData.stage = value })}>
+                                <SelectTrigger><SelectValue placeholder="Selecciona etapa..." /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="early">Early</SelectItem>
+                                    <SelectItem value="mid">Mid</SelectItem>
+                                    <SelectItem value="late">Late</SelectItem>
+                                    <SelectItem value="itm">ITM</SelectItem>
+                                    <SelectItem value="ft">Final Table (FT)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-sm font-medium">Stack Inicial / Final</label>
+                            <Input placeholder="Ej: 1000 / 0" value={currentLog.generalData.stacks} onChange={e => handleUpdateCurrentLog(draft => { draft.generalData.stacks = e.target.value })} />
+                        </div>
+                    </CardContent>
+                </Card>
+                
+                 {/* Decisions Table */}
+                <Card className="mb-6">
+                    <CardHeader>
+                        <CardTitle className="font-headline text-xl">🧠 2. Decisiones Clave Tomadas</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Mano</TableHead>
+                                    <TableHead>Posición</TableHead>
+                                    <TableHead>Acción</TableHead>
+                                    <TableHead>¿Fue EV+?</TableHead>
+                                    <TableHead>Resultado</TableHead>
+                                    <TableHead className="text-right">Acción</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {currentLog.decisions.map((decision, index) => (
+                                    <TableRow key={decision.id}>
+                                        <TableCell><Input placeholder="A♠Q♠" value={decision.hand} onChange={e => handleUpdateCurrentLog(draft => { draft.decisions[index].hand = e.target.value })} /></TableCell>
+                                        <TableCell><Input placeholder="CO" value={decision.position} onChange={e => handleUpdateCurrentLog(draft => { draft.decisions[index].position = e.target.value })} /></TableCell>
+                                        <TableCell><Input placeholder="Push" value={decision.action} onChange={e => handleUpdateCurrentLog(draft => { draft.decisions[index].action = e.target.value })} /></TableCell>
+                                        <TableCell>
+                                            <Badge onClick={() => handleUpdateCurrentLog(draft => { draft.decisions[index].ev = !draft.decisions[index].ev })} variant={decision.ev ? "default" : "destructive"} className="cursor-pointer">
+                                                {decision.ev ? '✅ Sí' : '❌ No'}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell><Input placeholder="Perdí vs KK" value={decision.result} onChange={e => handleUpdateCurrentLog(draft => { draft.decisions[index].result = e.target.value })} /></TableCell>
+                                        <TableCell className="text-right">
+                                            <Button onClick={() => handleUpdateCurrentLog(draft => { draft.decisions = draft.decisions.filter(d => d.id !== decision.id) })} variant="ghost" size="icon">
+                                                <Trash2 className="h-4 w-4 text-destructive" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <Button onClick={() => handleUpdateCurrentLog(draft => { draft.decisions.push({ id: Date.now(), hand: '', position: '', action: '', ev: true, result: '' }) })} variant="outline" className="mt-4 w-full">
+                            <PlusCircle className="mr-2 h-4 w-4" /> Añadir Decisión
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                 {/* Other Cards similarly */}
+                 <Card className="mb-6">
+                    <CardHeader><CardTitle className="font-headline text-xl">🎯 3. Spots de Fold Equity</CardTitle></CardHeader>
+                    <CardContent>
+                        {/* Fold Equity Table */}
+                        <Table>
+                             <TableHeader>
+                                <TableRow>
+                                    <TableHead>Mano</TableHead>
+                                    <TableHead>Posición</TableHead>
+                                    <TableHead>Stack (BB)</TableHead>
+                                    <TableHead>Acción</TableHead>
+                                    <TableHead>¿Rival foldeó?</TableHead>
+                                    <TableHead className="text-right">Acción</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {currentLog.foldEquitySpots.map((spot, index) => (
+                                    <TableRow key={spot.id}>
+                                        <TableCell><Input placeholder="K♠J♠" value={spot.hand} onChange={e => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].hand = e.target.value })} /></TableCell>
+                                        <TableCell><Input placeholder="BTN" value={spot.position} onChange={e => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].position = e.target.value })} /></TableCell>
+                                        <TableCell><Input type="number" placeholder="12" value={spot.stack} onChange={e => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].stack = e.target.value })} /></TableCell>
+                                        <TableCell><Input placeholder="Push" value={spot.action} onChange={e => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].action = e.target.value })} /></TableCell>
+                                        <TableCell>
+                                            <Badge onClick={() => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].rivalFolded = !draft.foldEquitySpots[index].rivalFolded })} variant={spot.rivalFolded ? "default" : "destructive"} className="cursor-pointer">
+                                                {spot.rivalFolded ? '✅ Sí' : '❌ No'}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Button onClick={() => handleUpdateCurrentLog(draft => { draft.foldEquitySpots = draft.foldEquitySpots.filter(s => s.id !== spot.id)})} variant="ghost" size="icon">
+                                                <Trash2 className="h-4 w-4 text-destructive" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                         <Button onClick={() => handleUpdateCurrentLog(draft => { draft.foldEquitySpots.push({ id: Date.now(), hand: '', position: '', stack: '', action: '', rivalFolded: true }) })} variant="outline" className="mt-4 w-full">
+                            <PlusCircle className="mr-2 h-4 w-4" /> Añadir Spot
+                        </Button>
+                    </CardContent>
+                 </Card>
+
+                 <Card className="mb-6">
+                    <CardHeader><CardTitle className="font-headline text-xl">💭 4. Estado Emocional (Mindset)</CardTitle></CardHeader>
+                    <CardContent>
+                        <Table>
+                             <TableHeader>
+                                <TableRow>
+                                    <TableHead>Mano Clave</TableHead>
+                                    <TableHead>Emoción Sentida</TableHead>
+                                    <TableHead>¿Decisión Lógica o Emocional?</TableHead>
+                                    <TableHead className="text-right">Acción</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {currentLog.mindset.map((m, index) => (
+                                    <TableRow key={m.id}>
+                                        <TableCell><Input placeholder="A♠J♠" value={m.hand} onChange={e => handleUpdateCurrentLog(draft => { draft.mindset[index].hand = e.target.value })} /></TableCell>
+                                        <TableCell><Input placeholder="Frustración" value={m.emotion} onChange={e => handleUpdateCurrentLog(draft => { draft.mindset[index].emotion = e.target.value })} /></TableCell>
+                                        <TableCell><Input placeholder="Emocional (quería que foldeara)" value={m.logic} onChange={e => handleUpdateCurrentLog(draft => { draft.mindset[index].logic = e.target.value })} /></TableCell>
+                                        <TableCell className="text-right">
+                                            <Button onClick={() => handleUpdateCurrentLog(draft => { draft.mindset = draft.mindset.filter(mind => mind.id !== m.id) })} variant="ghost" size="icon">
+                                                <Trash2 className="h-4 w-4 text-destructive" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <Button onClick={() => handleUpdateCurrentLog(draft => { draft.mindset.push({ id: Date.now(), hand: '', emotion: '', logic: '' }) })} variant="outline" className="mt-4 w-full">
+                            <PlusCircle className="mr-2 h-4 w-4" /> Añadir Registro Emocional
+                        </Button>
+                    </CardContent>
+                 </Card>
+
+                {/* Notes and Final Reflection */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="font-headline text-xl">📈 5. Reflexión Final y Plan de Acción</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="font-semibold text-sm">¿Qué patrón de error se repitió o qué leak principal detectaste?</label>
+                            <Textarea placeholder="Ej: Volví a pagar de más con proyectos débiles fuera de posición..." value={currentLog.notes.errors} onChange={e => handleUpdateCurrentLog(draft => { draft.notes.errors = e.target.value })}/>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="font-semibold text-sm">¿Qué hiciste mejor que en torneos anteriores?</label>
+                            <Textarea placeholder="Ej: Fui más disciplinado en early position, robé más desde el botón..." value={currentLog.notes.improvements} onChange={e => handleUpdateCurrentLog(draft => { draft.notes.improvements = e.target.value })}/>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="font-semibold text-sm">¿Qué ajustarás específicamente en el próximo torneo? (Plan de acción)</label>
+                            <Textarea placeholder="Ej: Seré más consciente de los tamaños de stack para 3-betear, foldearé AJo a raises de UTG..." value={currentLog.notes.plan} onChange={e => handleUpdateCurrentLog(draft => { draft.notes.plan = e.target.value })}/>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="font-semibold text-sm">¿Cómo me sentí al terminar?</label>
+                            <Textarea placeholder="Ej: Satisfecho con mis decisiones a pesar del resultado, frustrado por un mal beat, etc." value={currentLog.notes.finalFeeling} onChange={e => handleUpdateCurrentLog(draft => { draft.notes.finalFeeling = e.target.value })}/>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                            <Button onClick={handleSave} className="flex-1">
+                                <Save className="mr-2 h-4 w-4" />
+                                {savedLogs.some(log => log.id === currentLog.id) ? 'Actualizar Registro' : 'Guardar Nuevo Registro'}
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
             </CardContent>
         </Card>
+
+        <Separator />
+
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl">📚 Registros Guardados</CardTitle>
+                <CardDescription>Aquí puedes ver, cargar o eliminar tus sesiones de análisis anteriores.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                {savedLogs.length > 0 ? (
+                     <Accordion type="single" collapsible className="w-full">
+                         {savedLogs.map(log => (
+                            <AccordionItem value={`log-${log.id}`} key={log.id}>
+                                <AccordionTrigger>
+                                    <div className="flex flex-col sm:flex-row justify-between w-full items-start sm:items-center pr-4">
+                                        <span className="font-semibold text-left">{log.generalData.tournamentName || "Registro Sin Título"}</span>
+                                        <Badge variant="secondary" className="mt-1 sm:mt-0">{log.generalData.date}</Badge>
+                                    </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="p-4 bg-secondary/20 rounded-md">
+                                    <div className="flex gap-2 mb-4">
+                                         <Button onClick={() => handleLoadLog(log.id)}><BookOpen className="mr-2 h-4 w-4" /> Cargar para Editar</Button>
+                                         <Button onClick={() => handleDeleteLog(log.id)} variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Eliminar</Button>
+                                    </div>
+                                    <h4 className="font-bold mb-2">Detalles del Registro:</h4>
+                                    <p className="text-sm text-muted-foreground"><strong>Etapa alcanzada:</strong> {log.generalData.stage}</p>
+                                    <p className="text-sm text-muted-foreground"><strong>Plan de acción:</strong> {log.notes.plan || "N/A"}</p>
+                                </AccordionContent>
+                            </AccordionItem>
+                         ))}
+                    </Accordion>
+                ) : (
+                    <p className="text-muted-foreground text-center">No tienes ningún registro guardado. ¡Completa el formulario de arriba y guarda tu primera sesión!</p>
+                )}
+            </CardContent>
+        </Card>
+
     </div>
   );
 }
