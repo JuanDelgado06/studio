@@ -105,6 +105,12 @@ const concepts = [
         title: "10. Bankroll Management",
         emoji: "🔹",
         content: "Administra tu dinero para evitar quiebras. Nunca juegues con más del 5% de tu bankroll en una sola sesión."
+    },
+    {
+        id: "strategic-log",
+        title: "11. Registro Estratégico",
+        emoji: "📓",
+        content: "La herramienta definitiva para el estudio y la mejora continua. Analiza tus decisiones, detecta patrones y corrige errores de forma sistemática después de cada sesión."
     }
 ];
 
