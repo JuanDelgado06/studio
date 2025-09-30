@@ -45,7 +45,7 @@ const LOGS_STORAGE_KEY = 'strategic-log-entries';
 
 const createNewLogEntry = (): LogEntry => ({
     id: Date.now(),
-    generalData: { date: new Date().toISOString().split('T')[0], tournamentName: '', buyIn: '', playerCount: '', stage: '', stacks: '' },
+    generalData: { date: '', tournamentName: '', buyIn: '', playerCount: '', stage: '', stacks: '' },
     decisions: [],
     foldEquitySpots: [],
     mindset: [],
@@ -65,7 +65,9 @@ export default function StrategicLogPage() {
       if (savedData) {
         setSavedLogs(JSON.parse(savedData));
       }
-      setCurrentLog(createNewLogEntry());
+      const newEntry = createNewLogEntry();
+      newEntry.generalData.date = new Date().toISOString().split('T')[0];
+      setCurrentLog(newEntry);
     } catch (error) {
       console.error("Failed to load strategic logs from localStorage", error);
     }
@@ -106,7 +108,9 @@ export default function StrategicLogPage() {
   };
 
   const handleNewLog = () => {
-      setCurrentLog(createNewLogEntry());
+      const newEntry = createNewLogEntry();
+      newEntry.generalData.date = new Date().toISOString().split('T')[0];
+      setCurrentLog(newEntry);
       toast({
           title: "Nuevo Registro",
           description: "Formulario limpiado para una nueva entrada."
@@ -148,13 +152,7 @@ export default function StrategicLogPage() {
   const handleUpdateCurrentLog = (updateFn: (draft: LogEntry) => void) => {
       setCurrentLog(prev => {
           if (!prev) return null;
-          const newLog = { ...prev }; // Shallow copy
-          // Deep copy nested objects that will be modified
-          newLog.generalData = { ...newLog.generalData };
-          newLog.notes = { ...newLog.notes };
-          newLog.decisions = newLog.decisions.map(d => ({...d}));
-          newLog.foldEquitySpots = newLog.foldEquitySpots.map(f => ({...f}));
-          newLog.mindset = newLog.mindset.map(m => ({...m}));
+          const newLog = JSON.parse(JSON.stringify(prev)); // Deep copy to avoid state mutation issues
           updateFn(newLog);
           return newLog;
       });
