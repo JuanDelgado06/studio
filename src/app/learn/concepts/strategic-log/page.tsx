@@ -18,11 +18,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function StrategicLogPage() {
   return (
@@ -36,10 +37,10 @@ export default function StrategicLogPage() {
             </Link>
             <div className="flex flex-col gap-1">
                 <h1 className="text-3xl font-bold font-headline text-primary">
-                    📓 Formato de Registro Estratégico – Torneos
+                    📓 Registro Estratégico Interactivo – Torneos
                 </h1>
                 <p className="text-muted-foreground">
-                    La herramienta definitiva para analizar tu juego, detectar patrones y acelerar tu mejora.
+                    Utiliza esta herramienta para analizar tu juego, detectar patrones y acelerar tu mejora.
                 </p>
             </div>
         </div>
@@ -50,21 +51,50 @@ export default function StrategicLogPage() {
                 <CardDescription>Información clave para contextualizar tu sesión de juego.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><span className="font-semibold">Fecha:</span> [Fecha del torneo]</div>
-                    <div><span className="font-semibold">Nombre/ID del Torneo:</span> [ID o Nombre]</div>
-                    <div><span className="font-semibold">Buy-in:</span> <Badge variant="secondary">Freeroll / USDT / Otro</Badge></div>
-                    <div><span className="font-semibold">Nº de Jugadores:</span> [Total de participantes]</div>
-                    <div><span className="font-semibold">Etapa Alcanzada:</span> <Badge>Early / Mid / Late / ITM / FT</Badge></div>
-                    <div><span className="font-semibold">Stack Inicial / Final:</span> [Fichas al inicio y final]</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium">Fecha</label>
+                        <Input type="date" />
+                    </div>
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium">Nombre/ID del Torneo</label>
+                        <Input placeholder="Ej: Daily Freeroll" />
+                    </div>
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium">Buy-in</label>
+                        <Input placeholder="Ej: 10 USDT" />
+                    </div>
+                     <div className="space-y-1.5">
+                        <label className="text-sm font-medium">Nº de Jugadores</label>
+                        <Input type="number" placeholder="Ej: 500" />
+                    </div>
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium">Etapa Alcanzada</label>
+                        <Select>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Selecciona etapa..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="early">Early</SelectItem>
+                                <SelectItem value="mid">Mid</SelectItem>
+                                <SelectItem value="late">Late</SelectItem>
+                                <SelectItem value="itm">ITM</SelectItem>
+                                <SelectItem value="ft">Final Table (FT)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                     <div className="space-y-1.5">
+                        <label className="text-sm font-medium">Stack Inicial / Final</label>
+                        <Input placeholder="Ej: 1000 / 0" />
+                    </div>
                 </div>
             </CardContent>
         </Card>
 
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline text-2xl">🧠 2. Decisiones EV+ Tomadas</CardTitle>
-                <CardDescription>Analiza jugadas donde la decisión fue correcta, independientemente del resultado. Esto refuerza tu disciplina.</CardDescription>
+                <CardTitle className="font-headline text-2xl">🧠 2. Decisiones Clave Tomadas</CardTitle>
+                <CardDescription>Analiza jugadas importantes, correctas o incorrectas, para reforzar tu disciplina y detectar errores.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Table>
@@ -75,35 +105,40 @@ export default function StrategicLogPage() {
                             <TableHead>Acción</TableHead>
                             <TableHead>¿Fue EV+?</TableHead>
                             <TableHead>Resultado</TableHead>
-                            <TableHead>¿Repetirías?</TableHead>
+                            <TableHead className="text-right">Acción</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
+                        {/* Placeholder for dynamic rows */}
                         <TableRow>
-                            <TableCell><code>A♠ Q♠</code></TableCell>
-                            <TableCell>CO</TableCell>
-                            <TableCell>Push</TableCell>
-                            <TableCell><Badge variant="default">✅ Sí</Badge></TableCell>
-                            <TableCell>Perdí</TableCell>
-                            <TableCell><Badge variant="default">✅ Sí</Badge></TableCell>
+                            <TableCell><Input placeholder="A♠Q♠" /></TableCell>
+                            <TableCell><Input placeholder="CO" /></TableCell>
+                            <TableCell><Input placeholder="Push" /></TableCell>
+                            <TableCell><Badge variant="default" className="cursor-pointer">✅ Sí</Badge></TableCell>
+                            <TableCell><Input placeholder="Perdí vs KK" /></TableCell>
+                            <TableCell className="text-right"><Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell><code>9♣ 9♦</code></TableCell>
-                            <TableCell>SB</TableCell>
-                            <TableCell>Call</TableCell>
-                            <TableCell><Badge variant="destructive">❌ No</Badge></TableCell>
-                            <TableCell>Perdí</TableCell>
-                            <TableCell><Badge variant="destructive">❌ No</Badge></TableCell>
+                            <TableCell><Input placeholder="9♣9♦" /></TableCell>
+                            <TableCell><Input placeholder="SB" /></TableCell>
+                            <TableCell><Input placeholder="Call vs 3bet" /></TableCell>
+                            <TableCell><Badge variant="destructive" className="cursor-pointer">❌ No</Badge></TableCell>
+                            <TableCell><Input placeholder="Perdí vs QQ" /></TableCell>
+                            <TableCell className="text-right"><Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
+                <Button variant="outline" className="mt-4 w-full">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Añadir Decisión
+                </Button>
             </CardContent>
         </Card>
 
         <Card>
             <CardHeader>
                 <CardTitle className="font-headline text-2xl">🎯 3. Spots de Fold Equity</CardTitle>
-                <CardDescription>Evalúa la efectividad de tus faroles y semi-faroles. ¿Estás leyendo bien la disposición de tus rivales a foldear?</CardDescription>
+                <CardDescription>Evalúa la efectividad de tus faroles y semi-faroles.</CardDescription>
             </CardHeader>
             <CardContent>
                  <Table>
@@ -111,48 +146,39 @@ export default function StrategicLogPage() {
                         <TableRow>
                             <TableHead>Mano</TableHead>
                             <TableHead>Posición</TableHead>
-                            <TableHead>Stack</TableHead>
+                            <TableHead>Stack (BB)</TableHead>
                             <TableHead>Acción</TableHead>
                             <TableHead>¿Rival foldeó?</TableHead>
-                            <TableHead>Lectura correcta</TableHead>
+                            <TableHead className="text-right">Acción</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
+                        {/* Placeholder for dynamic rows */}
                         <TableRow>
-                            <TableCell><code>K♠ J♠</code></TableCell>
-                            <TableCell>BTN</TableCell>
-                            <TableCell>12bb</TableCell>
-                            <TableCell>Push</TableCell>
-                            <TableCell><Badge variant="default">✅ Sí</Badge></TableCell>
-                            <TableCell><Badge variant="default">✅ Sí</Badge></TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell><code>A♣ T♦</code></TableCell>
-                            <TableCell>CO</TableCell>
-                            <TableCell>10bb</TableCell>
-                            <TableCell>Push</TableCell>
-                            <TableCell><Badge variant="destructive">❌ No</Badge></TableCell>
-                            <TableCell><Badge variant="destructive">❌ No</Badge></TableCell>
+                            <TableCell><Input placeholder="K♠J♠" /></TableCell>
+                            <TableCell><Input placeholder="BTN" /></TableCell>
+                            <TableCell><Input type="number" placeholder="12" /></TableCell>
+                            <TableCell><Input placeholder="Push" /></TableCell>
+                            <TableCell><Badge variant="default" className="cursor-pointer">✅ Sí</Badge></TableCell>
+                            <TableCell className="text-right"><Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
+                 <Button variant="outline" className="mt-4 w-full">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Añadir Spot
+                </Button>
             </CardContent>
         </Card>
 
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline text-2xl">🔍 4. Errores Detectados (Leaks)</CardTitle>
+                <CardTitle className="font-headline text-2xl">🔍 4. Errores Detectados y Leaks</CardTitle>
                 <CardDescription>Sé brutalmente honesto. Identifica tus fugas de dinero (leaks) para poder corregirlas.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                 <div className="p-4 bg-secondary/30 rounded-lg border">
-                    <p className="font-semibold">Ejemplo 1:</p>
-                    <p className="text-muted-foreground">Aposté fuerte con AJ en un board con Q, creyendo que tenía fold equity. El rival ya me ganaba desde el turn y pagó. Error de lectura de la fuerza del rival.</p>
-                </div>
-                 <div className="p-4 bg-secondary/30 rounded-lg border">
-                    <p className="font-semibold">Ejemplo 2:</p>
-                    <p className="text-muted-foreground">No leí el proyecto de escalera en un flop 2-4-5. Seguí apostando con mi overpair y el rival completó su escalera en el river. Error de evaluación de la textura del board.</p>
-                </div>
+                 <Textarea placeholder="Ejemplo: Aposté fuerte con AJ en un board con Q, creyendo que tenía fold equity. El rival ya me ganaba desde el turn y pagó. Error de lectura de la fuerza del rival." />
+                 <Textarea placeholder="Ejemplo: No leí el proyecto de escalera en un flop 2-4-5. Seguí apostando con mi overpair y el rival completó su escalera en el river. Error de evaluación de la textura del board." />
             </CardContent>
         </Card>
 
@@ -168,49 +194,55 @@ export default function StrategicLogPage() {
                             <TableHead>Mano Clave</TableHead>
                             <TableHead>Emoción Sentida</TableHead>
                             <TableHead>¿Decisión Lógica o Emocional?</TableHead>
+                            <TableHead className="text-right">Acción</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
+                        {/* Placeholder for dynamic rows */}
                         <TableRow>
-                            <TableCell><code>A♠ J♠</code></TableCell>
-                            <TableCell>Frustración</TableCell>
-                            <TableCell>Emocional (quería que foldeara, no analicé su rango de call).</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell><code>3♣ 3♦</code></TableCell>
-                            <TableCell>Duda / Inseguridad</TableCell>
-                            <TableCell>Lógica (pago correcto por odds), pero con falta de confianza post-flop.</TableCell>
+                            <TableCell><Input placeholder="A♠J♠" /></TableCell>
+                            <TableCell><Input placeholder="Frustración" /></TableCell>
+                            <TableCell><Input placeholder="Emocional (quería que foldeara)" /></TableCell>
+                            <TableCell className="text-right"><Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
+                 <Button variant="outline" className="mt-4 w-full">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Añadir Registro Emocional
+                </Button>
             </CardContent>
         </Card>
 
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline text-2xl">📈 6. Reflexión Final del Torneo</CardTitle>
+                <CardTitle className="font-headline text-2xl">📈 6. Reflexión Final y Plan de Acción</CardTitle>
                 <CardDescription>Destila las lecciones más importantes de la sesión para aplicarlas en el futuro.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-2">
-                    <label className="font-semibold">¿Qué hice mejor que en torneos anteriores?</label>
+                    <label className="font-semibold text-sm">¿Qué hice mejor que en torneos anteriores?</label>
                     <Textarea placeholder="Ej: Fui más disciplinado en early position, robé más desde el botón..." />
                 </div>
                 <div className="space-y-2">
-                    <label className="font-semibold">¿Qué patrón de error se repitió?</label>
+                    <label className="font-semibold text-sm">¿Qué patrón de error se repitió?</label>
                     <Textarea placeholder="Ej: Volví a pagar de más con proyectos débiles fuera de posición..." />
                 </div>
                 <div className="space-y-2">
-                    <label className="font-semibold">¿Qué ajustaré específicamente en el próximo torneo?</label>
+                    <label className="font-semibold text-sm">¿Qué ajustaré específicamente en el próximo torneo? (Plan de acción)</label>
                     <Textarea placeholder="Ej: Seré más consciente de los tamaños de stack para 3-betear, foldearé AJo a raises de UTG..." />
                 </div>
                  <div className="space-y-2">
-                    <label className="font-semibold">¿Cómo me sentí al terminar?</label>
+                    <label className="font-semibold text-sm">¿Cómo me sentí al terminar?</label>
                     <Textarea placeholder="Ej: Satisfecho con mis decisiones a pesar del resultado, frustrado por un mal beat, etc." />
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                    <Button className="flex-1">Guardar Registro</Button>
+                    <Button variant="destructive" className="flex-1">Borrar Todo</Button>
                 </div>
             </CardContent>
         </Card>
-
     </div>
   );
 }
