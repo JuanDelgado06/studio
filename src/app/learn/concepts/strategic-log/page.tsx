@@ -18,12 +18,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, PlusCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Trash2, Save } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 
 // Define types for our state
 type DecisionRow = { id: number; hand: string; position: string; action: string; ev: boolean; result: string; };
@@ -35,6 +36,7 @@ type NotesData = { errors: string; improvements: string; plan: string; finalFeel
 const LOG_STORAGE_KEY = 'strategic-log-data';
 
 export default function StrategicLogPage() {
+  const { toast } = useToast();
   // State for all form data
   const [generalData, setGeneralData] = useState<GeneralData>({ date: '', tournamentName: '', buyIn: '', playerCount: '', stage: '', stacks: '' });
   const [decisions, setDecisions] = useState<DecisionRow[]>([]);
@@ -59,15 +61,23 @@ export default function StrategicLogPage() {
     }
   }, []);
 
-  // Save data to localStorage whenever it changes
-  useEffect(() => {
+  const handleSave = () => {
     const dataToSave = { generalData, decisions, foldEquitySpots, mindset, notes };
     try {
       window.localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(dataToSave));
+      toast({
+        title: "Registro Guardado",
+        description: "Tu sesión de análisis ha sido guardada en tu navegador.",
+      });
     } catch (error) {
       console.error("Failed to save strategic log to localStorage", error);
+      toast({
+        variant: "destructive",
+        title: "Error al Guardar",
+        description: "No se pudo guardar el registro en el almacenamiento local.",
+      });
     }
-  }, [generalData, decisions, foldEquitySpots, mindset, notes]);
+  };
 
 
   // Generic handler for top-level inputs
@@ -111,6 +121,10 @@ export default function StrategicLogPage() {
         setNotes({ errors: '', improvements: '', plan: '', finalFeeling: '' });
         try {
             window.localStorage.removeItem(LOG_STORAGE_KEY);
+            toast({
+                title: "Registro Borrado",
+                description: "Se han limpiado todos los datos del formulario.",
+            });
         } catch (error) {
             console.error("Failed to clear localStorage", error);
         }
@@ -131,7 +145,7 @@ export default function StrategicLogPage() {
                     📓 Registro Estratégico Interactivo – Torneos
                 </h1>
                 <p className="text-muted-foreground">
-                    Tus datos se guardan automáticamente en tu navegador.
+                    Tus datos se guardan en tu navegador cuando presionas &quot;Guardar&quot;.
                 </p>
             </div>
         </div>
@@ -362,13 +376,18 @@ export default function StrategicLogPage() {
                     />
                 </div>
 
-                <div className="flex gap-4 pt-4">
-                    <Button onClick={clearAll} variant="destructive" className="flex-1">Borrar Todo</Button>
+                <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                    <Button onClick={handleSave} className="flex-1">
+                        <Save className="mr-2 h-4 w-4" />
+                        Guardar Registro
+                    </Button>
+                    <Button onClick={clearAll} variant="destructive" className="flex-1">
+                         <Trash2 className="mr-2 h-4 w-4" />
+                        Borrar Todo
+                    </Button>
                 </div>
             </CardContent>
         </Card>
     </div>
   );
 }
-
-    
