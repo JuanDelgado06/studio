@@ -28,6 +28,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Separator } from '@/components/ui/separator';
 
+const POSITIONS = ['SB', 'BB', 'UTG', 'MP', 'CO', 'BTN'];
+const ACTIONS = ['Fold', 'Call', 'Raise', '3-Bet', '4-Bet', 'All-in', 'Check', 'Bet', 'Push'];
+const STAGES = ['Early', 'Mid', 'Late', 'ITM', 'Final Table (FT)'];
+
 type DecisionRow = { id: number; hand: string; position: string; action: string; ev: boolean; result: string; };
 type FoldEquityRow = { id: number; hand: string; position: string; stack: string; action: string; rivalFolded: boolean; };
 type MindsetRow = { id: number; hand: string; emotion: string; logic: string; };
@@ -73,9 +77,25 @@ export default function StrategicLogPage() {
     }
     setIsLoading(false);
   }, []);
+
+  const handleUpdateCurrentLog = (updateFn: (draft: LogEntry) => void) => {
+      setCurrentLog(prev => {
+          if (!prev) return null;
+          const newLog = JSON.parse(JSON.stringify(prev)); // Deep copy to avoid state mutation issues
+          updateFn(newLog);
+          return newLog;
+      });
+  };
   
   const handleSave = () => {
-    if (!currentLog) return;
+    if (!currentLog || !currentLog.generalData.tournamentName.trim()) {
+        toast({
+            variant: "destructive",
+            title: "Faltan Datos",
+            description: "Por favor, añade al menos un nombre al torneo para guardarlo.",
+        });
+        return;
+    };
     
     setSavedLogs(prevLogs => {
         const existingLogIndex = prevLogs.findIndex(log => log.id === currentLog.id);
@@ -149,15 +169,6 @@ export default function StrategicLogPage() {
       }
   }
 
-  const handleUpdateCurrentLog = (updateFn: (draft: LogEntry) => void) => {
-      setCurrentLog(prev => {
-          if (!prev) return null;
-          const newLog = JSON.parse(JSON.stringify(prev)); // Deep copy to avoid state mutation issues
-          updateFn(newLog);
-          return newLog;
-      });
-  };
-
   if (isLoading || !currentLog) {
       return <div className="flex justify-center items-center h-96"><Loader2 className="h-16 w-16 animate-spin"/></div>
   }
@@ -222,11 +233,7 @@ export default function StrategicLogPage() {
                             <Select value={currentLog.generalData.stage} onValueChange={value => handleUpdateCurrentLog(draft => { draft.generalData.stage = value })}>
                                 <SelectTrigger><SelectValue placeholder="Selecciona etapa..." /></SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="early">Early</SelectItem>
-                                    <SelectItem value="mid">Mid</SelectItem>
-                                    <SelectItem value="late">Late</SelectItem>
-                                    <SelectItem value="itm">ITM</SelectItem>
-                                    <SelectItem value="ft">Final Table (FT)</SelectItem>
+                                    {STAGES.map(stage => <SelectItem key={stage} value={stage.toLowerCase().split(' ')[0]}>{stage}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -258,8 +265,22 @@ export default function StrategicLogPage() {
                                 {currentLog.decisions.map((decision, index) => (
                                     <TableRow key={decision.id}>
                                         <TableCell><Input placeholder="A♠Q♠" value={decision.hand} onChange={e => handleUpdateCurrentLog(draft => { draft.decisions[index].hand = e.target.value })} /></TableCell>
-                                        <TableCell><Input placeholder="CO" value={decision.position} onChange={e => handleUpdateCurrentLog(draft => { draft.decisions[index].position = e.target.value })} /></TableCell>
-                                        <TableCell><Input placeholder="Push" value={decision.action} onChange={e => handleUpdateCurrentLog(draft => { draft.decisions[index].action = e.target.value })} /></TableCell>
+                                        <TableCell>
+                                            <Select value={decision.position} onValueChange={value => handleUpdateCurrentLog(draft => { draft.decisions[index].position = value })}>
+                                                <SelectTrigger><SelectValue placeholder="Pos..." /></SelectTrigger>
+                                                <SelectContent>
+                                                    {POSITIONS.map(pos => <SelectItem key={pos} value={pos}>{pos}</SelectItem>)}
+                                                </SelectContent>
+                                            </Select>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Select value={decision.action} onValueChange={value => handleUpdateCurrentLog(draft => { draft.decisions[index].action = value })}>
+                                                <SelectTrigger><SelectValue placeholder="Acción..." /></SelectTrigger>
+                                                <SelectContent>
+                                                    {ACTIONS.map(act => <SelectItem key={act} value={act}>{act}</SelectItem>)}
+                                                </SelectContent>
+                                            </Select>
+                                        </TableCell>
                                         <TableCell>
                                             <Badge onClick={() => handleUpdateCurrentLog(draft => { draft.decisions[index].ev = !draft.decisions[index].ev })} variant={decision.ev ? "default" : "destructive"} className="cursor-pointer">
                                                 {decision.ev ? '✅ Sí' : '❌ No'}
@@ -301,9 +322,23 @@ export default function StrategicLogPage() {
                                 {currentLog.foldEquitySpots.map((spot, index) => (
                                     <TableRow key={spot.id}>
                                         <TableCell><Input placeholder="K♠J♠" value={spot.hand} onChange={e => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].hand = e.target.value })} /></TableCell>
-                                        <TableCell><Input placeholder="BTN" value={spot.position} onChange={e => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].position = e.target.value })} /></TableCell>
+                                        <TableCell>
+                                            <Select value={spot.position} onValueChange={value => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].position = value })}>
+                                                <SelectTrigger><SelectValue placeholder="Pos..." /></SelectTrigger>
+                                                <SelectContent>
+                                                    {POSITIONS.map(pos => <SelectItem key={pos} value={pos}>{pos}</SelectItem>)}
+                                                </SelectContent>
+                                            </Select>
+                                        </TableCell>
                                         <TableCell><Input type="number" placeholder="12" value={spot.stack} onChange={e => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].stack = e.target.value })} /></TableCell>
-                                        <TableCell><Input placeholder="Push" value={spot.action} onChange={e => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].action = e.target.value })} /></TableCell>
+                                        <TableCell>
+                                            <Select value={spot.action} onValueChange={value => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].action = value })}>
+                                                <SelectTrigger><SelectValue placeholder="Acción..." /></SelectTrigger>
+                                                <SelectContent>
+                                                    {ACTIONS.map(act => <SelectItem key={act} value={act}>{act}</SelectItem>)}
+                                                </SelectContent>
+                                            </Select>
+                                        </TableCell>
                                         <TableCell>
                                             <Badge onClick={() => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].rivalFolded = !draft.foldEquitySpots[index].rivalFolded })} variant={spot.rivalFolded ? "default" : "destructive"} className="cursor-pointer">
                                                 {spot.rivalFolded ? '✅ Sí' : '❌ No'}
