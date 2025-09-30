@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -29,51 +29,92 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 type DecisionRow = { id: number; hand: string; position: string; action: string; ev: boolean; result: string; };
 type FoldEquityRow = { id: number; hand: string; position: string; stack: string; action: string; rivalFolded: boolean; };
 type MindsetRow = { id: number; hand: string; emotion: string; logic: string; };
+type GeneralData = { date: string; tournamentName: string; buyIn: string; playerCount: string; stage: string; stacks: string; };
+type NotesData = { errors: string; improvements: string; plan: string; finalFeeling: string; };
 
-let decisionId = 0;
-let foldEquityId = 0;
-let mindsetId = 0;
+const LOG_STORAGE_KEY = 'strategic-log-data';
 
 export default function StrategicLogPage() {
+  // State for all form data
+  const [generalData, setGeneralData] = useState<GeneralData>({ date: '', tournamentName: '', buyIn: '', playerCount: '', stage: '', stacks: '' });
   const [decisions, setDecisions] = useState<DecisionRow[]>([]);
   const [foldEquitySpots, setFoldEquitySpots] = useState<FoldEquityRow[]>([]);
   const [mindset, setMindset] = useState<MindsetRow[]>([]);
+  const [notes, setNotes] = useState<NotesData>({ errors: '', improvements: '', plan: '', finalFeeling: '' });
+
+  // Load data from localStorage on initial render
+  useEffect(() => {
+    try {
+      const savedData = window.localStorage.getItem(LOG_STORAGE_KEY);
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        setGeneralData(parsedData.generalData || { date: '', tournamentName: '', buyIn: '', playerCount: '', stage: '', stacks: '' });
+        setDecisions(parsedData.decisions || []);
+        setFoldEquitySpots(parsedData.foldEquitySpots || []);
+        setMindset(parsedData.mindset || []);
+        setNotes(parsedData.notes || { errors: '', improvements: '', plan: '', finalFeeling: '' });
+      }
+    } catch (error) {
+      console.error("Failed to load strategic log from localStorage", error);
+    }
+  }, []);
+
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    const dataToSave = { generalData, decisions, foldEquitySpots, mindset, notes };
+    try {
+      window.localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(dataToSave));
+    } catch (error) {
+      console.error("Failed to save strategic log to localStorage", error);
+    }
+  }, [generalData, decisions, foldEquitySpots, mindset, notes]);
+
+
+  // Generic handler for top-level inputs
+  const handleGeneralDataChange = (field: keyof GeneralData, value: string) => {
+    setGeneralData(prev => ({ ...prev, [field]: value }));
+  };
   
+  const handleNotesChange = (field: keyof NotesData, value: string) => {
+      setNotes(prev => ({ ...prev, [field]: value}));
+  }
+
+  // Generic handler to update a row in any table
+  const handleRowChange = <T extends { id: number }>(
+    setter: React.Dispatch<React.SetStateAction<T[]>>,
+    id: number,
+    field: keyof T,
+    value: any
+  ) => {
+    setter(prev => prev.map(row => (row.id === id ? { ...row, [field]: value } : row)));
+  };
+
+
   // Handlers for Decisions Table
-  const addDecision = () => {
-    setDecisions([...decisions, { id: decisionId++, hand: '', position: '', action: '', ev: true, result: '' }]);
-  };
-  const removeDecision = (id: number) => {
-    setDecisions(decisions.filter(d => d.id !== id));
-  };
-  const toggleDecisionEv = (id: number) => {
-    setDecisions(decisions.map(d => d.id === id ? { ...d, ev: !d.ev } : d));
-  };
+  const addDecision = () => setDecisions(prev => [...prev, { id: Date.now(), hand: '', position: '', action: '', ev: true, result: '' }]);
+  const removeDecision = (id: number) => setDecisions(prev => prev.filter(d => d.id !== id));
 
   // Handlers for Fold Equity Table
-  const addFoldEquitySpot = () => {
-    setFoldEquitySpots([...foldEquitySpots, { id: foldEquityId++, hand: '', position: '', stack: '', action: '', rivalFolded: true }]);
-  };
-  const removeFoldEquitySpot = (id: number) => {
-    setFoldEquitySpots(foldEquitySpots.filter(spot => spot.id !== id));
-  };
-  const toggleFoldEquityRivalFolded = (id: number) => {
-    setFoldEquitySpots(foldEquitySpots.map(spot => spot.id === id ? { ...spot, rivalFolded: !spot.rivalFolded } : spot));
-  };
-
+  const addFoldEquitySpot = () => setFoldEquitySpots(prev => [...prev, { id: Date.now(), hand: '', position: '', stack: '', action: '', rivalFolded: true }]);
+  const removeFoldEquitySpot = (id: number) => setFoldEquitySpots(prev => prev.filter(spot => spot.id !== id));
+  
   // Handlers for Mindset Table
-  const addMindsetRow = () => {
-      setMindset([...mindset, {id: mindsetId++, hand: '', emotion: '', logic: ''}]);
-  }
-  const removeMindsetRow = (id: number) => {
-      setMindset(mindset.filter(m => m.id !== id));
-  }
+  const addMindsetRow = () => setMindset(prev => [...prev, { id: Date.now(), hand: '', emotion: '', logic: '' }]);
+  const removeMindsetRow = (id: number) => setMindset(prev => prev.filter(m => m.id !== id));
 
   const clearAll = () => {
-      setDecisions([]);
-      setFoldEquitySpots([]);
-      setMindset([]);
-      // Consider clearing textareas and inputs too if needed
+    if (window.confirm("¿Estás seguro de que quieres borrar todos los datos del registro? Esta acción no se puede deshacer.")) {
+        setGeneralData({ date: '', tournamentName: '', buyIn: '', playerCount: '', stage: '', stacks: '' });
+        setDecisions([]);
+        setFoldEquitySpots([]);
+        setMindset([]);
+        setNotes({ errors: '', improvements: '', plan: '', finalFeeling: '' });
+        try {
+            window.localStorage.removeItem(LOG_STORAGE_KEY);
+        } catch (error) {
+            console.error("Failed to clear localStorage", error);
+        }
+    }
   }
 
   return (
@@ -90,7 +131,7 @@ export default function StrategicLogPage() {
                     📓 Registro Estratégico Interactivo – Torneos
                 </h1>
                 <p className="text-muted-foreground">
-                    Utiliza esta herramienta para analizar tu juego, detectar patrones y acelerar tu mejora.
+                    Tus datos se guardan automáticamente en tu navegador.
                 </p>
             </div>
         </div>
@@ -104,23 +145,23 @@ export default function StrategicLogPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="space-y-1.5">
                         <label className="text-sm font-medium">Fecha</label>
-                        <Input type="date" />
+                        <Input type="date" value={generalData.date} onChange={e => handleGeneralDataChange('date', e.target.value)} />
                     </div>
                     <div className="space-y-1.5">
                         <label className="text-sm font-medium">Nombre/ID del Torneo</label>
-                        <Input placeholder="Ej: Daily Freeroll" />
+                        <Input placeholder="Ej: Daily Freeroll" value={generalData.tournamentName} onChange={e => handleGeneralDataChange('tournamentName', e.target.value)} />
                     </div>
                     <div className="space-y-1.5">
                         <label className="text-sm font-medium">Buy-in</label>
-                        <Input placeholder="Ej: 10 USDT" />
+                        <Input placeholder="Ej: 10 USDT" value={generalData.buyIn} onChange={e => handleGeneralDataChange('buyIn', e.target.value)} />
                     </div>
                      <div className="space-y-1.5">
                         <label className="text-sm font-medium">Nº de Jugadores</label>
-                        <Input type="number" placeholder="Ej: 500" />
+                        <Input type="number" placeholder="Ej: 500" value={generalData.playerCount} onChange={e => handleGeneralDataChange('playerCount', e.target.value)} />
                     </div>
                     <div className="space-y-1.5">
                         <label className="text-sm font-medium">Etapa Alcanzada</label>
-                        <Select>
+                        <Select value={generalData.stage} onValueChange={value => handleGeneralDataChange('stage', value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Selecciona etapa..." />
                             </SelectTrigger>
@@ -135,7 +176,7 @@ export default function StrategicLogPage() {
                     </div>
                      <div className="space-y-1.5">
                         <label className="text-sm font-medium">Stack Inicial / Final</label>
-                        <Input placeholder="Ej: 1000 / 0" />
+                        <Input placeholder="Ej: 1000 / 0" value={generalData.stacks} onChange={e => handleGeneralDataChange('stacks', e.target.value)} />
                     </div>
                 </div>
             </CardContent>
@@ -161,15 +202,15 @@ export default function StrategicLogPage() {
                     <TableBody>
                         {decisions.map(decision => (
                              <TableRow key={decision.id}>
-                                <TableCell><Input placeholder="A♠Q♠" /></TableCell>
-                                <TableCell><Input placeholder="CO" /></TableCell>
-                                <TableCell><Input placeholder="Push" /></TableCell>
+                                <TableCell><Input placeholder="A♠Q♠" value={decision.hand} onChange={e => handleRowChange(setDecisions, decision.id, 'hand', e.target.value)} /></TableCell>
+                                <TableCell><Input placeholder="CO" value={decision.position} onChange={e => handleRowChange(setDecisions, decision.id, 'position', e.target.value)} /></TableCell>
+                                <TableCell><Input placeholder="Push" value={decision.action} onChange={e => handleRowChange(setDecisions, decision.id, 'action', e.target.value)} /></TableCell>
                                 <TableCell>
-                                    <Badge onClick={() => toggleDecisionEv(decision.id)} variant={decision.ev ? "default" : "destructive"} className="cursor-pointer">
+                                    <Badge onClick={() => handleRowChange(setDecisions, decision.id, 'ev', !decision.ev)} variant={decision.ev ? "default" : "destructive"} className="cursor-pointer">
                                         {decision.ev ? '✅ Sí' : '❌ No'}
                                     </Badge>
                                 </TableCell>
-                                <TableCell><Input placeholder="Perdí vs KK" /></TableCell>
+                                <TableCell><Input placeholder="Perdí vs KK" value={decision.result} onChange={e => handleRowChange(setDecisions, decision.id, 'result', e.target.value)} /></TableCell>
                                 <TableCell className="text-right">
                                     <Button onClick={() => removeDecision(decision.id)} variant="ghost" size="icon">
                                         <Trash2 className="h-4 w-4 text-destructive" />
@@ -206,12 +247,12 @@ export default function StrategicLogPage() {
                     <TableBody>
                         {foldEquitySpots.map(spot => (
                             <TableRow key={spot.id}>
-                                <TableCell><Input placeholder="K♠J♠" /></TableCell>
-                                <TableCell><Input placeholder="BTN" /></TableCell>
-                                <TableCell><Input type="number" placeholder="12" /></TableCell>
-                                <TableCell><Input placeholder="Push" /></TableCell>
+                                <TableCell><Input placeholder="K♠J♠" value={spot.hand} onChange={e => handleRowChange(setFoldEquitySpots, spot.id, 'hand', e.target.value)} /></TableCell>
+                                <TableCell><Input placeholder="BTN" value={spot.position} onChange={e => handleRowChange(setFoldEquitySpots, spot.id, 'position', e.target.value)} /></TableCell>
+                                <TableCell><Input type="number" placeholder="12" value={spot.stack} onChange={e => handleRowChange(setFoldEquitySpots, spot.id, 'stack', e.target.value)} /></TableCell>
+                                <TableCell><Input placeholder="Push" value={spot.action} onChange={e => handleRowChange(setFoldEquitySpots, spot.id, 'action', e.target.value)} /></TableCell>
                                 <TableCell>
-                                    <Badge onClick={() => toggleFoldEquityRivalFolded(spot.id)} variant={spot.rivalFolded ? "default" : "destructive"} className="cursor-pointer">
+                                    <Badge onClick={() => handleRowChange(setFoldEquitySpots, spot.id, 'rivalFolded', !spot.rivalFolded)} variant={spot.rivalFolded ? "default" : "destructive"} className="cursor-pointer">
                                         {spot.rivalFolded ? '✅ Sí' : '❌ No'}
                                     </Badge>
                                 </TableCell>
@@ -237,8 +278,11 @@ export default function StrategicLogPage() {
                 <CardDescription>Sé brutalmente honesto. Identifica tus fugas de dinero (leaks) para poder corregirlas.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                 <Textarea placeholder="Ejemplo: Aposté fuerte con AJ en un board con Q, creyendo que tenía fold equity. El rival ya me ganaba desde el turn y pagó. Error de lectura de la fuerza del rival." />
-                 <Textarea placeholder="Ejemplo: No leí el proyecto de escalera en un flop 2-4-5. Seguí apostando con mi overpair y el rival completó su escalera en el river. Error de evaluación de la textura del board." />
+                 <Textarea 
+                    placeholder="Ejemplo: Aposté fuerte con AJ en un board con Q, creyendo que tenía fold equity. El rival ya me ganaba desde el turn y pagó. Error de lectura de la fuerza del rival." 
+                    value={notes.errors}
+                    onChange={e => handleNotesChange('errors', e.target.value)}
+                 />
             </CardContent>
         </Card>
 
@@ -260,9 +304,9 @@ export default function StrategicLogPage() {
                     <TableBody>
                         {mindset.map(m => (
                             <TableRow key={m.id}>
-                                <TableCell><Input placeholder="A♠J♠" /></TableCell>
-                                <TableCell><Input placeholder="Frustración" /></TableCell>
-                                <TableCell><Input placeholder="Emocional (quería que foldeara)" /></TableCell>
+                                <TableCell><Input placeholder="A♠J♠" value={m.hand} onChange={e => handleRowChange(setMindset, m.id, 'hand', e.target.value)} /></TableCell>
+                                <TableCell><Input placeholder="Frustración" value={m.emotion} onChange={e => handleRowChange(setMindset, m.id, 'emotion', e.target.value)} /></TableCell>
+                                <TableCell><Input placeholder="Emocional (quería que foldeara)" value={m.logic} onChange={e => handleRowChange(setMindset, m.id, 'logic', e.target.value)} /></TableCell>
                                 <TableCell className="text-right">
                                     <Button onClick={() => removeMindsetRow(m.id)} variant="ghost" size="icon">
                                         <Trash2 className="h-4 w-4 text-destructive" />
@@ -287,23 +331,38 @@ export default function StrategicLogPage() {
             <CardContent className="space-y-6">
                 <div className="space-y-2">
                     <label className="font-semibold text-sm">¿Qué hice mejor que en torneos anteriores?</label>
-                    <Textarea placeholder="Ej: Fui más disciplinado en early position, robé más desde el botón..." />
+                    <Textarea 
+                        placeholder="Ej: Fui más disciplinado en early position, robé más desde el botón..." 
+                        value={notes.improvements}
+                        onChange={e => handleNotesChange('improvements', e.target.value)}
+                    />
                 </div>
                 <div className="space-y-2">
                     <label className="font-semibold text-sm">¿Qué patrón de error se repitió?</label>
-                    <Textarea placeholder="Ej: Volví a pagar de más con proyectos débiles fuera de posición..." />
+                    <Textarea 
+                        placeholder="Ej: Volví a pagar de más con proyectos débiles fuera de posición..." 
+                        value={notes.errors}
+                        onChange={e => handleNotesChange('errors', e.target.value)}
+                    />
                 </div>
                 <div className="space-y-2">
                     <label className="font-semibold text-sm">¿Qué ajustaré específicamente en el próximo torneo? (Plan de acción)</label>
-                    <Textarea placeholder="Ej: Seré más consciente de los tamaños de stack para 3-betear, foldearé AJo a raises de UTG..." />
+                    <Textarea 
+                        placeholder="Ej: Seré más consciente de los tamaños de stack para 3-betear, foldearé AJo a raises de UTG..." 
+                        value={notes.plan}
+                        onChange={e => handleNotesChange('plan', e.target.value)}
+                    />
                 </div>
                  <div className="space-y-2">
                     <label className="font-semibold text-sm">¿Cómo me sentí al terminar?</label>
-                    <Textarea placeholder="Ej: Satisfecho con mis decisiones a pesar del resultado, frustrado por un mal beat, etc." />
+                    <Textarea 
+                        placeholder="Ej: Satisfecho con mis decisiones a pesar del resultado, frustrado por un mal beat, etc." 
+                        value={notes.finalFeeling}
+                        onChange={e => handleNotesChange('finalFeeling', e.target.value)}
+                    />
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                    <Button className="flex-1">Guardar Registro</Button>
                     <Button onClick={clearAll} variant="destructive" className="flex-1">Borrar Todo</Button>
                 </div>
             </CardContent>
@@ -311,3 +370,5 @@ export default function StrategicLogPage() {
     </div>
   );
 }
+
+    
