@@ -18,7 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, PlusCircle, Trash2, Save, FilePlus, Loader2, BookOpen, GripVertical } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Trash2, Save, FilePlus, Loader2, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
@@ -69,7 +69,7 @@ const HandSelector: React.FC<{ selectedHand: string; onSelect: (hand: string) =>
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-2">
-                <div className="grid grid-cols-13 gap-1 font-mono text-xs">
+                <div className="grid grid-cols-13 gap-0.5 sm:gap-1 font-mono text-xs">
                     {RANKS.map((rowRank, i) =>
                         RANKS.map((colRank, j) => {
                             let hand: string;
@@ -96,7 +96,7 @@ const HandSelector: React.FC<{ selectedHand: string; onSelect: (hand: string) =>
                                         setIsOpen(false);
                                     }}
                                     className={cn(
-                                        'flex h-8 w-8 items-center justify-center rounded-md border text-center font-bold transition-colors',
+                                        'flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-sm border text-center font-bold transition-colors',
                                         handType === 'pair' && 'bg-primary/10 border-primary/30',
                                         handType === 'suited' && 'bg-sky-500/10 border-sky-500/30',
                                         handType === 'offsuit' && 'bg-zinc-500/10 border-zinc-500/30',
@@ -533,3 +533,5 @@ export default function StrategicLogPage() {
     </div>
   );
 }
+
+    
