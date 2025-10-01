@@ -18,7 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, PlusCircle, Trash2, Save, FilePlus, Loader2, BookOpen } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Trash2, Save, FilePlus, Loader2, BookOpen, GripVertical } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,10 +27,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Separator } from '@/components/ui/separator';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 const POSITIONS = ['SB', 'BB', 'UTG', 'MP', 'CO', 'BTN'];
 const ACTIONS = ['Fold', 'Call', 'Raise', '3-Bet', '4-Bet', 'All-in', 'Check', 'Bet', 'Push'];
 const STAGES = ['Early', 'Mid', 'Late', 'ITM', 'Final Table (FT)'];
+const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 
 type DecisionRow = { id: number; hand: string; position: string; action: string; ev: boolean; result: string; };
 type FoldEquityRow = { id: number; hand: string; position: string; stack: string; action: string; rivalFolded: boolean; };
@@ -56,6 +59,64 @@ const createNewLogEntry = (): LogEntry => ({
     notes: { errors: '', improvements: '', plan: '', finalFeeling: '' },
 });
 
+const HandSelector: React.FC<{ selectedHand: string; onSelect: (hand: string) => void }> = ({ selectedHand, onSelect }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+            <PopoverTrigger asChild>
+                <Button variant="outline" className="w-[100px] justify-start font-mono">
+                    {selectedHand || <span className="text-muted-foreground">Mano...</span>}
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-2">
+                <div className="grid grid-cols-13 gap-1 font-mono text-xs">
+                    {RANKS.map((rowRank, i) =>
+                        RANKS.map((colRank, j) => {
+                            let hand: string;
+                            let handType: 'pair' | 'suited' | 'offsuit';
+
+                            if (i < j) {
+                                hand = `${rowRank}${colRank}s`; // Suited
+                                handType = 'suited';
+                            } else if (i > j) {
+                                hand = `${colRank}${rowRank}o`; // Offsuit
+                                handType = 'offsuit';
+                            } else {
+                                hand = `${rowRank}${colRank}`; // Pair
+                                handType = 'pair';
+                            }
+                            
+                            const isSelected = hand === selectedHand;
+
+                            return (
+                                <button
+                                    key={hand}
+                                    onClick={() => {
+                                        onSelect(hand);
+                                        setIsOpen(false);
+                                    }}
+                                    className={cn(
+                                        'flex h-8 w-8 items-center justify-center rounded-md border text-center font-bold transition-colors',
+                                        handType === 'pair' && 'bg-primary/10 border-primary/30',
+                                        handType === 'suited' && 'bg-sky-500/10 border-sky-500/30',
+                                        handType === 'offsuit' && 'bg-zinc-500/10 border-zinc-500/30',
+                                        isSelected && 'ring-2 ring-accent bg-accent text-accent-foreground',
+                                        'hover:bg-accent hover:text-accent-foreground'
+                                    )}
+                                    title={hand}
+                                >
+                                    {hand.slice(0, 2)}
+                                </button>
+                            );
+                        })
+                    )}
+                </div>
+            </PopoverContent>
+        </Popover>
+    );
+};
+
+
 export default function StrategicLogPage() {
   const { toast } = useToast();
   
@@ -64,12 +125,14 @@ export default function StrategicLogPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
     try {
       const savedData = window.localStorage.getItem(LOGS_STORAGE_KEY);
       if (savedData) {
         setSavedLogs(JSON.parse(savedData));
       }
       const newEntry = createNewLogEntry();
+       // Set date on client side to avoid hydration mismatch
       newEntry.generalData.date = new Date().toISOString().split('T')[0];
       setCurrentLog(newEntry);
     } catch (error) {
@@ -264,7 +327,9 @@ export default function StrategicLogPage() {
                             <TableBody>
                                 {currentLog.decisions.map((decision, index) => (
                                     <TableRow key={decision.id}>
-                                        <TableCell><Input placeholder="A♠Q♠" value={decision.hand} onChange={e => handleUpdateCurrentLog(draft => { draft.decisions[index].hand = e.target.value })} /></TableCell>
+                                        <TableCell>
+                                            <HandSelector selectedHand={decision.hand} onSelect={hand => handleUpdateCurrentLog(draft => { draft.decisions[index].hand = hand })} />
+                                        </TableCell>
                                         <TableCell>
                                             <Select value={decision.position} onValueChange={value => handleUpdateCurrentLog(draft => { draft.decisions[index].position = value })}>
                                                 <SelectTrigger><SelectValue placeholder="Pos..." /></SelectTrigger>
@@ -321,7 +386,9 @@ export default function StrategicLogPage() {
                             <TableBody>
                                 {currentLog.foldEquitySpots.map((spot, index) => (
                                     <TableRow key={spot.id}>
-                                        <TableCell><Input placeholder="K♠J♠" value={spot.hand} onChange={e => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].hand = e.target.value })} /></TableCell>
+                                        <TableCell>
+                                            <HandSelector selectedHand={spot.hand} onSelect={hand => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].hand = hand })} />
+                                        </TableCell>
                                         <TableCell>
                                             <Select value={spot.position} onValueChange={value => handleUpdateCurrentLog(draft => { draft.foldEquitySpots[index].position = value })}>
                                                 <SelectTrigger><SelectValue placeholder="Pos..." /></SelectTrigger>
@@ -374,7 +441,9 @@ export default function StrategicLogPage() {
                             <TableBody>
                                 {currentLog.mindset.map((m, index) => (
                                     <TableRow key={m.id}>
-                                        <TableCell><Input placeholder="A♠J♠" value={m.hand} onChange={e => handleUpdateCurrentLog(draft => { draft.mindset[index].hand = e.target.value })} /></TableCell>
+                                        <TableCell>
+                                            <HandSelector selectedHand={m.hand} onSelect={hand => handleUpdateCurrentLog(draft => { draft.mindset[index].hand = hand })} />
+                                        </TableCell>
                                         <TableCell><Input placeholder="Frustración" value={m.emotion} onChange={e => handleUpdateCurrentLog(draft => { draft.mindset[index].emotion = e.target.value })} /></TableCell>
                                         <TableCell><Input placeholder="Emocional (quería que foldeara)" value={m.logic} onChange={e => handleUpdateCurrentLog(draft => { draft.mindset[index].logic = e.target.value })} /></TableCell>
                                         <TableCell className="text-right">
