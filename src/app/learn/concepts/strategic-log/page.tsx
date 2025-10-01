@@ -131,10 +131,12 @@ export default function StrategicLogPage() {
       if (savedData) {
         setSavedLogs(JSON.parse(savedData));
       }
+      
       const newEntry = createNewLogEntry();
-       // Set date on client side to avoid hydration mismatch
+      // Set date on client side to avoid hydration mismatch
       newEntry.generalData.date = new Date().toISOString().split('T')[0];
       setCurrentLog(newEntry);
+
     } catch (error) {
       console.error("Failed to load strategic logs from localStorage", error);
     }
@@ -521,14 +523,83 @@ export default function StrategicLogPage() {
                                         <Badge variant="secondary" className="mt-1 sm:mt-0">{log.generalData.date}</Badge>
                                     </div>
                                 </AccordionTrigger>
-                                <AccordionContent className="p-4 bg-secondary/20 rounded-md">
+                                <AccordionContent className="p-4 bg-secondary/20 rounded-md space-y-6">
                                     <div className="flex gap-2 mb-4">
                                          <Button onClick={() => handleLoadLog(log.id)}><BookOpen className="mr-2 h-4 w-4" /> Cargar para Editar</Button>
                                          <Button onClick={() => handleDeleteLog(log.id)} variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Eliminar</Button>
                                     </div>
-                                    <h4 className="font-bold mb-2">Detalles del Registro:</h4>
-                                    <p className="text-sm text-muted-foreground"><strong>Etapa alcanzada:</strong> {log.generalData.stage}</p>
-                                    <p className="text-sm text-muted-foreground"><strong>Plan de acción:</strong> {log.notes.plan || "N/A"}</p>
+                                    
+                                    {/* General Data Display */}
+                                    <div className='space-y-2'>
+                                        <h4 className="font-headline text-lg font-semibold">🧩 Datos Generales</h4>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+                                            <p><strong className="text-muted-foreground">Buy-in:</strong> {log.generalData.buyIn || 'N/A'}</p>
+                                            <p><strong className="text-muted-foreground">Jugadores:</strong> {log.generalData.playerCount || 'N/A'}</p>
+                                            <p><strong className="text-muted-foreground">Etapa:</strong> {log.generalData.stage || 'N/A'}</p>
+                                            <p><strong className="text-muted-foreground">Stacks:</strong> {log.generalData.stacks || 'N/A'}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Decisions Table Display */}
+                                    {log.decisions.length > 0 && <div>
+                                        <h4 className="font-headline text-lg font-semibold mb-2">🧠 Decisiones Clave</h4>
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Mano</TableHead><TableHead>Pos</TableHead><TableHead>Acción</TableHead><TableHead>EV+</TableHead><TableHead>Resultado</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {log.decisions.map(d => <TableRow key={d.id}>
+                                                    <TableCell className="font-mono">{d.hand}</TableCell><TableCell>{d.position}</TableCell><TableCell>{d.action}</TableCell><TableCell>{d.ev ? '✅' : '❌'}</TableCell><TableCell>{d.result}</TableCell>
+                                                </TableRow>)}
+                                            </TableBody>
+                                        </Table>
+                                    </div>}
+
+                                    {/* Fold Equity Display */}
+                                     {log.foldEquitySpots.length > 0 && <div>
+                                        <h4 className="font-headline text-lg font-semibold mb-2">🎯 Spots de Fold Equity</h4>
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Mano</TableHead><TableHead>Pos</TableHead><TableHead>Stack</TableHead><TableHead>Acción</TableHead><TableHead>¿Fold?</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {log.foldEquitySpots.map(s => <TableRow key={s.id}>
+                                                    <TableCell className="font-mono">{s.hand}</TableCell><TableCell>{s.position}</TableCell><TableCell>{s.stack} BB</TableCell><TableCell>{s.action}</TableCell><TableCell>{s.rivalFolded ? '✅' : '❌'}</TableCell>
+                                                </TableRow>)}
+                                            </TableBody>
+                                        </Table>
+                                    </div>}
+                                    
+                                     {/* Mindset Display */}
+                                     {log.mindset.length > 0 && <div>
+                                        <h4 className="font-headline text-lg font-semibold mb-2">💭 Estado Emocional</h4>
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Mano</TableHead><TableHead>Emoción</TableHead><TableHead>Lógica/Emoción</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {log.mindset.map(m => <TableRow key={m.id}>
+                                                    <TableCell className="font-mono">{m.hand}</TableCell><TableCell>{m.emotion}</TableCell><TableCell>{m.logic}</TableCell>
+                                                </TableRow>)}
+                                            </TableBody>
+                                        </Table>
+                                    </div>}
+                                    
+                                    {/* Notes Display */}
+                                    <div className="space-y-3 text-sm">
+                                        <h4 className="font-headline text-lg font-semibold">📈 Reflexión Final</h4>
+                                        <div><strong className="text-muted-foreground block">Errores detectados:</strong><p className="whitespace-pre-wrap">{log.notes.errors || 'N/A'}</p></div>
+                                        <div><strong className="text-muted-foreground block">Mejoras:</strong><p className="whitespace-pre-wrap">{log.notes.improvements || 'N/A'}</p></div>
+                                        <div><strong className="text-muted-foreground block">Plan de acción:</strong><p className="whitespace-pre-wrap">{log.notes.plan || 'N/A'}</p></div>
+                                        <div><strong className="text-muted-foreground block">Sentimiento final:</strong><p className="whitespace-pre-wrap">{log.notes.finalFeeling || 'N/A'}</p></div>
+                                    </div>
+
                                 </AccordionContent>
                             </AccordionItem>
                          ))}
@@ -542,7 +613,5 @@ export default function StrategicLogPage() {
     </div>
   );
 }
-
-    
 
     
