@@ -273,6 +273,7 @@ export default function StrategicLogPage() {
                 <Card className="mb-6">
                     <CardHeader>
                         <CardTitle className="font-headline text-xl">🧩 1. Datos Generales del Torneo</CardTitle>
+                        <CardDescription>Registra los datos básicos para contextualizar y encontrar tus sesiones de juego fácilmente.</CardDescription>
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="space-y-1.5">
@@ -311,6 +312,7 @@ export default function StrategicLogPage() {
                 <Card className="mb-6">
                     <CardHeader>
                         <CardTitle className="font-headline text-xl">🧠 2. Decisiones Clave Tomadas</CardTitle>
+                        <CardDescription>Anota las manos más importantes o dudosas, sin importar el resultado. El objetivo es analizar la calidad de la decisión.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Table>
@@ -369,7 +371,10 @@ export default function StrategicLogPage() {
 
                  {/* Other Cards similarly */}
                  <Card className="mb-6">
-                    <CardHeader><CardTitle className="font-headline text-xl">🎯 3. Spots de Fold Equity</CardTitle></CardHeader>
+                    <CardHeader>
+                        <CardTitle className="font-headline text-xl">🎯 3. Spots de Fold Equity</CardTitle>
+                        <CardDescription>Analiza los momentos en que intentaste robar el bote con un 'push' o 'bluff'. ¿Funcionó? ¿Tu lectura del rival fue correcta?</CardDescription>
+                    </CardHeader>
                     <CardContent>
                         {/* Fold Equity Table */}
                         <Table>
@@ -427,7 +432,10 @@ export default function StrategicLogPage() {
                  </Card>
 
                  <Card className="mb-6">
-                    <CardHeader><CardTitle className="font-headline text-xl">💭 4. Estado Emocional (Mindset)</CardTitle></CardHeader>
+                    <CardHeader>
+                        <CardTitle className="font-headline text-xl">💭 4. Estado Emocional (Mindset)</CardTitle>
+                        <CardDescription>Sé honesto. Identificar si una decisión fue impulsada por la lógica o por la emoción (tilt, frustración, miedo) es clave para mejorar tu juego mental.</CardDescription>
+                    </CardHeader>
                     <CardContent>
                         <Table>
                              <TableHeader>
@@ -465,6 +473,7 @@ export default function StrategicLogPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="font-headline text-xl">📈 5. Reflexión Final y Plan de Acción</CardTitle>
+                        <CardDescription>Este es el paso más importante. Consolida tu aprendizaje, detecta patrones y crea un plan concreto para tu próxima sesión.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="space-y-2">
@@ -533,5 +542,7 @@ export default function StrategicLogPage() {
     </div>
   );
 }
+
+    
 
     
