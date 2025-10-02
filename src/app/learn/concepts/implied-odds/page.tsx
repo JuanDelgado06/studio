@@ -17,7 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BrainCircuit, Search, ShieldAlert, Target, TrendingDown, TrendingUp, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, Search, Shield, ShieldAlert, Sword, Target, TrendingDown, TrendingUp, CheckCircle, XCircle, Calculator, Scale, AlertOctagon } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 
@@ -33,24 +33,6 @@ const gVsEData = [
     filosofia: 'Maximiza errores del rival',
   },
 ];
-
-const comparisonData = [
-    {
-        concepto: "Pot Odds",
-        considera: "Solo el bote actual",
-        cuando: "Decisiones inmediatas"
-    },
-    {
-        concepto: "Implied Odds",
-        considera: "Bote + apuestas futuras esperadas",
-        cuando: "Proyectos con potencial oculto"
-    },
-    {
-        concepto: "Reverse Implied Odds",
-        considera: "Pérdidas si conectas pero no ganas",
-        cuando: "Evitar manos dominadas"
-    }
-]
 
 export default function ImpliedOddsPage() {
   return (
@@ -128,61 +110,76 @@ export default function ImpliedOddsPage() {
 
        <Card>
         <CardHeader>
-          <CardTitle className="font-headline text-2xl">🧠 Comparación rápida</CardTitle>
+          <CardTitle className="font-headline text-2xl">🧠 Comparación Detallada de Odds</CardTitle>
+           <CardDescription>Entender las diferencias entre los tipos de "odds" es clave para tomar decisiones precisas en la mesa.</CardDescription>
         </CardHeader>
-        <CardContent>
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Concepto</TableHead>
-                        <TableHead>¿Qué considera?</TableHead>
-                        <TableHead>¿Cuándo se usa?</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {comparisonData.map(item => (
-                        <TableRow key={item.concepto}>
-                            <TableCell className="font-semibold">{item.concepto}</TableCell>
-                            <TableCell>{item.considera}</TableCell>
-                            <TableCell>{item.cuando}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-            <div className="mt-6 rounded-lg border border-primary/30 bg-primary/10 p-4 text-center">
-                <h4 className="font-headline text-lg font-semibold text-primary-foreground">✅ Decisión rentable</h4>
-                <p className="text-primary-foreground/90 mt-2">Si tu <span className="font-bold">equity × Implied Odds > cantidad a pagar</span>, el call puede ser rentable (EV+), incluso si las *Pot Odds* dicen que no.</p>
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
+           <div className="flex flex-col p-4 rounded-lg border bg-secondary/30">
+                <div className="flex items-center gap-3 mb-2">
+                    <Calculator className="h-7 w-7 text-primary" />
+                    <h4 className="font-headline text-lg font-semibold">Pot Odds</h4>
+                </div>
+                <p className="text-sm text-muted-foreground flex-grow">Miden la rentabilidad inmediata de un call. Comparan el tamaño del bote con el costo de la apuesta. Son puramente matemáticas y objetivas.</p>
+                <div className="mt-4 p-2 bg-background/50 rounded text-center text-xs"><strong className="block text-primary">Pregunta Clave:</strong> "¿El bote me paga lo suficiente AHORA MISMO para justificar este call?"</div>
+            </div>
+             <div className="flex flex-col p-4 rounded-lg border-2 border-primary bg-primary/10">
+                <div className="flex items-center gap-3 mb-2">
+                    <TrendingUp className="h-7 w-7 text-primary" />
+                    <h4 className="font-headline text-lg font-semibold text-primary-foreground">Implied Odds</h4>
+                </div>
+                <p className="text-sm text-foreground/80 flex-grow">Estiman las ganancias futuras potenciales si completas tu proyecto. Son subjetivas y dependen de tu lectura del rival y la situación.</p>
+                 <div className="mt-4 p-2 bg-background/50 rounded text-center text-xs"><strong className="block text-primary">Pregunta Clave:</strong> "Si conecto mi mano, ¿cuánto MÁS podré extraer de mi rival en las siguientes calles?"</div>
+            </div>
+             <div className="flex flex-col p-4 rounded-lg border bg-destructive/30">
+                <div className="flex items-center gap-3 mb-2">
+                    <AlertOctagon className="h-7 w-7 text-destructive" />
+                    <h4 className="font-headline text-lg font-semibold">Reverse Implied Odds</h4>
+                </div>
+                <p className="text-sm text-muted-foreground flex-grow">Calculan el riesgo de pérdida futura. Ocurren cuando conectas una mano buena, pero no la mejor, y terminas pagando apuestas grandes a un rival que te domina.</p>
+                <div className="mt-4 p-2 bg-background/50 rounded text-center text-xs"><strong className="block text-destructive">Pregunta Clave:</strong> "Si conecto mi mano, ¿cuánto podría perder si mi rival tiene una mano todavía mejor?"</div>
             </div>
         </CardContent>
       </Card>
       
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline text-2xl">🎯 ¿Por qué las Implied Odds son explotativas?</CardTitle>
+          <CardTitle className="font-headline text-2xl">🎯 El Duelo: GTO vs. Juego Explotativo</CardTitle>
            <CardDescription>
-                El enfoque GTO (Game Theory Optimal) busca equilibrio: jugar de forma que no puedas ser explotado, sin asumir errores del rival. En cambio, las Implied Odds sí asumen que el rival cometerá errores — como pagar de más cuando conectas tu proyecto — y tú los capitalizas.
+                Las Implied Odds son el corazón del juego explotativo. Se basan en la suposición fundamental de que tu rival cometerá errores que tú puedes capitalizar.
             </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Enfoque</TableHead>
-                <TableHead>Uso de Implied Odds</TableHead>
-                <TableHead>Filosofía de juego</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {gVsEData.map((item) => (
-                <TableRow key={item.enfoque}>
-                  <TableCell className="font-semibold">{item.enfoque}</TableCell>
-                  <TableCell>{item.uso}</TableCell>
-                  <TableCell>{item.filosofia}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-           <p className="mt-4 text-center font-semibold text-muted-foreground">Conclusión: Las Implied Odds son una herramienta clave en el juego explotativo, especialmente en torneos, freerolls y mesas con rivales recreativos. Te permiten tomar decisiones EV+ basadas en lectura, posición y perfil del rival.</p>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 rounded-lg border border-sky-500/30 bg-sky-900/10 space-y-4">
+                <div className="flex items-center gap-3">
+                    <Shield className="h-8 w-8 text-sky-400" />
+                    <h3 className="font-headline text-2xl text-sky-400">Juego GTO (Teórico)</h3>
+                </div>
+                <p className="text-sky-200/80">
+                    GTO (Game Theory Optimal) es una estrategia de equilibrio. Su objetivo es jugar de una manera tan perfecta que seas **inexplotable**, sin importar cómo juegue tu oponente.
+                </p>
+                <ul className="list-disc list-inside space-y-2 text-sm text-sky-200/90">
+                    <li><strong className="text-sky-300">Filosofía:</strong> "Jugaré mis rangos de forma tan balanceada que mis rivales no podrán aprovecharse de mí."</li>
+                    <li><strong className="text-sky-300">Uso de Implied Odds:</strong> Mínimo o nulo. GTO no "espera" que el rival pague de más; modela respuestas óptimas de ambos lados.</li>
+                    <li><strong className="text-sky-300">Enfoque:</strong> Defensivo. Protege tu EV contra oponentes de clase mundial.</li>
+                </ul>
+            </div>
+             <div className="p-6 rounded-lg border border-red-500/30 bg-red-900/10 space-y-4">
+                <div className="flex items-center gap-3">
+                    <Sword className="h-8 w-8 text-red-400" />
+                    <h3 className="font-headline text-2xl text-red-400">Juego Explotativo</h3>
+                </div>
+                <p className="text-red-200/80">
+                    El juego explotativo se desvía del GTO intencionadamente para **atacar los errores específicos** y predecibles de tus rivales. Aquí es donde se maximizan las ganancias.
+                </p>
+                 <ul className="list-disc list-inside space-y-2 text-sm text-red-200/90">
+                    <li><strong className="text-red-300">Filosofía:</strong> "He identificado un error en el juego de mi rival, y voy a ajustar mi estrategia para castigarlo y ganar más dinero."</li>
+                    <li><strong className="text-red-300">Uso de Implied Odds:</strong> Fundamental. El cálculo se basa en la expectativa de que el rival **pagará de más** cuando conectes tu mano (un error).</li>
+                    <li><strong className="text-red-300">Enfoque:</strong> Ofensivo. Busca activamente las debilidades para maximizar tu EV.</li>
+                </ul>
+            </div>
+             <div className="md:col-span-2 text-center p-4 bg-background/50 rounded-md">
+                <p className="text-lg font-semibold font-headline">Conclusión: Un profesional usa el GTO como su escudo y el juego explotador (con herramientas como las Implied Odds) como su espada.</p>
+            </div>
         </CardContent>
       </Card>
 
@@ -238,5 +235,3 @@ export default function ImpliedOddsPage() {
     </div>
   );
 }
-
-    
