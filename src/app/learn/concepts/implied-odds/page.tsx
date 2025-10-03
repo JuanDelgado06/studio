@@ -58,22 +58,17 @@ export default function ImpliedOddsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-2xl">🧮 ¿Cómo se calculan?</CardTitle>
-          <CardDescription>No hay una fórmula exacta, pero se estima de la siguiente manera:</CardDescription>
+          <CardDescription>No hay una fórmula exacta, ya que se basan en la estimación. La idea es comparar tu equity con el "precio" que te ofrecen las pot odds.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-lg bg-secondary/50 p-4 text-center">
-            <p className="font-mono text-lg">Implied Odds = (Bote actual + apuestas futuras esperadas) / Cantidad a pagar</p>
-          </div>
-          <div className="rounded-lg border bg-background p-4">
-            <h4 className="font-semibold mb-2">Ejemplo práctico:</h4>
-            <ul className="list-disc list-inside space-y-1 text-sm text-foreground/90">
-                <li>Bote actual: <span className="font-bold">$100</span></li>
-                <li>Rival apuesta: <span className="font-bold">$20</span></li>
-                <li>Tú pagas: <span className="font-bold">$20</span></li>
-                <li>Estimas ganar <span className="font-bold text-primary">$60 más</span> si conectas tu proyecto</li>
+          <div className="rounded-lg border bg-secondary/50 p-4">
+            <h4 className="font-semibold mb-2">Ejemplo de Lógica (Usando Porcentajes):</h4>
+            <ul className="list-decimal list-inside space-y-2 text-sm text-foreground/90">
+                <li>Calculas tus **Pot Odds** en porcentaje (lo que necesitas para que el call sea rentable). Ej: <span className="font-bold text-destructive">25%</span>.</li>
+                <li>Calculas tu **Equity** real (tus probabilidades de ganar). Ej: <span className="font-bold text-primary">20%</span>.</li>
+                <li>Ves que te faltan <span className="font-bold text-destructive">5%</span> para que el call sea matemáticamente correcto.</li>
+                <li>Estimas si las **ganancias futuras** que podrías obtener si conectas tu mano compensan ese 5% de déficit. Si crees que sí, el call es rentable gracias a las Implied Odds.</li>
             </ul>
-            <Separator className="my-3"/>
-            <p className="font-mono text-center">Implied Odds = (100 + 60) / 20 = 160 / 20 = 8:1</p>
           </div>
         </CardContent>
       </Card>
@@ -199,26 +194,30 @@ export default function ImpliedOddsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p><span className="font-semibold">Escenario:</span> Estás en MP con <code className="font-mono">5♦6♦</code>. El flop es <code className="font-mono">A♣8♠2♥</code>. Tienes un proyecto de escalera interna a una carta (gutshot). Para ligar necesitas un 7. El bote es de $120 y tu rival apuesta $40.</p>
+                <p><span className="font-semibold">Escenario:</span> Estás en MP con <code className="font-mono">T♦9♦</code>. El flop es <code className="font-mono">A♣Q♠2♥</code>. No has conectado nada, pero si cae una J tendrías la mejor escalera posible (nuts). Tienes un proyecto de escalera interna (gutshot). Para ligar necesitas una J. El bote es de $120 y tu rival apuesta $40.</p>
               </div>
               <Separator />
               <div className="space-y-2">
                 <h4 className="font-semibold text-destructive">Análisis de Pot Odds</h4>
                 <p className="text-sm text-muted-foreground">
-                  Debes pagar $40 para ganar un bote total de $160 ($120 + $40). Tus pot odds son 160:40, lo que equivale a 4:1. Necesitas una equity de $40 / ($120 + $40 + $40) = <strong className="text-foreground">22.2%</strong>. Tu equity real con un gutshot de 4 outs (los cuatro 7s) es de solo <strong className="text-foreground">~16%</strong> (4 outs x 4 en el flop).
+                  Debes pagar $40 para ganar un bote total de $200 ($120 + $40 (apuesta) + $40 (tu call)). Tus pot odds son $40 / $200 = <strong className="text-foreground">20%</strong>.
+                  <br/>
+                  Tu equity real con un gutshot de 4 outs (las cuatro Jotas) es de solo <strong className="text-foreground">~16%</strong> (4 outs x 4 en el flop).
                   <br />
-                  <span className="font-bold text-destructive">Conclusión: Basado en Pot Odds, es un FOLD claro.</span>
+                  <span className="font-bold text-destructive">Conclusión: Como 16% &lt; 20%, basado en Pot Odds, es un FOLD claro.</span>
                 </p>
               </div>
               <Separator />
               <div className="space-y-2">
                 <h4 className="font-semibold text-primary">Análisis de Implied Odds</h4>
                 <p className="text-sm text-muted-foreground">
-                  Tu proyecto de escalera es muy oculto. Si conectas un 7 en el turn o river, es probable que tu rival (que puede tener un As) no te crea y pague una apuesta grande. Estimas que podrías extraer <strong className="text-foreground">$100 adicionales</strong> si conectas.
+                  Aquí es donde brilla el concepto. Tu proyecto de escalera es muy oculto. Si conectas una J en el turn o river, es muy probable que tu rival (que puede tener un As) no te crea y pague una apuesta grande. Estimas que podrías extraer <strong className="text-foreground">$100 adicionales</strong> de su stack si conectas.
                   <br />
-                  <code className="font-mono block text-center my-2 text-foreground">Implied Odds = ($120 (bote) + $100 (futuras)) / $40 (pago) = $220 / $40 = 5.5:1</code>
+                  Ahora el cálculo es diferente: pagas $40 para ganar el bote actual ($160) MÁS los $100 que esperas ganar. Bote total potencial = $260.
                   <br />
-                  Tus probabilidades de ligar son aproximadamente 4.7:1 en el turn. Como tus Implied Odds (5.5:1) son mejores que tus odds de ligar, el call se vuelve rentable.
+                   <code className="font-mono block text-center my-2 text-foreground">Equity Necesaria Real = $40 (tu call) / ($160 (bote post-call) + $100 (ganancias implícitas)) = $40 / $260 ≈ 15.4%</code>
+                   <br/>
+                   Como tu equity real (16%) es MAYOR que la equity que necesitas considerando las ganancias implícitas (15.4%), el call se vuelve rentable.
                   <br />
                    <span className="font-bold text-primary">Decisión Final: CALL.</span>
                 </p>
@@ -237,13 +236,15 @@ export default function ImpliedOddsPage() {
               </div>
                <Separator />
               <div className="space-y-2">
-                <h4 className="font-semibold text-primary">Análisis de Implied Odds</h4>
+                <h4 className="font-semibold text-primary">Análisis de Implied Odds y Pot Odds</h4>
                 <p className="text-sm text-muted-foreground">
-                  Aquí las Implied Odds son limitadas por el stack del rival. Lo máximo que puedes ganar es lo que le queda detrás.
-                   <br />
-                  <code className="font-mono block text-center my-2 text-foreground">Implied Odds = ($80 + $60 adicionales) / $40 = $140 / $40 = 3.5:1</code>
+                  Aquí las Implied Odds son limitadas por el stack del rival. Lo máximo que puedes ganar es lo que le queda detrás ($60).
                   <br />
-                  Tu equity con proyecto de color (9 outs) es ~36%, lo que requiere odds de ~2:1. Como 3.5:1 es mucho mejor, es un call fácil. Sin embargo, el "upside" es limitado; no vas a ganar un bote gigante.
+                  Equity con proyecto de color (9 outs) ≈ <strong className="text-foreground">36%</strong>.
+                  <br />
+                  Pot Odds: $40 / ($80 + $40 + $40) = $40 / $160 = <strong className="text-foreground">25%</strong>.
+                  <br />
+                  Como tu equity (36%) es mucho mayor que tus pot odds (25%), el call ya es rentable por sí mismo. No necesitas depender de las implied odds, aunque también suman.
                   <br />
                    <span className="font-bold text-primary">Decisión Final: CALL (o incluso un Shove podría ser mejor para maximizar fold equity).</span>
                 </p>
