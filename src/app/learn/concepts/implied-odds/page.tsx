@@ -85,7 +85,10 @@ export default function ImpliedOddsPage() {
             </CardHeader>
             <CardContent>
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                    <li><span className="font-semibold text-foreground">Proyectos marginales:</span> Gutshot, overcards, backdoor flushes.</li>
+                    <li><span className="font-semibold text-foreground">Proyectos marginales:</span> Gutshot (escalera interna)
+                    , Overcards (cartas por encima del board)
+                    , Backdoor flush (color por detrás)
+                    .</li>
                     <li><span className="font-semibold text-foreground">Rivales pasivos o recreativos:</span> Pagan cuando conectas.</li>
                     <li><span className="font-semibold text-foreground">Stacks profundos:</span> Hay espacio para apuestas grandes en turn y river.</li>
                     <li><span className="font-semibold text-foreground">Posición favorable:</span> Puedes controlar el tamaño del bote.</li>
