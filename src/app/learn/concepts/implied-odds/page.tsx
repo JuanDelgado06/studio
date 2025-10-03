@@ -63,11 +63,17 @@ export default function ImpliedOddsPage() {
         <CardContent className="space-y-4">
           <div className="rounded-lg border bg-secondary/50 p-4">
             <h4 className="font-semibold mb-2">Lógica Principal (Recomendado):</h4>
-            <ul className="list-decimal list-inside space-y-2 text-sm text-foreground/90">
-                <li>Calculas tus **Pot Odds** en porcentaje (lo que necesitas para que el call sea rentable). Ej: <span className="font-bold text-destructive">25%</span>.</li>
+             <p className="text-sm text-muted-foreground mb-3">
+              La fórmula para calcular la equity que realmente necesitas, considerando las ganancias futuras, es:
+            </p>
+            <code className="font-mono block text-center my-2 text-foreground bg-background p-2 rounded-md">
+              Equity Necesaria Real % = Costo del Call / (Bote Total post-call + Ganancias Implícitas Estimadas)
+            </code>
+            <ul className="list-decimal list-inside space-y-2 text-sm text-foreground/90 mt-3">
+                <li>Calculas tus **Pot Odds** en porcentaje (lo que necesitas para que el call sea rentable solo con el bote actual). Ej: <span className="font-bold text-destructive">25%</span>.</li>
                 <li>Calculas tu **Equity** real (tus probabilidades de ganar). Ej: <span className="font-bold text-primary">20%</span>.</li>
-                <li>Ves que te faltan <span className="font-bold text-destructive">5%</span> para que el call sea matemáticamente correcto.</li>
-                <li>Estimas si las **ganancias futuras** que podrías obtener si conectas tu mano compensan ese 5% de déficit. Si crees que sí, el call es rentable gracias a las Implied Odds.</li>
+                <li>Ves que te falta un <span className="font-bold text-destructive">5%</span>. Ahora estimas si las **ganancias futuras** que podrías obtener si conectas tu mano hacen que el call sea rentable.</li>
+                <li>Aplicas la fórmula completa para ver si tu equity real (20%) es mayor que la equity necesaria real.</li>
             </ul>
           </div>
           <div className="rounded-lg border bg-secondary/20 p-4">
