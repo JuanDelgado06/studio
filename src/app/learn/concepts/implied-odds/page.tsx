@@ -195,17 +195,17 @@ export default function ImpliedOddsPage() {
         <CardContent className="space-y-6">
           <Card className="bg-secondary/20">
             <CardHeader>
-              <CardTitle className="font-headline text-lg">1. Proyecto disfrazado vs. rival agresivo</CardTitle>
+              <CardTitle className="font-headline text-lg">1. Proyecto de Gutshot vs. rival que paga de más</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p><span className="font-semibold">Escenario:</span> Estás en MP con <code className="font-mono">5♦6♦</code>. El flop es <code className="font-mono">7♣8♠K♥</code>. Tienes un proyecto de escalera interna (gutshot). El bote es de $120 y tu rival apuesta $40.</p>
+                <p><span className="font-semibold">Escenario:</span> Estás en MP con <code className="font-mono">5♦6♦</code>. El flop es <code className="font-mono">A♣8♠2♥</code>. Tienes un proyecto de escalera interna a una carta (gutshot). Para ligar necesitas un 7. El bote es de $120 y tu rival apuesta $40.</p>
               </div>
               <Separator />
               <div className="space-y-2">
                 <h4 className="font-semibold text-destructive">Análisis de Pot Odds</h4>
                 <p className="text-sm text-muted-foreground">
-                  Debes pagar $40 para ganar un bote total de $180 ($120 + $40). Tus pot odds son 180:40, lo que equivale a 4.5:1. Necesitas una equity de $40 / ($120 + $40 + $40) = <strong className="text-foreground">22.2%</strong>. Tu equity real con un gutshot (4 outs) es de solo <strong className="text-foreground">~16%</strong> (4 outs x 4).
+                  Debes pagar $40 para ganar un bote total de $160 ($120 + $40). Tus pot odds son 160:40, lo que equivale a 4:1. Necesitas una equity de $40 / ($120 + $40 + $40) = <strong className="text-foreground">22.2%</strong>. Tu equity real con un gutshot de 4 outs (los cuatro 7s) es de solo <strong className="text-foreground">~16%</strong> (4 outs x 4 en el flop).
                   <br />
                   <span className="font-bold text-destructive">Conclusión: Basado en Pot Odds, es un FOLD claro.</span>
                 </p>
@@ -214,9 +214,9 @@ export default function ImpliedOddsPage() {
               <div className="space-y-2">
                 <h4 className="font-semibold text-primary">Análisis de Implied Odds</h4>
                 <p className="text-sm text-muted-foreground">
-                  Tu proyecto de escalera es muy oculto. Si conectas un 4 o un 9, es probable que tu rival (que apostó fuerte, representando una mano como un Rey) pague una apuesta grande en el turn o river. Estimas que podrías extraer <strong className="text-foreground">$100 adicionales</strong>.
+                  Tu proyecto de escalera es muy oculto. Si conectas un 7 en el turn o river, es probable que tu rival (que puede tener un As) no te crea y pague una apuesta grande. Estimas que podrías extraer <strong className="text-foreground">$100 adicionales</strong> si conectas.
                   <br />
-                  <code className="font-mono block text-center my-2 text-foreground">Implied Odds = ($120 + $100 adicionales) / $40 = $220 / $40 = 5.5:1</code>
+                  <code className="font-mono block text-center my-2 text-foreground">Implied Odds = ($120 (bote) + $100 (futuras)) / $40 (pago) = $220 / $40 = 5.5:1</code>
                   <br />
                   Tus probabilidades de ligar son aproximadamente 4.7:1 en el turn. Como tus Implied Odds (5.5:1) son mejores que tus odds de ligar, el call se vuelve rentable.
                   <br />
