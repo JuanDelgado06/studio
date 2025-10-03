@@ -185,54 +185,95 @@ export default function ImpliedOddsPage() {
             </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-2xl">🔍 Ejemplos estratégicos</CardTitle>
+          <CardDescription>
+            Analicemos cómo se aplican las Implied Odds en situaciones reales de juego.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 border rounded-lg space-y-2">
-                <h4 className="font-semibold">1. Proyecto disfrazado vs rival agresivo</h4>
-                <p className="text-sm"><span className="font-bold">Mano:</span> 5♦6♦ en MP</p>
-                <p className="text-sm"><span className="font-bold">Flop:</span> 7♣8♠K♥ → gutshot</p>
-                <p className="text-sm"><span className="font-bold">Escenario:</span> Bote: $120 | Apuesta rival: $40 | Equity: ~16%</p>
-                <Separator/>
-                <p className="text-sm"><span className="font-bold text-destructive">Pot Odds:</span> 20% → <span className="italic">No rentable</span></p>
-                <p className="text-sm"><span className="font-bold text-primary">Implied Odds estimadas:</span> 5.5:1 → <span className="italic">Call EV+</span></p>
-            </div>
-             <div className="p-4 border rounded-lg space-y-2">
-                <h4 className="font-semibold">2. Proyecto de color vs stack corto</h4>
-                <p className="text-sm"><span className="font-bold">Mano:</span> A♠J♠ en BTN</p>
-                <p className="text-sm"><span className="font-bold">Flop:</span> 2♠7♠K♦ → proyecto de color</p>
-                <p className="text-sm"><span className="font-bold">Escenario:</span> Bote: $80 | Apuesta rival: $40 | Stack rival: $60</p>
-                <Separator/>
-                <p className="text-sm"><span className="font-bold text-primary">Implied Odds:</span> 3.5:1 → <span className="italic">Rentable pero upside limitado</span></p>
-            </div>
-             <div className="p-4 border rounded-lg space-y-2">
-                <h4 className="font-semibold">3. Escalera oculta vs rival recreativo</h4>
-                <p className="text-sm"><span className="font-bold">Mano:</span> 4♣5♣ en BB</p>
-                <p className="text-sm"><span className="font-bold">Flop:</span> 6♠7♦K♣ → gutshot + backdoor</p>
-                <p className="text-sm"><span className="font-bold">Escenario:</span> Bote: $60 | Apuesta rival: $20</p>
-                <Separator/>
-                <p className="text-sm"><span className="font-bold text-primary">Implied Odds:</span> 7:1 → <span className="italic">Call EV+</span></p>
-            </div>
-             <div className="p-4 border rounded-lg space-y-2 bg-destructive/10 border-destructive/50">
-                <h4 className="font-semibold">4. Reverse Implied Odds (riesgo oculto)</h4>
-                <p className="text-sm"><span className="font-bold">Mano:</span> A♣J♣ en UTG</p>
-                <p className="text-sm"><span className="font-bold">Flop:</span> A♠7♦2♥ → top pair</p>
-                <p className="text-sm"><span className="font-bold">River:</span> J♦ → conectas dobles</p>
-                <p className="text-sm"><span className="font-bold">Escenario:</span> Rival shovea: $300 → tiene A7, A2, sets</p>
-                <Separator/>
-                <p className="text-sm"><span className="font-bold text-destructive">Decisión:</span> <span className="italic">Fold correcto</span></p>
-            </div>
-             <div className="p-4 border rounded-lg space-y-2">
-                <h4 className="font-semibold">5. Freeroll con estructura agresiva</h4>
-                <p className="text-sm"><span className="font-bold">Mano:</span> 9♠T♠ en BTN</p>
-                <p className="text-sm"><span className="font-bold">Flop:</span> J♠Q♦2♣ → escalera abierta + backdoor</p>
-                <p className="text-sm"><span className="font-bold">Escenario:</span> Bote: $150 | Apuesta rival: $50 | Stack rival: $500</p>
-                <Separator/>
-                <p className="text-sm"><span className="font-bold text-primary">Implied Odds:</span> 7:1 → <span className="italic">Call EV+</span></p>
-            </div>
+        <CardContent className="space-y-6">
+          <Card className="bg-secondary/20">
+            <CardHeader>
+              <CardTitle className="font-headline text-lg">1. Proyecto disfrazado vs. rival agresivo</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p><span className="font-semibold">Escenario:</span> Estás en MP con <code className="font-mono">5♦6♦</code>. El flop es <code className="font-mono">7♣8♠K♥</code>. Tienes un proyecto de escalera interna (gutshot). El bote es de $120 y tu rival apuesta $40.</p>
+              </div>
+              <Separator />
+              <div className="space-y-2">
+                <h4 className="font-semibold text-destructive">Análisis de Pot Odds</h4>
+                <p className="text-sm text-muted-foreground">
+                  Debes pagar $40 para ganar un bote total de $180 ($120 + $40). Tus pot odds son 180:40, lo que equivale a 4.5:1. Necesitas una equity de $40 / ($120 + $40 + $40) = <strong className="text-foreground">22.2%</strong>. Tu equity real con un gutshot (4 outs) es de solo <strong className="text-foreground">~16%</strong> (4 outs x 4).
+                  <br />
+                  <span className="font-bold text-destructive">Conclusión: Basado en Pot Odds, es un FOLD claro.</span>
+                </p>
+              </div>
+              <Separator />
+              <div className="space-y-2">
+                <h4 className="font-semibold text-primary">Análisis de Implied Odds</h4>
+                <p className="text-sm text-muted-foreground">
+                  Tu proyecto de escalera es muy oculto. Si conectas un 4 o un 9, es probable que tu rival (que apostó fuerte, representando una mano como un Rey) pague una apuesta grande en el turn o river. Estimas que podrías extraer <strong className="text-foreground">$100 adicionales</strong>.
+                  <br />
+                  <code className="font-mono block text-center my-2 text-foreground">Implied Odds = ($120 + $100 adicionales) / $40 = $220 / $40 = 5.5:1</code>
+                  <br />
+                  Tus probabilidades de ligar son aproximadamente 4.7:1 en el turn. Como tus Implied Odds (5.5:1) son mejores que tus odds de ligar, el call se vuelve rentable.
+                  <br />
+                   <span className="font-bold text-primary">Decisión Final: CALL.</span>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-secondary/20">
+            <CardHeader>
+              <CardTitle className="font-headline text-lg">2. Proyecto de color vs. stack corto</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p><span className="font-semibold">Escenario:</span> Estás en BTN con <code className="font-mono">A♠J♠</code>. Flop <code className="font-mono">2♠7♠K♦</code>. Tienes proyecto de color nut. Bote de $80, rival apuesta $40. El stack efectivo del rival es de solo $60 más.
+                </p>
+              </div>
+               <Separator />
+              <div className="space-y-2">
+                <h4 className="font-semibold text-primary">Análisis de Implied Odds</h4>
+                <p className="text-sm text-muted-foreground">
+                  Aquí las Implied Odds son limitadas por el stack del rival. Lo máximo que puedes ganar es lo que le queda detrás.
+                   <br />
+                  <code className="font-mono block text-center my-2 text-foreground">Implied Odds = ($80 + $60 adicionales) / $40 = $140 / $40 = 3.5:1</code>
+                  <br />
+                  Tu equity con proyecto de color (9 outs) es ~36%, lo que requiere odds de ~2:1. Como 3.5:1 es mucho mejor, es un call fácil. Sin embargo, el "upside" es limitado; no vas a ganar un bote gigante.
+                  <br />
+                   <span className="font-bold text-primary">Decisión Final: CALL (o incluso un Shove podría ser mejor para maximizar fold equity).</span>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          
+           <Card className="bg-destructive/10 border border-destructive/30">
+            <CardHeader>
+              <CardTitle className="font-headline text-lg text-destructive">3. Reverse Implied Odds (riesgo oculto)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p><span className="font-semibold">Escenario:</span> Estás en UTG con <code className="font-mono">A♣J♣</code>. En el river, el board es <code className="font-mono">A♠ K♦ 7♦ 2♥ J♦</code> y has conectado dobles parejas. Tu rival, que ha estado pagando pasivamente, de repente hace un 'shove' de $300 en un bote de $100.
+                </p>
+              </div>
+               <Separator />
+              <div className="space-y-2">
+                <h4 className="font-semibold text-destructive">Análisis de Reverse Implied Odds</h4>
+                <p className="text-sm text-muted-foreground">
+                  Aunque tienes una mano fuerte (dobles parejas), el board completó un proyecto de color. La acción del rival (check-call todo el camino y shove masivo en el river) grita una mano monstruo. Su rango probable incluye colores (que te ganan) y quizás algunos sets (que también te ganan).
+                  <br />
+                  Este es un caso clásico de Reverse Implied Odds: el mismo board que "mejora" tu mano a una buena, mejora la de tu rival a una **excelente**. Pagar aquí te costaría todo tu stack contra una mano superior.
+                  <br />
+                   <span className="font-bold text-destructive">Decisión Final: FOLD. Ahorrarte el dinero en este spot es más rentable a largo plazo que pagar y descubrir que estás dominado.</span>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
         </CardContent>
       </Card>
     </div>
