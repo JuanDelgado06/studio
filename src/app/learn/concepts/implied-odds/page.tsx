@@ -64,16 +64,13 @@ export default function ImpliedOddsPage() {
           <div className="rounded-lg border bg-secondary/50 p-4">
             <h4 className="font-semibold mb-2">Lógica Principal (Recomendado):</h4>
              <p className="text-sm text-muted-foreground mb-3">
-              La fórmula para calcular la equity que realmente necesitas, considerando las ganancias futuras, es:
+              En lugar de una fórmula compleja, sigue este proceso mental:
             </p>
-            <code className="font-mono block text-center my-2 text-foreground bg-background p-2 rounded-md">
-              Equity Necesaria Real % = Costo del Call / (Bote Total post-call + Ganancias Implícitas Estimadas)
-            </code>
             <ul className="list-decimal list-inside space-y-2 text-sm text-foreground/90 mt-3">
                 <li>Calculas tus **Pot Odds** en porcentaje (lo que necesitas para que el call sea rentable solo con el bote actual). Ej: <span className="font-bold text-destructive">25%</span>.</li>
                 <li>Calculas tu **Equity** real (tus probabilidades de ganar). Ej: <span className="font-bold text-primary">20%</span>.</li>
-                <li>Ves que te falta un <span className="font-bold text-destructive">5%</span>. Ahora estimas si las **ganancias futuras** que podrías obtener si conectas tu mano hacen que el call sea rentable.</li>
-                <li>Aplicas la fórmula completa para ver si tu equity real (20%) es mayor que la equity necesaria real.</li>
+                <li>Ves que te falta un <span className="font-bold text-destructive">5%</span> de equity para que el call sea rentable.</li>
+                <li>Ahora estimas si las **ganancias futuras** que podrías obtener si conectas tu mano justifican pagar a pesar de ese déficit del 5%. Si crees que sí, entonces el call es correcto gracias a las implied odds.</li>
             </ul>
           </div>
           <div className="rounded-lg border bg-secondary/20 p-4">
@@ -217,7 +214,7 @@ export default function ImpliedOddsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p><span className="font-semibold">Escenario:</span> Estás en MP con <code className="font-mono">T♦9♦</code>. El flop es <code className="font-mono">A♣Q♠2♥</code>. No has conectado nada, pero si cae una J tendrías la mejor escalera posible (nuts). Tienes un proyecto de escalera interna (gutshot). Para ligar necesitas una J. El bote es de $120 y tu rival apuesta $40.</p>
+                <p><span className="font-semibold">Escenario:</span> Estás en MP con <code className="font-mono">T♦9♦</code>. El flop es <code className="font-mono">A♣Q♠2♥</code>. Tienes un proyecto de escalera interna (gutshot) que necesita una J. El bote es de $120 y tu rival apuesta $40.</p>
               </div>
               <Separator />
               <div className="space-y-2">
@@ -236,11 +233,7 @@ export default function ImpliedOddsPage() {
                 <p className="text-sm text-muted-foreground">
                   Aquí es donde brilla el concepto. Tu proyecto de escalera es muy oculto. Si conectas una J en el turn o river, es muy probable que tu rival (que puede tener un As) no te crea y pague una apuesta grande. Estimas que podrías extraer <strong className="text-foreground">$100 adicionales</strong> de su stack si conectas.
                   <br />
-                  Ahora el cálculo es diferente: pagas $40 para ganar el bote actual ($160) MÁS los $100 que esperas ganar. Bote total potencial = $260.
-                  <br />
-                   <code className="font-mono block text-center my-2 text-foreground">Equity Necesaria Real = $40 (tu call) / ($160 (bote post-call) + $100 (ganancias implícitas)) = $40 / $260 ≈ 15.4%</code>
-                   <br/>
-                   Como tu equity real (16%) es MAYOR que la equity que necesitas considerando las ganancias implícitas (15.4%), el call se vuelve rentable.
+                  Las ganancias implícitas hacen que el call sea rentable. No necesitas una fórmula compleja, solo entender que esos $100 potenciales compensan con creces el déficit de 4% de equity que te faltaba.
                   <br />
                    <span className="font-bold text-primary">Decisión Final: CALL.</span>
                 </p>
@@ -303,3 +296,5 @@ export default function ImpliedOddsPage() {
     </div>
   );
 }
+
+    
