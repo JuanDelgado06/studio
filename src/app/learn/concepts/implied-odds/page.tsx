@@ -76,15 +76,15 @@ export default function ImpliedOddsPage() {
           <div className="rounded-lg border bg-secondary/20 p-4">
             <h4 className="font-semibold mb-2">Cálculo Alternativo: El Método de Ratios</h4>
              <p className="text-sm text-muted-foreground mb-3">
-              También puedes pensar en ratios. La fórmula clásica es:
+              También puedes pensar en ratios. Un ratio de `4:1` (se lee "cuatro a uno") significa que esperas ganar 4 dólares por cada 1 dólar que arriesgas. Para que un call sea rentable, el ratio que te ofrecen tus Implied Odds debe ser **mayor** que el ratio en contra de ligar tu mano.
             </p>
             <code className="font-mono block text-center my-2 text-foreground bg-background p-2 rounded-md">
-              Implied Odds = (Bote actual + Ganancias futuras estimadas) / Cantidad a pagar
+              Implied Odds Ratio = (Bote actual + Ganancias futuras estimadas) / Cantidad a pagar
             </code>
              <ul className="list-disc list-inside space-y-2 text-sm text-foreground/90 mt-3">
-                <li>**Ejemplo:** Bote de $100, rival apuesta $20 (tú pagas $20). Estimas ganar $60 adicionales.</li>
-                <li>**Cálculo:** (100 + 20 + 60) / 20 = 180 / 20 = 9. Obtienes un ratio de **9:1**.</li>
-                <li>**Decisión:** Comparas este ratio con el de tus probabilidades de ligar (ej: un gutshot tiene un ratio de ~11:1 en el flop). Si tus implied odds (9:1) son mejores que tus odds de ligar, el call puede ser rentable.</li>
+                <li>**Ejemplo:** Bote de $100, rival apuesta $20 (tú pagas $20). Estimas ganar $60 adicionales si conectas.</li>
+                <li>**Cálculo:** ($100 + $20 + $60) / $20 = $180 / $20 = 9. Obtienes un ratio de **9:1**.</li>
+                <li>**Decisión:** Un gutshot tiene 4 outs. La probabilidad de no ligar es de ~43/47, lo que da un ratio en contra de casi **11:1**. Como tu ratio de implied odds (9:1) es **menor** que el ratio en contra de ligar (11:1), este call, incluso con implied odds, sigue siendo marginal o incorrecto. Necesitarías ganar más en el futuro para justificarlo.</li>
             </ul>
           </div>
           <div className="text-center p-3 bg-background/50 rounded-md text-sm">
