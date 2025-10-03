@@ -57,24 +57,24 @@ export default function ImpliedOddsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline text-2xl">🧮 ¿Cómo se calculan? (Método de Porcentajes)</CardTitle>
-          <CardDescription>No hay una fórmula exacta, ya que se basan en la estimación. La idea es comparar tu equity con el "precio" que te ofrecen las pot odds.</CardDescription>
+          <CardTitle className="font-headline text-2xl">🧮 ¿Cómo se calculan?</CardTitle>
+          <CardDescription>Hay dos formas principales de pensar en las Implied Odds: una basada en porcentajes (más moderna y directa) y otra en ratios (más clásica).</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-lg border bg-secondary/50 p-4">
-            <h4 className="font-semibold mb-2">Lógica Principal (Recomendado):</h4>
-             <p className="text-sm text-muted-foreground mb-3">
-              En lugar de una fórmula compleja, sigue este proceso mental:
+          <div className="rounded-lg border-2 border-primary/30 bg-primary/10 p-4">
+            <h4 className="font-semibold mb-2 text-primary-foreground">Lógica Principal: El Método de Porcentajes (Recomendado)</h4>
+             <p className="text-sm text-foreground/80 mb-3">
+              En lugar de una fórmula compleja, sigue este proceso mental que es más práctico durante el juego:
             </p>
             <ul className="list-decimal list-inside space-y-2 text-sm text-foreground/90 mt-3">
-                <li>Calculas tus **Pot Odds** en porcentaje (lo que necesitas para que el call sea rentable solo con el bote actual). Ej: <span className="font-bold text-destructive">25%</span>.</li>
-                <li>Calculas tu **Equity** real (tus probabilidades de ganar). Ej: <span className="font-bold text-primary">20%</span>.</li>
-                <li>Ves que te falta un <span className="font-bold text-destructive">5%</span> de equity para que el call sea rentable.</li>
-                <li>Ahora estimas si las **ganancias futuras** que podrías obtener si conectas tu mano justifican pagar a pesar de ese déficit del 5%. Si crees que sí, entonces el call es correcto gracias a las implied odds.</li>
+                <li>Calculas tus **Pot Odds** en porcentaje (lo que necesitas para que el call sea rentable solo con el bote actual).</li>
+                <li>Calculas tu **Equity** real (tus probabilidades de ganar, usando la regla del 4 y 2).</li>
+                <li>Comparas ambos. Si tu Equity es menor, ves que te falta un **déficit** para que el call sea rentable.</li>
+                <li>Ahora la pregunta clave: **¿Las ganancias futuras que podrías obtener si conectas tu mano justifican pagar a pesar de ese déficit?** Si crees que sí, entonces el call es correcto gracias a las implied odds.</li>
             </ul>
           </div>
           <div className="rounded-lg border bg-secondary/20 p-4">
-            <h4 className="font-semibold mb-2">Cálculo Alternativo (basado en Ratios):</h4>
+            <h4 className="font-semibold mb-2">Cálculo Alternativo: El Método de Ratios</h4>
              <p className="text-sm text-muted-foreground mb-3">
               También puedes pensar en ratios. La fórmula clásica es:
             </p>
