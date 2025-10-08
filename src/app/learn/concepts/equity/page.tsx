@@ -1,0 +1,246 @@
+
+'use client';
+
+import React, { useState, useMemo } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, BrainCircuit, Calculator, PieChart, CheckCircle, XCircle, Percent } from 'lucide-react';
+import Link from 'next/link';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+
+const outsData = [
+    { situation: 'Proyecto de color (Flush Draw)', outs: 9, probability: '~36%' },
+    { situation: 'Escalera abierta (Open-Ended)', outs: 8, probability: '~32%' },
+    { situation: 'Dos overcards', outs: 6, probability: '~24%' },
+    { situation: 'Escalera interna (Gutshot)', outs: 4, probability: '~16%' },
+    { situation: 'Un par buscando un trío (Set)', outs: 2, probability: '~8%' },
+    { situation: 'Proyecto de color + Escalera abierta', outs: 15, probability: '~54%' },
+];
+
+
+const EquityCalculator = () => {
+    const [potSize, setPotSize] = useState(100);
+    const [betToCall, setBetToCall] = useState(50);
+    const [outs, setOuts] = useState(9);
+
+    const { potOddsPercentage, equityPercentage, isProfitable } = useMemo(() => {
+        const totalPot = potSize + betToCall + betToCall;
+        const potOddsDecimal = totalPot > 0 ? betToCall / totalPot : 0;
+        const potOddsPercentage = (potOddsDecimal * 100);
+        const equityPercentage = outs * 4; // Using Rule of 4
+        const isProfitable = equityPercentage > potOddsPercentage;
+        return { potOddsPercentage, equityPercentage, isProfitable };
+    }, [potSize, betToCall, outs]);
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl flex items-center gap-2">
+                    <Calculator className="text-primary"/>
+                    Calculadora de Equity vs. Pot Odds
+                </CardTitle>
+                <CardDescription>Visualiza si un call es rentable (+EV) en el flop.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-4">
+                        <Label htmlFor="pot-size">Tamaño del Bote</Label>
+                        <Input id="pot-size" type="number" value={potSize} onChange={(e) => setPotSize(Number(e.target.value))} />
+                        <Slider value={[potSize]} onValueChange={(v) => setPotSize(v[0])} max={1000} step={10} />
+                    </div>
+                    <div className="space-y-4">
+                        <Label htmlFor="bet-to-call">Apuesta a Pagar</Label>
+                        <Input id="bet-to-call" type="number" value={betToCall} onChange={(e) => setBetToCall(Number(e.target.value))} />
+                        <Slider value={[betToCall]} onValueChange={(v) => setBetToCall(v[0])} max={500} step={5} />
+                    </div>
+                    <div className="space-y-4">
+                        <Label htmlFor="outs">Outs (Cartas que te sirven)</Label>
+                        <Input id="outs" type="number" value={outs} onChange={(e) => setOuts(Number(e.target.value))} />
+                        <Slider value={[outs]} onValueChange={(v) => setOuts(v[0])} max={20} step={1} />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                    <div className="p-4 bg-secondary/50 rounded-lg">
+                        <p className="text-sm text-muted-foreground">Equity Requerida (Pot Odds)</p>
+                        <p className="text-3xl font-bold text-destructive">{potOddsPercentage.toFixed(1)}%</p>
+                    </div>
+                     <div className="p-4 bg-secondary/50 rounded-lg">
+                        <p className="text-sm text-muted-foreground">Tu Equity Estimada</p>
+                        <p className="text-3xl font-bold text-primary">{equityPercentage.toFixed(1)}%</p>
+                    </div>
+                </div>
+
+                <div className={`p-4 rounded-lg text-center ${isProfitable ? 'bg-primary/10 border-primary border' : 'bg-destructive/10 border-destructive border'}`}>
+                    <h3 className={`font-headline text-2xl font-bold flex items-center justify-center gap-2 ${isProfitable ? 'text-primary' : 'text-destructive'}`}>
+                        {isProfitable ? <CheckCircle/> : <XCircle/>}
+                        El Call es {isProfitable ? 'Rentable (+EV)' : 'No Rentable (-EV)'}
+                    </h3>
+                     <p className="text-sm text-muted-foreground mt-2">
+                        {isProfitable 
+                        ? `Tu probabilidad de ganar (${equityPercentage.toFixed(1)}%) es mayor que la equity que necesitas para que el call sea rentable (${potOddsPercentage.toFixed(1)}%).`
+                        : `Necesitas un ${potOddsPercentage.toFixed(1)}% de equity para justificar el call, pero solo tienes un ${equityPercentage.toFixed(1)}%.`}
+                    </p>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
+export default function EquityConceptPage() {
+  return (
+    <div className="space-y-8">
+        <div className="flex flex-col gap-4">
+            <Link href="/learn/concepts" className="self-start">
+                <Button variant="default" className="shadow-md hover:shadow-lg transition-shadow">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Volver a Conceptos
+                </Button>
+            </Link>
+            <div className="flex flex-col gap-1">
+                <h1 className="text-3xl font-bold font-headline text-primary flex items-center gap-3">
+                    <PieChart className="h-8 w-8" />
+                    Equity: Tu Porción del Bote
+                </h1>
+                <p className="text-muted-foreground">
+                    La equity es el concepto matemático más importante en el póker. Representa tu probabilidad de ganar la mano en un momento dado.
+                </p>
+            </div>
+        </div>
+        <Separator />
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl">¿Qué es la Equity?</CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-invert max-w-none text-foreground/90">
+                <p>
+                    Imagina que el bote es un pastel. Tu equity es la porción del pastel que "te pertenece" en base a tus probabilidades de tener la mejor mano al final (en el showdown). Si tienes un 60% de equity, te corresponde el 60% del bote a largo plazo.
+                </p>
+                <p>
+                    El póker rentable no se trata de ganar todas las manos, sino de tomar decisiones que sean de <strong>Valor Esperado Positivo (+EV)</strong>. Tomarás una decisión +EV siempre que la equity que arriesgas sea menor que la equity que esperas ganar. Entender tu equity es el primer paso para lograrlo.
+                </p>
+            </CardContent>
+        </Card>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl">⚡ La Regla del 4 y del 2: Cálculo Rápido de Equity</CardTitle>
+                <CardDescription>No necesitas ser un genio matemático en la mesa. Usa esta regla simple para estimar tu equity en segundos.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <p>El primer paso es contar tus <strong>"outs"</strong>: las cartas que quedan en la baraja que mejorarán tu mano a una que probablemente ganará.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-primary/10 rounded-lg border border-primary/30">
+                        <h4 className="font-semibold text-lg text-primary-foreground">En el Flop (con 2 cartas por venir)</h4>
+                        <p className="font-mono text-2xl mt-2">Outs × 4 ≈ Tu Equity %</p>
+                    </div>
+                     <div className="p-4 bg-secondary/20 rounded-lg border">
+                        <h4 className="font-semibold text-lg">En el Turn (con 1 carta por venir)</h4>
+                        <p className="font-mono text-2xl mt-2">Outs × 2 ≈ Tu Equity %</p>
+                    </div>
+                </div>
+                 <div>
+                    <h4 className="font-semibold text-lg mb-2">📊 Tabla de Outs Comunes</h4>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Situación de Proyecto</TableHead>
+                                <TableHead className="text-center">Outs</TableHead>
+                                <TableHead className="text-right">Equity Estimada (en el Flop)</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {outsData.map((d) => (
+                                <TableRow key={d.situation}>
+                                    <TableCell>{d.situation}</TableCell>
+                                    <TableCell className="text-center font-bold">{d.outs}</TableCell>
+                                    <TableCell className="text-right text-primary font-semibold">{d.probability}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </CardContent>
+        </Card>
+
+        <EquityCalculator />
+
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl flex items-center gap-2">
+                    <BrainCircuit className="text-primary"/> La Decisión Final: Equity vs. Pot Odds
+                </CardTitle>
+                <CardDescription>Aquí es donde todo se une. Compara lo que puedes ganar (tu equity) con lo que te cuesta (las pot odds).</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="text-center p-6 rounded-lg bg-background border-2 border-dashed">
+                    <p className="text-xl font-semibold text-primary">Si tu Equity (%) > Equity Requerida por las Pot Odds (%) → El call es rentable (+EV).</p>
+                    <p className="text-xl font-semibold text-destructive mt-3">Si tu Equity (%) &lt; Equity Requerida por las Pot Odds (%) → El call NO es rentable (-EV).</p>
+                 </div>
+                 <Separator/>
+                 <h4 className="font-semibold text-lg">🃏 Ejemplo Práctico Completo:</h4>
+                 <div className="rounded-lg border bg-secondary/50 p-4 space-y-3">
+                    <p><strong>Tu Mano:</strong> <code className="bg-muted px-2 py-1 rounded-md">8♠ 7♠</code></p>
+                    <p><strong>Flop:</strong> <code className="bg-muted px-2 py-1 rounded-md">6♠ 5♦ K♥</code></p>
+                    <p>Tienes un proyecto de escalera abierta (Open-Ended Straight Draw).</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div className="p-3 bg-background/50 rounded-md">
+                            <p className="font-semibold mb-2">1. Calcula tu Equity:</p>
+                            <p>Necesitas un 4 o un 9. Hay cuatro 4s y cuatro 9s. Tienes <strong>8 outs</strong>.</p>
+                            <p className="font-mono mt-2">8 outs × 4 (Regla del 4) = <span className="font-bold text-primary text-xl">32%</span></p>
+                        </div>
+                        <div className="p-3 bg-background/50 rounded-md">
+                            <p className="font-semibold mb-2">2. Calcula tus Pot Odds:</p>
+                            <p>El bote es de $90. El rival apuesta $30.</p>
+                            <p className="font-mono mt-2">30 / (90 + 30 + 30) = 30 / 150 = <span className="font-bold text-destructive text-xl">20%</span></p>
+                        </div>
+                    </div>
+                     <div className="text-center pt-3">
+                        <Badge variant="default" className="text-lg py-2 px-4">32% (Tu Equity) > 20% (Equity Requerida)</Badge>
+                        <p className="mt-2 font-semibold text-lg">✅ ¡El call es matemáticamente correcto y rentable a largo plazo!</p>
+                     </div>
+                 </div>
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl">🎯 Conceptos Avanzados de Equity</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="p-4 rounded-lg border bg-secondary/20">
+                    <h3 className="font-semibold text-lg text-foreground">Fold Equity</h3>
+                    <p className="text-muted-foreground mt-1">
+                        Es la porción de equity que ganas cuando tu rival se retira (foldea) ante tu apuesta. Es el componente que hace rentables los faroles y semi-faroles. Si apuestas con un proyecto (semi-farol), tienes dos formas de ganar: completando tu mano (tu equity) o haciendo que el rival foldee (fold equity).
+                    </p>
+                </div>
+                 <div className="p-4 rounded-lg border bg-secondary/20">
+                    <h3 className="font-semibold text-lg text-foreground">Equity Realization (Realización de Equity)</h3>
+                    <p className="text-muted-foreground mt-1">
+                        No siempre podrás "realizar" o "cobrar" el 100% de tu equity. Factores como estar fuera de posición, enfrentar mucha agresión, o tener un stack profundo pueden hacer que te veas forzado a foldear antes del showdown, incluso con una buena mano. Por eso, una mano como 76s realiza mejor su equity que A2o, aunque A2o tenga más equity "en bruto".
+                    </p>
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+  );
+}
