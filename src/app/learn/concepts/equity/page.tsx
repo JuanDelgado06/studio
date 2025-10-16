@@ -135,6 +135,9 @@ export default function EquityConceptPage() {
                 <p>
                     Imagina que el bote es un pastel. Tu equity es la porción del pastel que "te pertenece" en base a tus probabilidades de tener la mejor mano al final (en el showdown). Si tienes un 60% de equity, te corresponde el 60% del bote a largo plazo.
                 </p>
+                 <p>
+                    Aunque a menudo se calcula contra una mano específica (mano vs. mano), en la práctica debes pensar en tu <strong>equity contra el rango completo de manos</strong> que podría tener tu oponente. Por ejemplo, si sospechas que tu rival solo juega manos fuertes, tu equity será menor que si crees que está jugando con un rango amplio de manos.
+                </p>
                 <p>
                     El póker rentable no se trata de ganar todas las manos, sino de tomar decisiones que sean de <strong>Valor Esperado Positivo (+EV)</strong>. Tomarás una decisión +EV siempre que la equity que arriesgas sea menor que la equity que esperas ganar. Entender tu equity es el primer paso para lograrlo.
                 </p>
@@ -224,10 +227,10 @@ export default function EquityConceptPage() {
 
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline text-2xl">🎯 Conceptos Avanzados de Equity</CardTitle>
-                <CardDescription>La equity no es solo tu probabilidad de ganar si todas las cartas se ven. Hay dos conceptos clave que modifican su valor: la Fold Equity y la Realización de Equity.</CardDescription>
+                <CardTitle className="font-headline text-2xl">🎯 Conceptos Avanzados: La Equity en el Mundo Real</CardTitle>
+                <CardDescription>La equity no es solo tu probabilidad de ganar si todas las cartas se ven. Hay dos conceptos clave que modifican su valor: la Fold Equity (tu espada) y la Realización de Equity (tu escudo).</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="grid md:grid-cols-2 gap-6">
                  <div className="p-6 rounded-lg border-2 border-dashed border-red-500/30 bg-red-900/10 space-y-4">
                     <div className="flex items-center gap-3">
                         <Sword className="h-8 w-8 text-red-400" />
@@ -239,7 +242,7 @@ export default function EquityConceptPage() {
                     <div className="p-3 bg-background/30 rounded-md text-sm">
                         <p className="font-semibold text-foreground">Fórmula conceptual del EV de un Farol:</p>
                         <code className="block text-center mt-2 font-mono text-sm bg-background/50 p-2 rounded">
-                            EV(bluff) = (Prob. de Fold del Rival * Bote Actual) - (Prob. de Call del Rival * Tu Apuesta)
+                            EV(bluff) = (Prob. de Fold del Rival * Bote) - (Prob. de Call del Rival * Tu Apuesta)
                         </code>
                     </div>
                     <p className="text-sm text-red-200/90">
@@ -269,8 +272,11 @@ export default function EquityConceptPage() {
                         <li>Es menos propensa a estar dominada (a diferencia de A2o, que a menudo se enfrenta a un As con mejor kicker).</li>
                     </ul>
                      <p className="text-sm text-sky-200/80 pt-2">
-                        <strong className="text-sky-300">Factores que afectan la Realización de Equity:</strong> Estar fuera de posición, enfrentar mucha agresión, o tener un stack muy profundo reduce tu capacidad de realizar tu equity, ya que puedes verte forzado a foldear antes del showdown.
+                        <strong className="text-sky-300">Factores que afectan tu Realización de Equity:</strong> Estar <strong>fuera de posición</strong>, enfrentar mucha agresión, o tener un stack muy profundo reduce tu capacidad de realizar tu equity, ya que puedes verte forzado a foldear antes del showdown. Por el contrario, estar **en posición** te permite controlar el bote y te ayuda a realizar un mayor porcentaje de tu equity.
                     </p>
+                </div>
+                 <div className="md:col-span-2 text-center p-4 bg-background/50 rounded-md">
+                    <p className="text-lg font-semibold font-headline">Un profesional del póker utiliza el GTO (Game Theory Optimal) para balancear estos dos conceptos. Sabe cuándo presionar con faroles (usando la Fold Equity) y cuándo protegerse y pagar (confiando en su Equity Realization).</p>
                 </div>
             </CardContent>
         </Card>
