@@ -18,7 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BrainCircuit, Calculator, PieChart, CheckCircle, XCircle, Percent } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, Calculator, PieChart, CheckCircle, XCircle, Percent, Shield, Sword } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -225,18 +225,51 @@ export default function EquityConceptPage() {
         <Card>
             <CardHeader>
                 <CardTitle className="font-headline text-2xl">🎯 Conceptos Avanzados de Equity</CardTitle>
+                <CardDescription>La equity no es solo tu probabilidad de ganar si todas las cartas se ven. Hay dos conceptos clave que modifican su valor: la Fold Equity y la Realización de Equity.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-                 <div className="p-4 rounded-lg border bg-secondary/20">
-                    <h3 className="font-semibold text-lg text-foreground">Fold Equity</h3>
-                    <p className="text-muted-foreground mt-1">
-                        Es la porción de equity que ganas cuando tu rival se retira (foldea) ante tu apuesta. Es el componente que hace rentables los faroles y semi-faroles. Si apuestas con un proyecto (semi-farol), tienes dos formas de ganar: completando tu mano (tu equity) o haciendo que el rival foldee (fold equity).
+            <CardContent className="space-y-6">
+                 <div className="p-6 rounded-lg border-2 border-dashed border-red-500/30 bg-red-900/10 space-y-4">
+                    <div className="flex items-center gap-3">
+                        <Sword className="h-8 w-8 text-red-400" />
+                        <h3 className="font-headline text-2xl text-red-400">Fold Equity: Ganar sin Enseñar las Cartas</h3>
+                    </div>
+                    <p className="text-red-200/80">
+                        La Fold Equity es la porción de "equity" que ganas cuando tu rival se retira (foldea) ante tu apuesta. Es el motor que hace rentables los faroles (bluffs) y semi-faroles. Si solo apuestas cuando tienes la mejor mano, eres predecible y fácil de explotar.
+                    </p>
+                    <div className="p-3 bg-background/30 rounded-md text-sm">
+                        <p className="font-semibold text-foreground">Fórmula conceptual del EV de un Farol:</p>
+                        <code className="block text-center mt-2 font-mono text-sm bg-background/50 p-2 rounded">
+                            EV(bluff) = (Prob. de Fold del Rival * Bote Actual) - (Prob. de Call del Rival * Tu Apuesta)
+                        </code>
+                    </div>
+                    <p className="text-sm text-red-200/90">
+                        Un <strong className="text-red-300">semi-farol</strong> es la jugada más poderosa que utiliza la Fold Equity. Ocurre cuando apuestas con una mano que no es la mejor AHORA, pero que tiene potencial de mejorar (un proyecto). Esto te da dos formas de ganar:
+                    </p>
+                    <ul className="list-decimal list-inside space-y-2 text-sm text-red-200/90">
+                        <li>El rival foldea y te llevas el bote inmediatamente (gracias a la <strong className="text-red-300">Fold Equity</strong>).</li>
+                        <li>El rival paga, pero tú completas tu proyecto en el turn o river y ganas un bote más grande (gracias a tu <strong className="text-red-300">Equity</strong>).</li>
+                    </ul>
+                     <p className="text-sm text-red-200/80 pt-2">
+                        <strong className="text-red-300">Factores que aumentan tu Fold Equity:</strong> tu imagen en la mesa (si eres 'tight'), un rival asustadizo, un board que parece peligroso para el rango del rival, y tener posición.
                     </p>
                 </div>
-                 <div className="p-4 rounded-lg border bg-secondary/20">
-                    <h3 className="font-semibold text-lg text-foreground">Equity Realization (Realización de Equity)</h3>
-                    <p className="text-muted-foreground mt-1">
-                        No siempre podrás "realizar" o "cobrar" el 100% de tu equity. Factores como estar fuera de posición, enfrentar mucha agresión, o tener un stack profundo pueden hacer que te veas forzado a foldear antes del showdown, incluso con una buena mano. Por eso, una mano como 76s realiza mejor su equity que A2o, aunque A2o tenga más equity "en bruto".
+                 <div className="p-6 rounded-lg border-2 border-dashed border-sky-500/30 bg-sky-900/10 space-y-4">
+                    <div className="flex items-center gap-3">
+                        <Shield className="h-8 w-8 text-sky-400" />
+                        <h3 className="font-headline text-2xl text-sky-400">Equity Realization: No Todo lo que Brilla es Oro</h3>
+                    </div>
+                    <p className="text-sky-200/80">
+                        La "Equity Realization" (Realización de Equity) es un concepto que mide qué porcentaje de tu equity "en papel" puedes esperar convertir en ganancias reales al llegar al showdown. No siempre podrás "cobrar" el 100% de tu equity.
+                    </p>
+                     <p className="text-sm text-sky-200/80">
+                        Por ejemplo, una mano como <code className="bg-background/30 px-1.5 py-0.5 rounded">A♠ 2♦</code> tiene más equity pre-flop contra una mano aleatoria que <code className="bg-background/30 px-1.5 py-0.5 rounded">7♥ 6♥</code>. Sin embargo, <code className="bg-background/30 px-1.5 py-0.5 rounded">7♥ 6♥</code> a menudo realizará *más* de su equity porque:
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 text-sm text-sky-200/90">
+                        <li>Forma manos ocultas y muy fuertes (escaleras, colores) que son fáciles de jugar por valor.</li>
+                        <li>Es menos propensa a estar dominada (a diferencia de A2o, que a menudo se enfrenta a un As con mejor kicker).</li>
+                    </ul>
+                     <p className="text-sm text-sky-200/80 pt-2">
+                        <strong className="text-sky-300">Factores que afectan la Realización de Equity:</strong> Estar fuera de posición, enfrentar mucha agresión, o tener un stack muy profundo reduce tu capacidad de realizar tu equity, ya que puedes verte forzado a foldear antes del showdown.
                     </p>
                 </div>
             </CardContent>
