@@ -25,6 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { cn } from '@/lib/utils';
 
 const outsData = [
     { situation: 'Proyecto de color (Flush Draw)', outs: 9, probability: '~36%' },
@@ -40,15 +41,19 @@ const EquityCalculator = () => {
     const [potSize, setPotSize] = useState(100);
     const [betToCall, setBetToCall] = useState(50);
     const [outs, setOuts] = useState(9);
+    const [street, setStreet] = useState<'flop' | 'turn'>('flop');
 
     const { potOddsPercentage, equityPercentage, isProfitable } = useMemo(() => {
         const totalPot = potSize + betToCall + betToCall;
         const potOddsDecimal = totalPot > 0 ? betToCall / totalPot : 0;
         const potOddsPercentage = (potOddsDecimal * 100);
-        const equityPercentage = outs * 4; // Using Rule of 4
+        
+        const equityMultiplier = street === 'flop' ? 4 : 2;
+        const equityPercentage = outs * equityMultiplier;
+
         const isProfitable = equityPercentage > potOddsPercentage;
         return { potOddsPercentage, equityPercentage, isProfitable };
-    }, [potSize, betToCall, outs]);
+    }, [potSize, betToCall, outs, street]);
 
     return (
         <Card>
@@ -57,9 +62,17 @@ const EquityCalculator = () => {
                     <Calculator className="text-primary"/>
                     Calculadora de Equity vs. Pot Odds
                 </CardTitle>
-                <CardDescription>Visualiza si un call es rentable (+EV) en el flop.</CardDescription>
+                <CardDescription>Visualiza si un call es rentable (+EV) en el flop o en el turn.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+                 <div className="flex justify-center gap-2">
+                    <Button onClick={() => setStreet('flop')} variant={street === 'flop' ? 'default' : 'outline'}>
+                        En el Flop (Regla del 4)
+                    </Button>
+                    <Button onClick={() => setStreet('turn')} variant={street === 'turn' ? 'default' : 'outline'}>
+                        En el Turn (Regla del 2)
+                    </Button>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-4">
                         <Label htmlFor="pot-size">Tamaño del Bote</Label>
@@ -84,13 +97,19 @@ const EquityCalculator = () => {
                         <p className="text-3xl font-bold text-destructive">{potOddsPercentage.toFixed(1)}%</p>
                     </div>
                      <div className="p-4 bg-secondary/50 rounded-lg">
-                        <p className="text-sm text-muted-foreground">Tu Equity Estimada</p>
+                        <p className="text-sm text-muted-foreground">Tu Equity Estimada (x{street === 'flop' ? 4 : 2})</p>
                         <p className="text-3xl font-bold text-primary">{equityPercentage.toFixed(1)}%</p>
                     </div>
                 </div>
 
-                <div className={`p-4 rounded-lg text-center ${isProfitable ? 'bg-primary/10 border-primary border' : 'bg-destructive/10 border-destructive border'}`}>
-                    <h3 className={`font-headline text-2xl font-bold flex items-center justify-center gap-2 ${isProfitable ? 'text-primary' : 'text-destructive'}`}>
+                <div className={cn(
+                    'p-4 rounded-lg text-center border transition-all',
+                    isProfitable ? 'bg-primary/10 border-primary' : 'bg-destructive/10 border-destructive'
+                )}>
+                    <h3 className={cn(
+                        'font-headline text-2xl font-bold flex items-center justify-center gap-2',
+                        isProfitable ? 'text-primary' : 'text-destructive'
+                    )}>
                         {isProfitable ? <CheckCircle/> : <XCircle/>}
                         El Call es {isProfitable ? 'Rentable (+EV)' : 'No Rentable (-EV)'}
                     </h3>
