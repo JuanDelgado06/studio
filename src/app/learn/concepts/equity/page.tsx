@@ -365,12 +365,11 @@ export default function EquityConceptPage() {
                     <p className="text-sky-200/80">
                        La "Equity Realization" (Realización de Equity) mide qué porcentaje de tu equity "en papel" puedes esperar convertir en ganancias reales. No siempre podrás "cobrar" el 100% de tu equity.
                     </p>
-
                     <h4 className="font-semibold text-lg text-sky-300 pt-2">El Concepto Clave: Jugabilidad</h4>
-                     <p className="text-sm text-sky-200/90">
+                    <p className="text-sm text-sky-200/90">
                         Ciertas manos "realizan" su equity mejor que otras.
                     </p>
-                     <div className="p-4 bg-background/30 rounded-md text-sm mt-2 border border-sky-400/20">
+                    <div className="p-4 bg-background/30 rounded-md text-sm mt-2 border border-sky-400/20">
                         <p className="font-bold text-base text-sky-300 mb-2">🃏 Ejemplo Práctico: 7♥6♥ vs. A♠2♦</p>
                         <p>Pre-flop, <code className="bg-background/50 px-1.5 py-0.5 rounded">A♠2♦</code> tiene más equity (~53%) contra una mano aleatoria que <code className="bg-background/50 px-1.5 py-0.5 rounded">7♥6♥</code> (~47%).</p>
                         <p className="mt-3 font-semibold">Entonces, ¿por qué los profesionales prefieren jugar 7♥6♥ en muchas situaciones?</p>
@@ -379,7 +378,6 @@ export default function EquityConceptPage() {
                             <li className="mt-1"><strong className="text-sky-300">Evita la Dominación:</strong> Con A♠2♦, si en el flop aparece un As, a menudo te enfrentarás a un As con un "kicker" (carta de acompañamiento) mejor (AK, AQ, AJ). Estarás "dominado" y perderás muchas fichas. 7♥6♥ rara vez está dominada de la misma manera.</li>
                         </ul>
                     </div>
-
                     <h4 className="font-semibold text-lg text-sky-300 pt-2">Factores que Afectan tu Realización de Equity</h4>
                     <p className="text-sm text-sky-200/90">
                         Tu capacidad de llegar al showdown y ganar depende de:
@@ -400,5 +398,3 @@ export default function EquityConceptPage() {
     </div>
   );
 }
-
-    
