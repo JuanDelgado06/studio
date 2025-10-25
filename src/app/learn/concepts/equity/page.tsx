@@ -62,7 +62,7 @@ const EquityCalculator = () => {
                     <Calculator className="text-primary"/>
                     Calculadora de Equity vs. Pot Odds
                 </CardTitle>
-                <CardDescription>Visualiza si un call es rentable (+EV) en el flop o en el turn.</CardDescription>
+                <CardDescription>Esta herramienta te ayuda a aplicar la "Regla del 4 y 2" en tiempo real para visualizar si un call es rentable (+EV) basándote en tus outs.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                  <div className="flex justify-center gap-2">
@@ -140,7 +140,7 @@ export default function EquityConceptPage() {
                     Equity: Tu Porción del Bote
                 </h1>
                 <p className="text-muted-foreground">
-                    La equity es el concepto matemático más importante en el póker. Representa tu probabilidad de ganar la mano en un momento dado.
+                    La equity es tu probabilidad de ganar la mano. Es el concepto matemático más importante para tomar decisiones rentables en el póker.
                 </p>
             </div>
         </div>
@@ -155,10 +155,10 @@ export default function EquityConceptPage() {
                     Imagina que el bote es un pastel. Tu equity es la porción del pastel que "te pertenece" en base a tus probabilidades de tener la mejor mano al final (en el showdown). Si tienes un 60% de equity, te corresponde el 60% del bote a largo plazo.
                 </p>
                  <p>
-                    Aunque a menudo se calcula contra una mano específica (mano vs. mano), en la práctica debes pensar en tu <strong>equity contra el rango completo de manos</strong> que podría tener tu oponente. Por ejemplo, si sospechas que tu rival solo juega manos fuertes, tu equity será menor que si crees que está jugando con un rango amplio de manos.
+                    Aunque a menudo se simplifica calculando tu equity contra una mano específica (mano vs. mano), en la práctica debes pensar en tu <strong>equity contra el rango completo de manos</strong> que podría tener tu oponente. Por ejemplo, si sospechas que tu rival solo apuesta fuerte con manos como tríos (sets) o dobles pares, tu equity con un proyecto de color será menor que si crees que su rango también incluye proyectos fallidos o pares medios.
                 </p>
-                <p>
-                    El póker rentable no se trata de ganar todas las manos, sino de tomar decisiones que sean de <strong>Valor Esperado Positivo (+EV)</strong>. Tomarás una decisión +EV siempre que la equity que arriesgas sea menor que la equity que esperas ganar. Entender tu equity es el primer paso para lograrlo.
+                 <p>
+                    Contar "outs" y usar la "Regla del 4 y 2" es una <strong>heurística</strong> (un atajo mental) que usamos en la mesa para obtener una estimación rápida de nuestra equity. No es un cálculo exacto contra un rango, pero es una herramienta práctica y poderosa para tomar decisiones rápidas.
                 </p>
             </CardContent>
         </Card>
@@ -209,14 +209,14 @@ export default function EquityConceptPage() {
         <Card>
             <CardHeader>
                 <CardTitle className="font-headline text-2xl flex items-center gap-2">
-                    <BrainCircuit className="text-primary"/> La Decisión Final: Equity vs. Pot Odds
+                    <BrainCircuit className="text-primary"/> La Decisión Final: Rango, Equity y Pot Odds
                 </CardTitle>
-                <CardDescription>Aquí es donde todo se une. Compara lo que puedes ganar (tu equity) con lo que te cuesta (las pot odds).</CardDescription>
+                <CardDescription>Aquí es donde todo se une. Compara lo que puedes ganar (tu equity) con lo que te cuesta (las pot odds), siempre pensando en el rango del rival.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                  <div className="text-center p-6 rounded-lg bg-background border-2 border-dashed">
-                    <p className="text-xl font-semibold text-primary">Si tu Equity (%) > Equity Requerida por las Pot Odds (%) → El call es rentable (+EV).</p>
-                    <p className="text-xl font-semibold text-destructive mt-3">Si tu Equity (%) &lt; Equity Requerida por las Pot Odds (%) → El call NO es rentable (-EV).</p>
+                    <p className="text-xl font-semibold text-primary">Si tu Equity Estimada (%) > Equity Requerida por las Pot Odds (%) → El call es rentable (+EV).</p>
+                    <p className="text-xl font-semibold text-destructive mt-3">Si tu Equity Estimada (%) &lt; Equity Requerida por las Pot Odds (%) → El call NO es rentable (-EV).</p>
                  </div>
                  <Separator/>
                  <h4 className="font-semibold text-lg">🃏 Ejemplo Práctico Completo:</h4>
@@ -226,14 +226,22 @@ export default function EquityConceptPage() {
                     <p>Tienes un proyecto de escalera abierta (Open-Ended Straight Draw).</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <div className="p-3 bg-background/50 rounded-md">
-                            <p className="font-semibold mb-2">1. Calcula tu Equity:</p>
-                            <p>Necesitas un 4 o un 9. Hay cuatro 4s y cuatro 9s. Tienes <strong>8 outs</strong>.</p>
-                            <p className="font-mono mt-2">8 outs × 4 (Regla del 4) = <span className="font-bold text-primary text-xl">32%</span></p>
+                            <p className="font-semibold mb-2">1. Analiza la situación y el rango del rival:</p>
+                            <p className="text-sm">Un rival "tight" subió desde posición media. Su rango probable contiene pares altos (AA-TT), broadways (AK, AQ, KQ) y quizás algunos pares medios (99, 88). Es poco probable que tenga manos débiles.</p>
                         </div>
                         <div className="p-3 bg-background/50 rounded-md">
-                            <p className="font-semibold mb-2">2. Calcula tus Pot Odds:</p>
-                            <p>El bote es de $90. El rival apuesta $30.</p>
-                            <p className="font-mono mt-2">30 / (90 + 30 + 30) = 30 / 150 = <span className="font-bold text-destructive text-xl">20%</span></p>
+                            <p className="font-semibold mb-2">2. Estima tu Equity con la regla rápida:</p>
+                            <p>Necesitas un 4 o un 9 para la escalera. Hay cuatro 4s y cuatro 9s, así que tienes <strong>8 outs</strong>.</p>
+                            <p className="font-mono mt-2">8 outs × 4 (Regla del 4) = <strong className="text-primary text-xl">~32%</strong></p>
+                        </div>
+                         <div className="p-3 bg-background/50 rounded-md">
+                            <p className="font-semibold mb-2">3. Calcula tus Pot Odds:</p>
+                            <p>El bote es de $90. El rival apuesta $30. Debes pagar $30 para ganar $150 ($90 bote + $30 rival + $30 tuyos).</p>
+                            <p className="font-mono mt-2">30 / 150 = <strong className="text-destructive text-xl">20%</strong></p>
+                        </div>
+                         <div className="p-3 bg-background/50 rounded-md">
+                            <p className="font-semibold mb-2">4. Compara y decide:</p>
+                             <p>Tu equity estimada (~32%) es mayor que la equity que necesitas para que el call sea rentable (20%). Aunque algunas de sus manos (como un set de Reyes) te tienen casi sin outs, contra la mayoría de su rango (pares altos como AA/KK, o broadways como AK/AQ) tienes una excelente equity.</p>
                         </div>
                     </div>
                      <div className="text-center pt-3">
