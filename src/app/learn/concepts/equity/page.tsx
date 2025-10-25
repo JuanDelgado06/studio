@@ -314,7 +314,7 @@ export default function EquityConceptPage() {
                         <h3 className="font-headline text-2xl text-red-400">Fold Equity: Ganar sin Enseñar las Cartas</h3>
                     </div>
                     <p className="text-red-200/80">
-                        La mayoría de las manos de póker (más del 70-80%) no llegan al showdown. La Fold Equity es el arte y la ciencia de ganar el bote ahora mismo, sin necesidad de tener la mejor mano al final. Cuando tienes Fold Equity, dejas de ser un jugador pasivo que depende de "ligar" buenas cartas y te conviertes en un jugador agresivo que fuerza al oponente a tomar decisiones difíciles.
+                        Tu instinto es correcto: la mayoría de las manos de póker (más del 70-80%) no llegan al showdown. La Fold Equity es el arte y la ciencia de ganar el bote ahora mismo, sin necesidad de tener la mejor mano al final. Cuando tienes Fold Equity, dejas de ser un jugador pasivo que depende de "ligar" buenas cartas y te conviertes en un jugador agresivo que fuerza al oponente a tomar decisiones difíciles.
                     </p>
                     
                     <h4 className="font-semibold text-lg text-red-300 pt-2">El Poder del Semi-Farol: Tu "Plan B"</h4>
@@ -338,44 +338,60 @@ export default function EquityConceptPage() {
                         Tu trabajo como jugador es ser un "cazador de Fold Equity". Búscala en estas situaciones:
                     </p>
                     <ul className="list-none space-y-3 text-sm">
-                        <li><strong>A. La Textura del Board:</strong> En "Dry Boards" (Mesas Secas) o "Scary Boards" (Mesas de Miedo) como K-7-2, donde es difícil que el rival haya conectado. Tu Fold Equity es ALTA. Por el contrario, en "Wet Boards" (Mesas Húmedas) como J♥ T♥ 9♠, tu Fold Equity es BAJA.</li>
-                        <li><strong>B. Tu Posición:</strong> Tienes ALTA Fold Equity cuando estás "En Posición" (IP) porque tienes más información. Tienes BAJA Fold Equity "Fuera de Posición" (OOP) porque apuestas a ciegas.</li>
-                        <li><strong>C. El Rival y Tu Imagen:</strong> Tienes ALTA Fold Equity contra jugadores "Tight-Weak" (miedosos) o si tu imagen en la mesa es muy sólida. Tienes BAJA Fold Equity contra "Calling Stations" (que pagan todo) o si has estado faroleando mucho.</li>
+                        <li><strong>A. La Textura del Board:</strong> En "Dry Boards" (Mesas Secas) como K-7-2, tu Fold Equity es ALTA. En "Wet Boards" (Mesas Húmedas) como J♥ T♥ 9♠, es BAJA.</li>
+                        <li><strong>B. Tu Posición:</strong> Tienes ALTA Fold Equity cuando estás "En Posición" (IP) y BAJA Fold Equity "Fuera de Posición" (OOP).</li>
+                        <li><strong>C. El Rival y Tu Imagen:</strong> Tienes ALTA Fold Equity contra jugadores "Tight-Weak" (miedosos) y BAJA Fold Equity contra "Calling Stations" (que pagan todo).</li>
                     </ul>
 
                      <h4 className="font-semibold text-lg text-red-300 pt-2">Fold Equity y el Tamaño de la Apuesta</h4>
                      <p className="text-sm text-red-200/90">
-                        Tu objetivo es hacer que al rival le sea matemáticamente incorrecto pagar. Usas tu apuesta para arruinarle las Pot Odds.
+                        Tu objetivo es usar tu apuesta para arruinarle las Pot Odds al rival.
                     </p>
                      <div className="p-4 bg-background/30 rounded-md text-sm mt-2 border border-red-400/20">
                         <p className="font-bold text-base text-red-300 mb-2">Ejemplo de Bet Sizing:</p>
-                        <p>El bote es de $100. Crees que el rival tiene un proyecto de color (~36% equity para ligar en dos calles).</p>
+                        <p>Bote de $100. Crees que el rival tiene un proyecto de color (~36% equity).</p>
                         <ul className="list-disc list-inside space-y-1 mt-2">
                             <li><strong className="text-red-200/80">Mala Apuesta ($25):</strong> El rival paga $25 para ganar $150. Le das odds de 5 a 1 (necesita ~17% equity). Su call es súper rentable. <strong className="text-red-300">Tu Fold Equity es baja.</strong></li>
                             <li className="mt-1"><strong className="text-red-300">Buena Apuesta ($100):</strong> El rival paga $100 para ganar $300. Le das odds de 2 a 1 (necesita ~33% equity). Su call es, en el mejor caso, neutral. <strong className="text-red-300">Tu Fold Equity es mucho más alta.</strong></li>
                         </ul>
                     </div>
-
                 </div>
+
                  <div className="p-6 rounded-lg border-2 border-dashed border-sky-500/30 bg-sky-900/10 space-y-4">
                     <div className="flex items-center gap-3">
                         <Shield className="h-8 w-8 text-sky-400" />
                         <h3 className="font-headline text-2xl text-sky-400">Equity Realization: No Todo lo que Brilla es Oro</h3>
                     </div>
                     <p className="text-sky-200/80">
-                        La "Equity Realization" (Realización de Equity) es un concepto que mide qué porcentaje de tu equity "en papel" puedes esperar convertir en ganancias reales al llegar al showdown. No siempre podrás "cobrar" el 100% de tu equity.
+                       La "Equity Realization" (Realización de Equity) mide qué porcentaje de tu equity "en papel" puedes esperar convertir en ganancias reales. No siempre podrás "cobrar" el 100% de tu equity.
                     </p>
-                     <p className="text-sm text-sky-200/80">
-                        Por ejemplo, una mano como <code className="bg-background/30 px-1.5 py-0.5 rounded">A♠ 2♦</code> tiene más equity pre-flop contra una mano aleatoria que <code className="bg-background/30 px-1.5 py-0.5 rounded">7♥ 6♥</code>. Sin embargo, <code className="bg-background/30 px-1.5 py-0.5 rounded">7♥ 6♥</code> a menudo realizará *más* de su equity porque:
+
+                    <h4 className="font-semibold text-lg text-sky-300 pt-2">El Concepto Clave: Jugabilidad</h4>
+                     <p className="text-sm text-sky-200/90">
+                        Ciertas manos "realizan" su equity mejor que otras.
                     </p>
-                    <ul className="list-disc list-inside space-y-2 text-sm text-sky-200/90">
-                        <li>Forma manos ocultas y muy fuertes (escaleras, colores) que son fáciles de jugar por valor.</li>
-                        <li>Es menos propensa a estar dominada (a diferencia de A2o, que a menudo se enfrenta a un As con mejor kicker).</li>
+                     <div className="p-4 bg-background/30 rounded-md text-sm mt-2 border border-sky-400/20">
+                        <p className="font-bold text-base text-sky-300 mb-2">🃏 Ejemplo Práctico: 7♥6♥ vs. A♠2♦</p>
+                        <p>Pre-flop, <code className="bg-background/50 px-1.5 py-0.5 rounded">A♠2♦</code> tiene más equity (~53%) contra una mano aleatoria que <code className="bg-background/50 px-1.5 py-0.5 rounded">7♥6♥</code> (~47%).</p>
+                        <p className="mt-3 font-semibold">Entonces, ¿por qué los profesionales prefieren jugar 7♥6♥ en muchas situaciones?</p>
+                        <ul className="list-disc list-inside space-y-1 mt-2">
+                            <li><strong className="text-sky-300">Forma Manos Ocultas:</strong> Si el flop es 9-8-5, tienes una escalera "nuts" (la mejor posible). El rival con A-K nunca sabrá qué le ha golpeado. Esto te permite ganar botes enormes.</li>
+                            <li className="mt-1"><strong className="text-sky-300">Evita la Dominación:</strong> Con A♠2♦, si en el flop aparece un As, a menudo te enfrentarás a un As con un "kicker" (carta de acompañamiento) mejor (AK, AQ, AJ). Estarás "dominado" y perderás muchas fichas. 7♥6♥ rara vez está dominada de la misma manera.</li>
+                        </ul>
+                    </div>
+
+                    <h4 className="font-semibold text-lg text-sky-300 pt-2">Factores que Afectan tu Realización de Equity</h4>
+                    <p className="text-sm text-sky-200/90">
+                        Tu capacidad de llegar al showdown y ganar depende de:
+                    </p>
+                    <ul className="list-none space-y-3 text-sm">
+                        <li><strong>1. Posición (El Factor #1):</strong> Estar **en posición** (IP) es el factor más importante. Te permite controlar el bote, tomar la última decisión y ver si tu rival muestra debilidad. Realizas mucha más equity IP. Estar **fuera de posición** (OOP) es un desastre para la realización de equity, ya que te enfrentas a apuestas sin saber qué hará el rival.</li>
+                        <li><strong>2. Iniciativa:</strong> Si fuiste el agresor pre-flop, es más fácil seguir apostando y realizar tu equity.</li>
+                        <li><strong>3. Habilidad del Rival:</strong> Contra un mal jugador, realizarás más equity. Contra un profesional muy agresivo, te será más difícil.</li>
+                        <li><strong>4. Profundidad del Stack:</strong> Con stacks muy profundos, las manos especulativas (como suited connectors) realizan mejor su equity porque el premio potencial es enorme.</li>
                     </ul>
-                     <p className="text-sm text-sky-200/80 pt-2">
-                        <strong className="text-sky-300">Factores que afectan tu Realización de Equity:</strong> Estar <strong>fuera de posición</strong>, enfrentar mucha agresión, o tener un stack muy profundo reduce tu capacidad de realizar tu equity, ya que puedes verte forzado a foldear antes del showdown. Por el contrario, estar **en posición** te permite controlar el bote y te ayuda a realizar un mayor porcentaje de tu equity.
-                    </p>
                 </div>
+
                  <div className="md:col-span-2 text-center p-4 bg-background/50 rounded-md">
                     <p className="text-lg font-semibold font-headline">Un profesional del póker utiliza el GTO (Game Theory Optimal) para balancear estos dos conceptos. Sabe cuándo presionar con faroles (usando la Fold Equity) y cuándo protegerse y pagar (confiando en su Equity Realization).</p>
                 </div>
@@ -384,3 +400,5 @@ export default function EquityConceptPage() {
     </div>
   );
 }
+
+    
