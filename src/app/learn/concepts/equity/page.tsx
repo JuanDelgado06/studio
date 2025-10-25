@@ -18,7 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BrainCircuit, Calculator, PieChart, CheckCircle, XCircle, Percent, Shield, Sword } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, Calculator, PieChart, CheckCircle, XCircle, Percent, Shield, Sword, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -219,7 +219,7 @@ export default function EquityConceptPage() {
                     <p className="text-xl font-semibold text-destructive mt-3">Si tu Equity Estimada (%) &lt; Equity Requerida por las Pot Odds (%) → El call NO es rentable (-EV).</p>
                  </div>
                  <Separator/>
-                 <h4 className="font-semibold text-lg">🃏 Ejemplo Práctico Completo:</h4>
+                 <h4 className="font-semibold text-lg">🃏 Ejemplo Práctico 1: Proyecto Fuerte en Posición</h4>
                  <div className="rounded-lg border bg-secondary/50 p-4 space-y-3">
                     <p><strong>Tu Mano:</strong> <code className="bg-muted px-2 py-1 rounded-md">8♠ 7♠</code></p>
                     <p><strong>Flop:</strong> <code className="bg-muted px-2 py-1 rounded-md">6♠ 5♦ K♥</code></p>
@@ -247,6 +247,56 @@ export default function EquityConceptPage() {
                      <div className="text-center pt-3">
                         <Badge variant="default" className="text-lg py-2 px-4">32% (Tu Equity) > 20% (Equity Requerida)</Badge>
                         <p className="mt-2 font-semibold text-lg">✅ ¡El call es matemáticamente correcto y rentable a largo plazo!</p>
+                     </div>
+                 </div>
+            </CardContent>
+        </Card>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl">🃏 Ejemplos Estratégicos Adicionales</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 space-y-3">
+                    <h4 className="font-semibold text-lg text-destructive flex items-center gap-2"><AlertTriangle/>Ejemplo 2: Proyecto de Color Débil y Reverse Implied Odds</h4>
+                    <p><strong>Tu Mano:</strong> <code className="bg-background/50 px-2 py-1 rounded-md">4♦ 5♦</code></p>
+                    <p><strong>Flop:</strong> <code className="bg-background/50 px-2 py-1 rounded-md">A♦ K♦ 9♣</code></p>
+                    <p>Tienes un proyecto de color bajo. Un rival muy agresivo apuesta fuerte.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div className="p-3 bg-background/30 rounded-md">
+                            <p className="font-semibold mb-2">Análisis del Problema:</p>
+                            <p className="text-sm">En teoría, tienes 9 outs para tu color (~36% equity). Si las pot odds son del 25%, parecería un call claro. <strong>Pero aquí está la trampa.</strong></p>
+                        </div>
+                        <div className="p-3 bg-background/30 rounded-md">
+                            <p className="font-semibold mb-2">El Peligro de los Outs "Sucios":</p>
+                            <p className="text-sm">El rango del rival agresivo contiene muchos diamantes mejores que los tuyos (ej. Q♦J♦, J♦T♦, A♣X♦). Si completas tu color con un diamante bajo (como 2♦), y el rival sigue apostando fuerte en el turn/river, es muy probable que tenga un color más alto.</p>
+                             <p className="text-sm mt-2">Si pagas y pierdes un bote enorme, sufres de <strong>"Reverse Implied Odds"</strong>. Tus "outs" están sucios porque, al conectar, te llevan a perder más dinero.</p>
+                        </div>
+                    </div>
+                     <div className="text-center pt-3">
+                        <Badge variant="destructive" className="text-lg py-2 px-4">Foldear es a menudo la jugada correcta</Badge>
+                        <p className="mt-2 font-semibold text-lg">❌ Contra mucha agresión y con proyectos dominados, pagar es una receta para el desastre (-EV).</p>
+                     </div>
+                 </div>
+                 
+                 <div className="rounded-lg border border-secondary p-4 space-y-3">
+                    <h4 className="font-semibold text-lg">Ejemplo 3: "Set Mining" con un Par Pequeño</h4>
+                    <p><strong>Tu Mano:</strong> <code className="bg-muted px-2 py-1 rounded-md">2♥ 2♠</code></p>
+                    <p><strong>Situación:</strong> Un rival sube pre-flop. Tú estás en posición y tienes que decidir si pagar.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div className="p-3 bg-background/50 rounded-md">
+                            <p className="font-semibold mb-2">Análisis de Pot Odds Directas:</p>
+                            <p className="text-sm">Tienes solo <strong>2 outs</strong> para ligar tu trío (set) en el flop. La probabilidad es de solo ~12%. Es casi imposible que las pot odds pre-flop justifiquen el call.</p>
+                        </div>
+                        <div className="p-3 bg-background/50 rounded-md">
+                            <p className="font-semibold mb-2">El Poder de las Implied Odds:</p>
+                            <p className="text-sm">Aquí no juegas por la equity inmediata, sino por las <strong>ganancias futuras potenciales</strong>. Si conectas tu trío en el flop, tu mano está muy oculta. El rival, que probablemente tiene cartas altas (AA, AK, KQ), a menudo pagará grandes apuestas en flop, turn y river.</p>
+                             <p className="text-sm mt-2">La regla general es la "Regla del 5/10": solo es rentable pagar si tanto tú como tu rival tenéis stacks efectivos de al menos 10-15 veces la cantidad que tienes que pagar. Esto asegura que, si conectas, ganarás lo suficiente para compensar todas las veces que no lo hagas.</p>
+                        </div>
+                    </div>
+                     <div className="text-center pt-3">
+                        <Badge variant="secondary" className="text-lg py-2 px-4">Decisión basada en Implied Odds, no en Pot Odds</Badge>
+                        <p className="mt-2 font-semibold text-lg">✅ Pagar es correcto si los stacks son profundos; es un fold claro si son cortos.</p>
                      </div>
                  </div>
             </CardContent>
@@ -310,5 +360,3 @@ export default function EquityConceptPage() {
     </div>
   );
 }
-
-    
