@@ -360,3 +360,5 @@ export default function EquityConceptPage() {
     </div>
   );
 }
+
+    
