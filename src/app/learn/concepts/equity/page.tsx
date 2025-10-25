@@ -307,34 +307,55 @@ export default function EquityConceptPage() {
                 <CardTitle className="font-headline text-2xl">🎯 Conceptos Avanzados: La Equity en el Mundo Real</CardTitle>
                 <CardDescription>La equity no es solo tu probabilidad de ganar si todas las cartas se ven. Hay dos conceptos clave que modifican su valor: la Fold Equity (tu espada) y la Realización de Equity (tu escudo).</CardDescription>
             </CardHeader>
-            <CardContent className="grid md:grid-cols-2 gap-6">
+            <CardContent className="grid md:grid-cols-1 gap-6">
                  <div className="p-6 rounded-lg border-2 border-dashed border-red-500/30 bg-red-900/10 space-y-4">
                     <div className="flex items-center gap-3">
                         <Sword className="h-8 w-8 text-red-400" />
                         <h3 className="font-headline text-2xl text-red-400">Fold Equity: Ganar sin Enseñar las Cartas</h3>
                     </div>
                     <p className="text-red-200/80">
-                        La Fold Equity es la porción de "equity" que ganas cuando tu rival se retira (foldea) ante tu apuesta. Es el motor que hace rentables los faroles (bluffs) y semi-faroles. Si solo apuestas cuando tienes la mejor mano, eres predecible y fácil de explotar.
+                        La mayoría de las manos de póker (más del 70-80%) no llegan al showdown. La Fold Equity es el arte y la ciencia de ganar el bote ahora mismo, sin necesidad de tener la mejor mano al final. Cuando tienes Fold Equity, dejas de ser un jugador pasivo que depende de "ligar" buenas cartas y te conviertes en un jugador agresivo que fuerza al oponente a tomar decisiones difíciles.
                     </p>
+                    
+                    <h4 className="font-semibold text-lg text-red-300 pt-2">El Poder del Semi-Farol: Tu "Plan B"</h4>
                     <p className="text-sm text-red-200/90">
-                        Un <strong className="text-red-300">semi-farol</strong> es la jugada más poderosa que utiliza la Fold Equity. Ocurre cuando apuestas con una mano que no es la mejor AHORA, pero que tiene potencial de mejorar (un proyecto). Esto te da dos formas de ganar:
+                        Un farol puro (apostar con 0% de equity, como con 7♦ 2♣ en un flop K♠ J♥ 5♣) solo tiene una forma de ganar: que el rival se retire. Si te pagan, estás "muerto". Un semi-farol te da dos formas de ganar.
                     </p>
-                    <ul className="list-decimal list-inside space-y-2 text-sm text-red-200/90">
-                        <li>El rival foldea y te llevas el bote inmediatamente (gracias a la <strong className="text-red-300">Fold Equity</strong>).</li>
-                        <li>El rival paga, pero tú completas tu proyecto en el turn o river y ganas un bote más grande (gracias a tu <strong className="text-red-300">Equity</strong>).</li>
-                    </ul>
-                    <div className="p-4 bg-background/30 rounded-md text-sm mt-4 border border-red-400/20">
-                        <p className="font-bold text-base text-red-300 mb-2">Ejemplo de Semi-Farol:</p>
-                        <p><strong>Tu Mano:</strong> <code className="bg-background/50 px-1.5 py-0.5 rounded">T♥ 9♥</code> en el BTN.</p>
-                        <p><strong>Flop:</strong> <code className="bg-background/50 px-1.5 py-0.5 rounded">8♥ 7♦ 2♠</code>.</p>
-                        <p><strong>Acción:</strong> El rival (en MP) apuesta medio bote.</p>
-                        <p className="mt-3 font-semibold">Análisis de las opciones:</p>
+                    <div className="p-4 bg-background/30 rounded-md text-sm mt-2 border border-red-400/20">
+                        <p className="font-bold text-base text-red-300 mb-2">🃏 Ejemplo Práctico de Semi-Farol:</p>
+                        <p><strong>Tu Mano:</strong> <code className="bg-background/50 px-1.5 py-0.5 rounded">A♥ 5♥</code> (Proyecto de color Nut)</p>
+                        <p><strong>Flop:</strong> <code className="bg-background/50 px-1.5 py-0.5 rounded">K♥ 9♣ 2♥</code></p>
+                        <p><strong>Acción:</strong> Tu rival apuesta (una c-bet). Tú decides subir la apuesta (raise).</p>
+                        <p className="mt-3 font-semibold">¿Por qué este raise es tan poderoso?</p>
                         <ul className="list-disc list-inside space-y-1 mt-2">
-                            <li><strong className="text-red-200/80">Opción 1: Call (Pasiva):</strong> Tienes un proyecto de escalera abierta (8 outs ≈ 32% equity). Si las pot odds son buenas (ej. 25%), pagar es rentable. Ganas solo si ligas tu escalera.</li>
-                            <li className="mt-1"><strong className="text-red-300">Opción 2: Raise (Agresiva - Semi-Farol):</strong> Esta jugada es superior. Presionas al rango del rival. Es posible que foldee manos mejores, como un par de 99 o un proyecto más débil.</li>
+                            <li><strong className="text-red-300">Ganas con Fold Equity (Plan A):</strong> Tu rival puede tener una mano media (como A♣ 9♦ o T♦ T♠) o un farol fallido. Ante tu agresión, es muy probable que foldee. Ganas el bote inmediatamente.</li>
+                            <li className="mt-1"><strong className="text-red-300">Ganas con Equity Real (Plan B):</strong> El rival te paga (quizás con K♦ Q♦ - un Top Pair). ¡No hay problema! Todavía tienes 9 outs (cualquier ♥) para completar tu color y ganar un bote mucho más grande en el turn o river.</li>
                         </ul>
-                         <p className="mt-3 font-bold text-red-300">Al hacer 'raise', creas Fold Equity y ahora tienes DOS formas de ganar: el rival foldea o ligas tu escalera. Esto hace que tu jugada sea mucho más rentable (+EV).</p>
                     </div>
+
+                    <h4 className="font-semibold text-lg text-red-300 pt-2">¿Cuándo Tengo Alta Fold Equity?</h4>
+                     <p className="text-sm text-red-200/90">
+                        Tu trabajo como jugador es ser un "cazador de Fold Equity". Búscala en estas situaciones:
+                    </p>
+                    <ul className="list-none space-y-3 text-sm">
+                        <li><strong>A. La Textura del Board:</strong> En "Dry Boards" (Mesas Secas) o "Scary Boards" (Mesas de Miedo) como K-7-2, donde es difícil que el rival haya conectado. Tu Fold Equity es ALTA. Por el contrario, en "Wet Boards" (Mesas Húmedas) como J♥ T♥ 9♠, tu Fold Equity es BAJA.</li>
+                        <li><strong>B. Tu Posición:</strong> Tienes ALTA Fold Equity cuando estás "En Posición" (IP) porque tienes más información. Tienes BAJA Fold Equity "Fuera de Posición" (OOP) porque apuestas a ciegas.</li>
+                        <li><strong>C. El Rival y Tu Imagen:</strong> Tienes ALTA Fold Equity contra jugadores "Tight-Weak" (miedosos) o si tu imagen en la mesa es muy sólida. Tienes BAJA Fold Equity contra "Calling Stations" (que pagan todo) o si has estado faroleando mucho.</li>
+                    </ul>
+
+                     <h4 className="font-semibold text-lg text-red-300 pt-2">Fold Equity y el Tamaño de la Apuesta</h4>
+                     <p className="text-sm text-red-200/90">
+                        Tu objetivo es hacer que al rival le sea matemáticamente incorrecto pagar. Usas tu apuesta para arruinarle las Pot Odds.
+                    </p>
+                     <div className="p-4 bg-background/30 rounded-md text-sm mt-2 border border-red-400/20">
+                        <p className="font-bold text-base text-red-300 mb-2">Ejemplo de Bet Sizing:</p>
+                        <p>El bote es de $100. Crees que el rival tiene un proyecto de color (~36% equity para ligar en dos calles).</p>
+                        <ul className="list-disc list-inside space-y-1 mt-2">
+                            <li><strong className="text-red-200/80">Mala Apuesta ($25):</strong> El rival paga $25 para ganar $150. Le das odds de 5 a 1 (necesita ~17% equity). Su call es súper rentable. <strong className="text-red-300">Tu Fold Equity es baja.</strong></li>
+                            <li className="mt-1"><strong className="text-red-300">Buena Apuesta ($100):</strong> El rival paga $100 para ganar $300. Le das odds de 2 a 1 (necesita ~33% equity). Su call es, en el mejor caso, neutral. <strong className="text-red-300">Tu Fold Equity es mucho más alta.</strong></li>
+                        </ul>
+                    </div>
+
                 </div>
                  <div className="p-6 rounded-lg border-2 border-dashed border-sky-500/30 bg-sky-900/10 space-y-4">
                     <div className="flex items-center gap-3">
