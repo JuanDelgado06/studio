@@ -304,15 +304,14 @@ export default function EquityConceptPage() {
 
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline text-2xl">🎯 Conceptos Avanzados: La Equity en el Mundo Real</CardTitle>
-                <CardDescription>La equity no es solo tu probabilidad de ganar si todas las cartas se ven. Hay dos conceptos clave que modifican su valor: la Fold Equity (tu espada) y la Realización de Equity (tu escudo).</CardDescription>
+                <CardTitle className="font-headline text-2xl flex items-center gap-2">
+                    <Sword className="h-7 w-7 text-red-400" />
+                    Concepto Avanzado: Fold Equity (Tu Espada)
+                </CardTitle>
+                <CardDescription>La Fold Equity es tu principal herramienta ofensiva. Es el arte de ganar el bote sin tener la mejor mano.</CardDescription>
             </CardHeader>
-            <CardContent className="grid md:grid-cols-1 gap-6">
+            <CardContent className="space-y-6">
                 <div className="p-6 rounded-lg border-2 border-dashed border-red-500/30 bg-red-900/10 space-y-4">
-                    <div className="flex items-center gap-3">
-                        <Sword className="h-8 w-8 text-red-400" />
-                        <h3 className="font-headline text-2xl text-red-400">Fold Equity: Ganar sin Enseñar las Cartas</h3>
-                    </div>
                     <p className="text-red-200/80">
                         Tu instinto es correcto: la mayoría de las manos de póker (más del 70-80%) no llegan al showdown. La Fold Equity es el arte y la ciencia de ganar el bote ahora mismo, sin necesidad de tener la mejor mano al final. Cuando tienes Fold Equity, dejas de ser un jugador pasivo que depende de "ligar" buenas cartas y te conviertes en un jugador agresivo que fuerza al oponente a tomar decisiones difíciles.
                     </p>
@@ -356,23 +355,27 @@ export default function EquityConceptPage() {
                         </ul>
                     </div>
                 </div>
-
+            </CardContent>
+        </Card>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl flex items-center gap-2">
+                    <Shield className="h-7 w-7 text-sky-400" />
+                    Concepto Avanzado: Equity Realization (Tu Escudo)
+                </CardTitle>
+                <CardDescription>La Equity Realization es tu principal herramienta defensiva. Es el arte de llegar al showdown y "cobrar" tu equity.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
                 <div className="p-6 rounded-lg border-2 border-dashed border-sky-500/30 bg-sky-900/10 space-y-4">
-                    <div className="flex items-center gap-3">
-                        <Shield className="h-8 w-8 text-sky-400" />
-                        <h3 className="font-headline text-2xl text-sky-400">Equity Realization: No Todo lo que Brilla es Oro</h3>
-                    </div>
-                    <div>
-                        <p className="text-sky-200/80">
-                            La "Equity Realization" (Realización de Equity) mide qué porcentaje de tu equity "en papel" puedes esperar convertir en ganancias reales. No siempre podrás "cobrar" el 100% de tu equity.
-                        </p>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold text-lg text-sky-300 pt-2">El Concepto Clave: Jugabilidad</h4>
-                        <p className="text-sm text-sky-200/90">
-                            Ciertas manos "realizan" su equity mejor que otras.
-                        </p>
-                    </div>
+                    <p className="text-sky-200/80">
+                        La "Equity Realization" (Realización de Equity) mide qué porcentaje de tu equity "en papel" puedes esperar convertir en ganancias reales. No siempre podrás "cobrar" el 100% de tu equity.
+                    </p>
+                    
+                    <h4 className="font-semibold text-lg text-sky-300 pt-2">El Concepto Clave: Jugabilidad</h4>
+                    <p className="text-sm text-sky-200/90">
+                        Ciertas manos "realizan" su equity mejor que otras.
+                    </p>
                     <div className="p-4 bg-background/30 rounded-md text-sm mt-2 border border-sky-400/20">
                         <p className="font-bold text-base text-sky-300 mb-2">🃏 Ejemplo Práctico: 7♥6♥ vs. A♠2♦</p>
                         <p>Pre-flop, <code className="bg-background/50 px-1.5 py-0.5 rounded">A♠2♦</code> tiene más equity (~53%) contra una mano aleatoria que <code className="bg-background/50 px-1.5 py-0.5 rounded">7♥6♥</code> (~47%).</p>
@@ -382,12 +385,11 @@ export default function EquityConceptPage() {
                             <li className="mt-1"><strong className="text-sky-300">Evita la Dominación:</strong> Con A♠2♦, si en el flop aparece un As, a menudo te enfrentarás a un As con un "kicker" (carta de acompañamiento) mejor (AK, AQ, AJ). Estarás "dominado" y perderás muchas fichas. 7♥6♥ rara vez está dominada de la misma manera.</li>
                         </ul>
                     </div>
-                    <div>
-                        <h4 className="font-semibold text-lg text-sky-300 pt-2">Factores que Afectan tu Realización de Equity</h4>
-                        <p className="text-sm text-sky-200/90">
-                            Tu capacidad de llegar al showdown y ganar depende de:
-                        </p>
-                    </div>
+
+                    <h4 className="font-semibold text-lg text-sky-300 pt-2">Factores que Afectan tu Realización de Equity</h4>
+                    <p className="text-sm text-sky-200/90">
+                        Tu capacidad de llegar al showdown y ganar depende de:
+                    </p>
                     <ul className="list-none space-y-3 text-sm">
                         <li><strong>1. Posición (El Factor #1):</strong> Estar **en posición** (IP) es el factor más importante. Te permite controlar el bote, tomar la última decisión y ver si tu rival muestra debilidad. Realizas mucha más equity IP. Estar **fuera de posición** (OOP) es un desastre para la realización de equity, ya que te enfrentas a apuestas sin saber qué hará el rival.</li>
                         <li><strong>2. Iniciativa:</strong> Si fuiste el agresor pre-flop, es más fácil seguir apostando y realizar tu equity.</li>
@@ -395,8 +397,7 @@ export default function EquityConceptPage() {
                         <li><strong>4. Profundidad del Stack:</strong> Con stacks muy profundos, las manos especulativas (como suited connectors) realizan mejor su equity porque el premio potencial es enorme.</li>
                     </ul>
                 </div>
-
-                <div className="md:col-span-2 text-center p-4 bg-background/50 rounded-md">
+                <div className="text-center p-4 bg-background/50 rounded-md">
                     <p className="text-lg font-semibold font-headline">Un profesional del póker utiliza el GTO (Game Theory Optimal) para balancear estos dos conceptos. Sabe cuándo presionar con faroles (usando la Fold Equity) y cuándo protegerse y pagar (confiando en su Equity Realization).</p>
                 </div>
             </CardContent>
@@ -404,3 +405,5 @@ export default function EquityConceptPage() {
     </div>
   );
 }
+
+    
