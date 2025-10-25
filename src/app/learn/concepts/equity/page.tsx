@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, 'useState', useMemo } from 'react';
 import {
   Card,
   CardContent,
@@ -316,12 +316,6 @@ export default function EquityConceptPage() {
                     <p className="text-red-200/80">
                         La Fold Equity es la porción de "equity" que ganas cuando tu rival se retira (foldea) ante tu apuesta. Es el motor que hace rentables los faroles (bluffs) y semi-faroles. Si solo apuestas cuando tienes la mejor mano, eres predecible y fácil de explotar.
                     </p>
-                    <div className="p-3 bg-background/30 rounded-md text-sm">
-                        <p className="font-semibold text-foreground">Fórmula conceptual del EV de un Farol:</p>
-                        <code className="block text-center mt-2 font-mono text-sm bg-background/50 p-2 rounded">
-                            EV(bluff) = (Prob. de Fold del Rival * Bote) - (Prob. de Call del Rival * Tu Apuesta)
-                        </code>
-                    </div>
                     <p className="text-sm text-red-200/90">
                         Un <strong className="text-red-300">semi-farol</strong> es la jugada más poderosa que utiliza la Fold Equity. Ocurre cuando apuestas con una mano que no es la mejor AHORA, pero que tiene potencial de mejorar (un proyecto). Esto te da dos formas de ganar:
                     </p>
@@ -329,9 +323,18 @@ export default function EquityConceptPage() {
                         <li>El rival foldea y te llevas el bote inmediatamente (gracias a la <strong className="text-red-300">Fold Equity</strong>).</li>
                         <li>El rival paga, pero tú completas tu proyecto en el turn o river y ganas un bote más grande (gracias a tu <strong className="text-red-300">Equity</strong>).</li>
                     </ul>
-                     <p className="text-sm text-red-200/80 pt-2">
-                        <strong className="text-red-300">Factores que aumentan tu Fold Equity:</strong> tu imagen en la mesa (si eres 'tight'), un rival asustadizo, un board que parece peligroso para el rango del rival, y tener posición.
-                    </p>
+                    <div className="p-4 bg-background/30 rounded-md text-sm mt-4 border border-red-400/20">
+                        <p className="font-bold text-base text-red-300 mb-2">Ejemplo de Semi-Farol:</p>
+                        <p><strong>Tu Mano:</strong> <code className="bg-background/50 px-1.5 py-0.5 rounded">T♥ 9♥</code> en el BTN.</p>
+                        <p><strong>Flop:</strong> <code className="bg-background/50 px-1.5 py-0.5 rounded">8♥ 7♦ 2♠</code>.</p>
+                        <p><strong>Acción:</strong> El rival (en MP) apuesta medio bote.</p>
+                        <p className="mt-3 font-semibold">Análisis de las opciones:</p>
+                        <ul className="list-disc list-inside space-y-1 mt-2">
+                            <li><strong className="text-red-200/80">Opción 1: Call (Pasiva):</strong> Tienes un proyecto de escalera abierta (8 outs ≈ 32% equity). Si las pot odds son buenas (ej. 25%), pagar es rentable. Ganas solo si ligas tu escalera.</li>
+                            <li className="mt-1"><strong className="text-red-300">Opción 2: Raise (Agresiva - Semi-Farol):</strong> Esta jugada es superior. Presionas al rango del rival. Es posible que foldee manos mejores, como un par de 99 o un proyecto más débil.</li>
+                        </ul>
+                         <p className="mt-3 font-bold text-red-300">Al hacer 'raise', creas Fold Equity y ahora tienes DOS formas de ganar: el rival foldea o ligas tu escalera. Esto hace que tu jugada sea mucho más rentable (+EV).</p>
+                    </div>
                 </div>
                  <div className="p-6 rounded-lg border-2 border-dashed border-sky-500/30 bg-sky-900/10 space-y-4">
                     <div className="flex items-center gap-3">
@@ -360,5 +363,3 @@ export default function EquityConceptPage() {
     </div>
   );
 }
-
-    
